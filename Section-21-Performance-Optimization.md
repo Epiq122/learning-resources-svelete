@@ -619,32 +619,26 @@ generateResponsive();
 
 ```svelte
 <script lang="ts">
-  import { onMount } from 'svelte';
-  
-  let { items = [] }: { items: any[] } = $props();
-  
-  let containerHeight = $state(600);
-  let scrollTop = $state(0);
-  let itemHeight = 50;
-  
-  // Calculate visible range
-  $derived {
-    const startIndex = Math.floor(scrollTop / itemHeight);
-    const endIndex = Math.min(
-      startIndex + Math.ceil(containerHeight / itemHeight) + 1,
-      items.length
-    );
-    
-    visibleItems = items.slice(startIndex, endIndex);
-    offsetY = startIndex * itemHeight;
-  }
-  
-  let visibleItems = $state<any[]>([]);
-  let offsetY = $state(0);
-  
-  function handleScroll(e: Event) {
-    scrollTop = (e.target as HTMLElement).scrollTop;
-  }
+	import { onMount } from 'svelte';
+
+	let { items = [] }: { items: any[] } = $props();
+
+	let containerHeight = $state(600);
+	let scrollTop = $state(0);
+	let itemHeight = 50;
+
+	// Calculate visible range
+	let startIndex = $derived(Math.floor(scrollTop / itemHeight));
+	let endIndex = $derived(
+		Math.min(startIndex + Math.ceil(containerHeight / itemHeight) + 1, items.length)
+	);
+
+	let visibleItems = $derived(items.slice(startIndex, endIndex));
+	let offsetY = $derived(startIndex * itemHeight);
+
+	function handleScroll(e: Event) {
+		scrollTop = (e.target as HTMLElement).scrollTop;
+	}
 </script>
 
 <div class="virtual-list" style="height: {containerHeight}px" onscroll={handleScroll}>

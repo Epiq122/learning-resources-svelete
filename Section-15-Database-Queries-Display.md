@@ -177,10 +177,11 @@ Use layout data in your UI components.
 ```svelte
 <!-- src/routes/(app)/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	let sidebarOpen = $state(false);
 </script>
@@ -384,10 +385,11 @@ export const load: LayoutServerLoad = async ({ params, locals, parent }) => {
 ```svelte
 <!-- src/routes/(app)/workspaces/[slug]/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { page } from '$app/stores';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	let canEdit = $derived(['owner', 'admin'].includes(data.userRole));
 </script>

@@ -1157,8 +1157,8 @@ export function getLayerContext(): Konva.Layer {
 
 	const layer = getLayerContext();
 
-	// Export the rect so parent can access it
-	export let rect: Konva.Rect | undefined = $state(undefined);
+	// Bindable prop so parent can access the rect
+	let rect = $state<Konva.Rect | undefined>(undefined);
 
 	onMount(() => {
 		rect = new Konva.Rect({
@@ -1235,8 +1235,8 @@ export function getLayerContext(): Konva.Layer {
 
 **Key Concepts:**
 
-- Use `export let` to expose internal values
-- Parent can `bind:` to the exported value
+- Expose internal state for parent component access
+- Parent can interact with component internals when needed
 - Gives direct access to Konva node for advanced manipulation
 - Useful for animations, tweens, or imperative operations
 

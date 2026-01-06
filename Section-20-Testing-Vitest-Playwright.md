@@ -442,6 +442,8 @@ describe('apiClient', () => {
 
 ```svelte
 <script lang="ts">
+  import type { Snippet } from 'svelte';
+
   type Variant = 'primary' | 'secondary' | 'danger';
 
   let {
@@ -453,7 +455,7 @@ describe('apiClient', () => {
     variant?: Variant;
     disabled?: boolean;
     onclick?: () => void;
-    children: any;
+    children: Snippet;
   } = $props();
 </script>
 

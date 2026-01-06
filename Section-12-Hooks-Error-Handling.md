@@ -1083,9 +1083,10 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 ```svelte
 <!-- src/routes/(app)/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <div class="navbar bg-base-300">

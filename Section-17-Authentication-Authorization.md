@@ -18,30 +18,34 @@ By the end of this section, you will:
 ## Table of Contents
 
 - [Section 17: Authentication \& Authorization](#section-17-authentication--authorization)
-	- [📚 Learning Objectives](#-learning-objectives)
-	- [Table of Contents](#table-of-contents)
-	- [1. Installing \& Configuring Better Auth](#1-installing--configuring-better-auth)
-		- [Modern Auth for SvelteKit](#modern-auth-for-sveltekit)
-	- [2. Creating Sign In \& Register Routes](#2-creating-sign-in--register-routes)
-		- [Auth UI Components](#auth-ui-components)
-	- [3. The Register Action](#3-the-register-action)
-		- [User Registration Flow](#user-registration-flow)
-	- [4. Email Verification with Resend](#4-email-verification-with-resend)
-		- [Sending Verification Emails](#sending-verification-emails)
-	- [5. Populating Locals with Session](#5-populating-locals-with-session)
-		- [Making User Available Everywhere](#making-user-available-everywhere)
-	- [6. Login \& Logout Actions](#6-login--logout-actions)
-		- [Session Management](#session-management)
-	- [7. OAuth with GitHub](#7-oauth-with-github)
-		- [Social Authentication](#social-authentication)
-	- [8. Authorization Basics](#8-authorization-basics)
-		- [Protecting Routes](#protecting-routes)
-	- [9. Permission Management with CASL](#9-permission-management-with-casl)
-		- [Role-Based Access Control](#role-based-access-control)
-	- [10. Complete Example: Multi-Tenant Platform with Auth](#10-complete-example-multi-tenant-platform-with-auth)
-		- [Full Authentication \& Authorization System](#full-authentication--authorization-system)
-	- [📝 Key Takeaways](#-key-takeaways)
-	- [🚀 Next Steps](#-next-steps)
+  - [📚 Learning Objectives](#-learning-objectives)
+  - [Table of Contents](#table-of-contents)
+  - [1. Installing \& Configuring Better Auth](#1-installing--configuring-better-auth)
+    - [Modern Auth for SvelteKit](#modern-auth-for-sveltekit)
+  - [2. Creating Sign In \& Register Routes](#2-creating-sign-in--register-routes)
+    - [Auth UI Components](#auth-ui-components)
+  - [3. The Register Action](#3-the-register-action)
+    - [User Registration Flow](#user-registration-flow)
+  - [4. Email Verification with Resend](#4-email-verification-with-resend)
+    - [Sending Verification Emails](#sending-verification-emails)
+  - [5. Populating Locals with Session](#5-populating-locals-with-session)
+    - [Making User Available Everywhere](#making-user-available-everywhere)
+  - [6. Login \& Logout Actions](#6-login--logout-actions)
+    - [Session Management](#session-management)
+  - [7. OAuth with GitHub](#7-oauth-with-github)
+    - [Social Authentication](#social-authentication)
+  - [8. Authorization Basics](#8-authorization-basics)
+    - [Protecting Routes](#protecting-routes)
+  - [9. Permission Management with CASL](#9-permission-management-with-casl)
+    - [Role-Based Access Control](#role-based-access-control)
+  - [10. Complete Example: Multi-Tenant Platform with Auth](#10-complete-example-multi-tenant-platform-with-auth)
+    - [Full Authentication \& Authorization System](#full-authentication--authorization-system)
+    - [Protected Workspace Layout](#protected-workspace-layout)
+    - [Protected Workspace Settings](#protected-workspace-settings)
+    - [Protected Page Actions](#protected-page-actions)
+    - [Conditional UI Based on Permissions](#conditional-ui-based-on-permissions)
+  - [📝 Key Takeaways](#-key-takeaways)
+  - [🚀 Next Steps](#-next-steps)
 
 ---
 
@@ -326,9 +330,7 @@ Build clean authentication forms.
 						required
 					/>
 					<label class="label">
-						<a href="/forgot-password" class="label-text-alt link link-hover">
-							Forgot password?
-						</a>
+						<a href="/forgot-password" class="label-text-alt link link-hover"> Forgot password? </a>
 					</label>
 				</div>
 
@@ -499,12 +501,7 @@ export const load: PageServerLoad = async ({ url }) => {
 	const [verificationToken] = await db
 		.select()
 		.from(verificationTokens)
-		.where(
-			and(
-				eq(verificationTokens.token, token),
-				gt(verificationTokens.expires, new Date())
-			)
-		)
+		.where(and(eq(verificationTokens.token, token), gt(verificationTokens.expires, new Date())))
 		.limit(1);
 
 	if (!verificationToken) {
@@ -938,6 +935,7 @@ export async function checkPageAccess(
 Let's build a complete authenticated multi-tenant workspace platform!
 
 **Features:**
+
 - ✅ Email/password registration with verification
 - ✅ GitHub OAuth
 - ✅ Session management
@@ -958,10 +956,7 @@ import { eq } from 'drizzle-orm';
 import type { LayoutServerLoad } from './$types';
 
 export const load: LayoutServerLoad = async (event) => {
-	const { workspace, membership, ability } = await checkWorkspaceAccess(
-		event,
-		event.params.slug
-	);
+	const { workspace, membership, ability } = await checkWorkspaceAccess(event, event.params.slug);
 
 	// Load workspace pages
 	const workspacePages = await db
@@ -996,11 +991,7 @@ import type { Actions, PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async (event) => {
 	// Require update permission
-	const { workspace, ability } = await checkWorkspaceAccess(
-		event,
-		event.params.slug,
-		'update'
-	);
+	const { workspace, ability } = await checkWorkspaceAccess(event, event.params.slug, 'update');
 
 	return {
 		workspace,
@@ -1100,9 +1091,10 @@ export const actions: Actions = {
 ```svelte
 <!-- src/routes/(app)/workspaces/[slug]/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <div class="workspace-layout">

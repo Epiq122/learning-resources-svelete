@@ -64,9 +64,10 @@ src/routes/
 ```svelte
 <!-- src/routes/blog/[slug]/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <div class="container mx-auto px-4 py-8">
@@ -855,10 +856,11 @@ export const load: LayoutLoad = async ({ params, fetch, depends }) => {
 ```svelte
 <!-- src/routes/tasks/[id]/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { invalidate } from '$app/navigation';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 
 	async function refresh() {
 		await invalidate('task:detail');

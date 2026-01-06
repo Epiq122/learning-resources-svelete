@@ -15,40 +15,40 @@ By the end of this section, you will:
 ## Table of Contents
 
 - [Section 1: Fundamentals \& Reactivity](#section-1-fundamentals--reactivity)
-	- [📚 Learning Objectives](#-learning-objectives)
-	- [Table of Contents](#table-of-contents)
-	- [1. What is Svelte?](#1-what-is-svelte)
-		- [What is Svelte?](#what-is-svelte)
-		- [Svelte Equivalent:](#svelte-equivalent)
-	- [3. Svelte vs SvelteKit](#3-svelte-vs-sveltekit)
-		- [What's the Difference?](#whats-the-difference)
-	- [4. Pure Functions](#4-pure-functions)
-		- [What are Pure Functions?](#what-are-pure-functions)
-		- [📁 Files to Create](#-files-to-create)
-	- [5. The Microtask Queue](#5-the-microtask-queue)
-		- [What is the Microtask Queue?](#what-is-the-microtask-queue)
-		- [📁 Files to Create](#-files-to-create-1)
-	- [6. Component Basics](#6-component-basics)
-		- [What are Svelte Components?](#what-are-svelte-components)
-		- [📁 Files to Create](#-files-to-create-2)
-		- [Usage:](#usage)
-	- [7. Adding Reactivity with $state](#7-adding-reactivity-with-state)
-		- [What is $state?](#what-is-state)
-		- [📁 Files to Create](#-files-to-create-3)
-	- [8. Signal-Based Reactivity Deep Dive](#8-signal-based-reactivity-deep-dive)
-		- [What are Signals?](#what-are-signals)
-		- [📁 Files to Create](#-files-to-create-4)
-	- [9. Derived State with $derived](#9-derived-state-with-derived)
-		- [What is $derived?](#what-is-derived)
-		- [📁 Files to Create](#-files-to-create-5)
-	- [10. Side Effects with $effect](#10-side-effects-with-effect)
-		- [What is $effect?](#what-is-effect)
-		- [📁 Files to Create](#-files-to-create-6)
-	- [11. Complete Counter Component](#11-complete-counter-component)
-		- [Building a Full-Featured Counter](#building-a-full-featured-counter)
-		- [📁 Files to Create](#-files-to-create-7)
-	- [📝 Key Takeaways](#-key-takeaways)
-	- [🚀 Next Steps](#-next-steps)
+  - [📚 Learning Objectives](#-learning-objectives)
+  - [Table of Contents](#table-of-contents)
+  - [1. What is Svelte?](#1-what-is-svelte)
+    - [What is Svelte?](#what-is-svelte)
+    - [Svelte Equivalent:](#svelte-equivalent)
+  - [3. Svelte vs SvelteKit](#3-svelte-vs-sveltekit)
+    - [What's the Difference?](#whats-the-difference)
+  - [4. Pure Functions](#4-pure-functions)
+    - [What are Pure Functions?](#what-are-pure-functions)
+    - [📁 Files to Create](#-files-to-create)
+  - [5. The Microtask Queue](#5-the-microtask-queue)
+    - [What is the Microtask Queue?](#what-is-the-microtask-queue)
+    - [📁 Files to Create](#-files-to-create-1)
+  - [6. Component Basics](#6-component-basics)
+    - [What are Svelte Components?](#what-are-svelte-components)
+    - [📁 Files to Create](#-files-to-create-2)
+    - [Usage:](#usage)
+  - [7. Adding Reactivity with $state](#7-adding-reactivity-with-state)
+    - [What is $state?](#what-is-state)
+    - [📁 Files to Create](#-files-to-create-3)
+  - [8. Signal-Based Reactivity Deep Dive](#8-signal-based-reactivity-deep-dive)
+    - [What are Signals?](#what-are-signals)
+    - [📁 Files to Create](#-files-to-create-4)
+  - [9. Derived State with $derived](#9-derived-state-with-derived)
+    - [What is $derived?](#what-is-derived)
+    - [📁 Files to Create](#-files-to-create-5)
+  - [10. Side Effects with $effect](#10-side-effects-with-effect)
+    - [What is $effect?](#what-is-effect)
+    - [📁 Files to Create](#-files-to-create-6)
+  - [11. Complete Counter Component](#11-complete-counter-component)
+    - [Building a Full-Featured Counter](#building-a-full-featured-counter)
+    - [📁 Files to Create](#-files-to-create-7)
+  - [📝 Key Takeaways](#-key-takeaways)
+  - [🚀 Next Steps](#-next-steps)
 
 ---
 
@@ -446,7 +446,9 @@ Create:
 	// This runs AFTER the DOM updates
 	$effect(() => {
 		// Read any state to track renders
-		(count, doubled, tripled);
+		count;
+		doubled;
+		tripled;
 		renderCount++;
 	});
 

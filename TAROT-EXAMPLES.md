@@ -175,7 +175,7 @@ export default AuthManager;
 ### Using Auth in Components
 
 ```svelte
-<script>
+<script lang="ts">
 	import AuthManager from '$lib/auth.svelte';
 
 	const auth = new AuthManager();
@@ -261,7 +261,7 @@ class AccessControl {
 ### Conditional Card Display
 
 ```svelte
-<script>
+<script lang="ts">
 	import AuthManager from '$lib/auth.svelte';
 	import AccessControl from '$lib/access-control';
 
@@ -380,7 +380,7 @@ class CardDatabase {
 ### Card Browser Component
 
 ```svelte
-<script>
+<script lang="ts">
 	import CardDatabase from '$lib/card-database.svelte';
 	import AuthManager from '$lib/auth.svelte';
 
@@ -532,7 +532,7 @@ class ReadingManager {
 ### Three-Card Reading Component
 
 ```svelte
-<script>
+<script lang="ts">
 	import ReadingManager from '$lib/reading-manager.svelte';
 	import AuthManager from '$lib/auth.svelte';
 	import AccessControl from '$lib/access-control';
@@ -652,7 +652,7 @@ class ReadingManager {
 ### Deck Selector Component
 
 ```svelte
-<script>
+<script lang="ts">
 	import CardDatabase from '$lib/card-database.svelte';
 
 	const cardDb = new CardDatabase(auth.user);
@@ -710,7 +710,7 @@ class ReadingManager {
 ### Full Reading Page
 
 ```svelte
-<script>
+<script lang="ts">
 	import AuthManager from '$lib/auth.svelte';
 	import CardDatabase from '$lib/card-database.svelte';
 	import ReadingManager from '$lib/reading-manager.svelte';
@@ -809,7 +809,7 @@ class ReadingManager {
 ### Card Detail Modal
 
 ```svelte
-<script>
+<script lang="ts">
 	import AccessControl from '$lib/access-control';
 
 	let { card, auth, onClose } = $props();
@@ -992,7 +992,7 @@ export default {
 **Usage in Any Component:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import session from '$lib/stores/session.svelte';
 </script>
 
@@ -1092,7 +1092,7 @@ export const readingHistory = new ReadingHistory();
 **Usage:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import { readingHistory } from '$lib/stores/reading-history.svelte';
 	import session from '$lib/stores/session.svelte';
 
@@ -1205,7 +1205,7 @@ export default {
 **Settings Page:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import settings from '$lib/stores/settings.svelte';
 </script>
 
@@ -1296,7 +1296,7 @@ export { getScrollY, getScrollPercent };
 **Usage - Scroll Progress Bar:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import { getScrollPercent } from '$lib/utils/scroll-tracker.svelte';
 
 	// Only subscribes to scroll events when this component is mounted
@@ -1363,7 +1363,7 @@ export { VALID_DECKS };
 **Usage:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import { selectedDeck, VALID_DECKS } from '$lib/stores/selected-deck.svelte';
 </script>
 
@@ -1446,7 +1446,7 @@ export const currentReading = new CurrentReading();
 **Usage:**
 
 ```svelte
-<script>
+<script lang="ts">
 	import { currentReading } from '$lib/stores/current-reading.svelte';
 	import { readingHistory } from '$lib/stores/reading-history.svelte';
 

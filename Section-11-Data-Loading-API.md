@@ -19,50 +19,63 @@ By the end of this section, you will:
 ## Table of Contents
 
 - [Section 11: Data Loading \& API Routes](#section-11-data-loading--api-routes)
-	- [📚 Learning Objectives](#-learning-objectives)
-	- [Table of Contents](#table-of-contents)
-	- [1. Load Functions Overview](#1-load-functions-overview)
-		- [What are Load Functions?](#what-are-load-functions)
-	- [2. Universal Load Functions](#2-universal-load-functions)
-		- [Running on Server and Client](#running-on-server-and-client)
-	- [3. Zero-Effort Type Safety with Generated Types](#3-zero-effort-type-safety-with-generated-types)
-		- [Automatic TypeScript Types](#automatic-typescript-types)
-	- [4. Server-Only Load Functions](#4-server-only-load-functions)
-		- [Secure Server-Side Data Loading](#secure-server-side-data-loading)
-	- [5. Layout Load Functions](#5-layout-load-functions)
-		- [Loading Data for Multiple Pages](#loading-data-for-multiple-pages)
-	- [6. Accessing Parent Data in Child Load Functions](#6-accessing-parent-data-in-child-load-functions)
-		- [Inheriting Parent Data](#inheriting-parent-data)
-	- [7. Passing Data From Pages to Layouts](#7-passing-data-from-pages-to-layouts)
-		- [Child-to-Parent Communication](#child-to-parent-communication)
-	- [8. Creating Endpoints](#8-creating-endpoints)
-		- [Building API Routes](#building-api-routes)
-	- [9. Handling POST Requests in Endpoints](#9-handling-post-requests-in-endpoints)
-		- [Processing Form Data](#processing-form-data)
-	- [10. Handling Pages \& Endpoints in the Same Route](#10-handling-pages--endpoints-in-the-same-route)
-		- [Co-locating UI and API](#co-locating-ui-and-api)
-	- [11. Sending Fetch Requests in Load Functions](#11-sending-fetch-requests-in-load-functions)
-		- [Fetching External APIs](#fetching-external-apis)
-	- [12. Implementing Pagination Using URL Search Params](#12-implementing-pagination-using-url-search-params)
-		- [URL-Based Pagination](#url-based-pagination)
-	- [13. Load More Pagination Pattern](#13-load-more-pagination-pattern)
-		- [Infinite Scroll Implementation](#infinite-scroll-implementation)
-	- [14. Running Requests in Parallel](#14-running-requests-in-parallel)
-		- [Promise.all for Performance](#promiseall-for-performance)
-	- [15. Streaming Data](#15-streaming-data)
-		- [Progressive Data Loading](#progressive-data-loading)
-	- [16. Navigation Loading Indicators](#16-navigation-loading-indicators)
-		- [Progress Bars with beforeNavigate](#progress-bars-with-beforenavigate)
-	- [17. Hooks Overview](#17-hooks-overview)
-		- [Server-Side Interceptors](#server-side-interceptors)
-	- [18. Handle Hook \& Authentication](#18-handle-hook--authentication)
-		- [Protecting Routes with Hooks](#protecting-routes-with-hooks)
-	- [19. Error Handling](#19-error-handling)
-		- [Expected and Unexpected Errors](#expected-and-unexpected-errors)
-	- [20. Complete Example: Blog Platform with Auth](#20-complete-example-blog-platform-with-auth)
-		- [Full-Stack Blog Application](#full-stack-blog-application)
-	- [📝 Key Takeaways](#-key-takeaways)
-	- [🚀 Next Steps](#-next-steps)
+  - [📚 Learning Objectives](#-learning-objectives)
+  - [Table of Contents](#table-of-contents)
+  - [1. Load Functions Overview](#1-load-functions-overview)
+    - [What are Load Functions?](#what-are-load-functions)
+  - [2. Universal Load Functions](#2-universal-load-functions)
+    - [Running on Server and Client](#running-on-server-and-client)
+  - [3. Zero-Effort Type Safety with Generated Types](#3-zero-effort-type-safety-with-generated-types)
+    - [Automatic TypeScript Types](#automatic-typescript-types)
+  - [4. Server-Only Load Functions](#4-server-only-load-functions)
+    - [Secure Server-Side Data Loading](#secure-server-side-data-loading)
+  - [5. Layout Load Functions](#5-layout-load-functions)
+    - [Loading Data for Multiple Pages](#loading-data-for-multiple-pages)
+  - [6. Accessing Parent Data in Child Load Functions](#6-accessing-parent-data-in-child-load-functions)
+    - [Inheriting Parent Data](#inheriting-parent-data)
+  - [7. Passing Data From Pages to Layouts](#7-passing-data-from-pages-to-layouts)
+    - [Child-to-Parent Communication](#child-to-parent-communication)
+  - [8. Creating Endpoints](#8-creating-endpoints)
+    - [Building API Routes](#building-api-routes)
+  - [9. Handling POST Requests in Endpoints](#9-handling-post-requests-in-endpoints)
+    - [Processing Form Data](#processing-form-data)
+  - [10. Handling Pages \& Endpoints in the Same Route](#10-handling-pages--endpoints-in-the-same-route)
+    - [Co-locating UI and API](#co-locating-ui-and-api)
+  - [11. Sending Fetch Requests in Load Functions](#11-sending-fetch-requests-in-load-functions)
+    - [Fetching External APIs](#fetching-external-apis)
+  - [12. Implementing Pagination Using URL Search Params](#12-implementing-pagination-using-url-search-params)
+    - [URL-Based Pagination](#url-based-pagination)
+  - [13. Load More Pagination Pattern](#13-load-more-pagination-pattern)
+    - [Infinite Scroll Implementation](#infinite-scroll-implementation)
+  - [14. Running Requests in Parallel](#14-running-requests-in-parallel)
+    - [Promise.all for Performance](#promiseall-for-performance)
+  - [15. Streaming Data](#15-streaming-data)
+    - [Progressive Data Loading](#progressive-data-loading)
+  - [16. Navigation Loading Indicators](#16-navigation-loading-indicators)
+    - [Progress Bars with beforeNavigate](#progress-bars-with-beforenavigate)
+  - [17. Hooks Overview](#17-hooks-overview)
+    - [Server-Side Interceptors](#server-side-interceptors)
+  - [18. Handle Hook \& Authentication](#18-handle-hook--authentication)
+    - [Protecting Routes with Hooks](#protecting-routes-with-hooks)
+  - [19. Error Handling](#19-error-handling)
+    - [Expected and Unexpected Errors](#expected-and-unexpected-errors)
+  - [20. Complete Example: Blog Platform with Auth](#20-complete-example-blog-platform-with-auth)
+    - [Full-Stack Blog Application](#full-stack-blog-application)
+    - [📁 Project Structure](#-project-structure)
+    - [Mock Database](#mock-database)
+    - [Auth Helpers](#auth-helpers)
+    - [Hooks](#hooks)
+    - [Type Definitions](#type-definitions)
+    - [Public Blog List](#public-blog-list)
+    - [Single Post Page](#single-post-page)
+    - [Login Page](#login-page)
+    - [Admin Dashboard](#admin-dashboard)
+    - [API Endpoints](#api-endpoints)
+    - [Components](#components)
+    - [Error Page](#error-page)
+    - [Navigation with Loading Bar](#navigation-with-loading-bar)
+  - [📝 Key Takeaways](#-key-takeaways)
+  - [🚀 Next Steps](#-next-steps)
 
 ---
 
@@ -136,6 +149,7 @@ export const load = async ({ fetch }) => {
 ```
 
 **When to use:**
+
 - ✅ Public API calls
 - ✅ Client-side navigation needs data
 - ✅ No secrets involved
@@ -164,7 +178,7 @@ export const load = async () => {
 	import type { PageData } from './$types'; // Auto-generated!
 
 	let { data }: { data: PageData } = $props();
-	
+
 	// Full autocomplete for data.title and data.posts!
 </script>
 ```
@@ -196,6 +210,7 @@ export const load = async ({ locals }) => {
 ```
 
 **When to use:**
+
 - ✅ Database queries
 - ✅ API calls with secrets
 - ✅ Server-side only operations
@@ -264,9 +279,9 @@ Use the `page` store to pass data up to layouts.
 <!-- src/routes/blog/[slug]/+page.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
-	
+
 	let { data } = $props();
-	
+
 	// Set page metadata
 	$effect(() => {
 		$page.data.meta = {
@@ -326,7 +341,7 @@ import { json } from '@sveltejs/kit';
 
 export const POST = async ({ request }) => {
 	const body = await request.json();
-	
+
 	// Save to database
 	const newPost = {
 		id: Date.now(),
@@ -372,7 +387,12 @@ src/routes/contact/
 	}
 </script>
 
-<form onsubmit={(e) => { e.preventDefault(); handleSubmit(); }}>
+<form
+	onsubmit={(e) => {
+		e.preventDefault();
+		handleSubmit();
+	}}
+>
 	<textarea bind:value={message} class="textarea textarea-bordered w-full"></textarea>
 	<button type="submit" class="btn btn-primary">Send</button>
 	{#if status}<p class="text-success">{status}</p>{/if}
@@ -385,7 +405,7 @@ import { json } from '@sveltejs/kit';
 
 export const POST = async ({ request }) => {
 	const { message } = await request.json();
-	
+
 	// Send email, save to DB, etc.
 	console.log('Received message:', message);
 
@@ -604,10 +624,12 @@ export const load = async () => {
 Hooks run on every request before route handlers.
 
 **Files:**
+
 - `src/hooks.server.ts` - Server hooks
 - `src/hooks.client.ts` - Client hooks (rare)
 
 **Use cases:**
+
 - Authentication checks
 - Logging
 - Adding headers
@@ -703,6 +725,7 @@ export const load = async ({ params }) => {
 Let's build a complete blog platform that demonstrates everything!
 
 **Features:**
+
 - ✅ Authentication with hooks
 - ✅ Protected admin routes
 - ✅ Public blog with pagination
@@ -801,9 +824,7 @@ let posts: Post[] = [
 	}
 ];
 
-let users: User[] = [
-	{ id: 1, email: 'admin@example.com', name: 'Admin User', role: 'admin' }
-];
+let users: User[] = [{ id: 1, email: 'admin@example.com', name: 'Admin User', role: 'admin' }];
 
 const sessions = new Map<string, number>(); // sessionId -> userId
 
@@ -892,7 +913,7 @@ export async function validateSession(sessionId: string | undefined) {
 export async function login(email: string, password: string) {
 	// In production: verify password hash
 	const user = await db.users.findUnique({ where: { email } });
-	
+
 	if (!user || password !== 'password123') {
 		return null;
 	}
@@ -1039,13 +1060,17 @@ export const load: PageLoad = async ({ params, fetch }) => {
 <div class="hero min-h-screen bg-base-200">
 	<div class="hero-content flex-col">
 		<div class="card w-full max-w-sm shadow-2xl bg-base-100">
-			<form method="POST" class="card-body" use:enhance={() => {
-				loading = true;
-				return async ({ update }) => {
-					await update();
-					loading = false;
-				};
-			}}>
+			<form
+				method="POST"
+				class="card-body"
+				use:enhance={() => {
+					loading = true;
+					return async ({ update }) => {
+						await update();
+						loading = false;
+					};
+				}}
+			>
 				<h2 class="card-title text-2xl justify-center mb-4">Login</h2>
 
 				<div class="form-control">
@@ -1139,9 +1164,10 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 ```svelte
 <!-- src/routes/(admin)/+layout.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import type { LayoutData } from './$types';
 
-	let { data, children }: { data: LayoutData; children: any } = $props();
+	let { data, children }: { data: LayoutData; children: Snippet } = $props();
 </script>
 
 <div class="drawer lg:drawer-open">
@@ -1296,7 +1322,11 @@ export const GET: RequestHandler = async ({ params }) => {
 ```svelte
 <!-- src/lib/components/Pagination.svelte -->
 <script lang="ts">
-	let { currentPage, totalPages, baseUrl }: { currentPage: number; totalPages: number; baseUrl: string } = $props();
+	let {
+		currentPage,
+		totalPages,
+		baseUrl
+	}: { currentPage: number; totalPages: number; baseUrl: string } = $props();
 </script>
 
 {#if totalPages > 1}

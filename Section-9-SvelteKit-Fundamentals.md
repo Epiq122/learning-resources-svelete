@@ -108,6 +108,8 @@ Let's create a production-ready SvelteKit app with modern tooling!
 
 **What it does:** Sets up a complete SvelteKit project with TypeScript, Tailwind 4, and DaisyUI.
 
+> 💡 **Learning Progression Note:** In Sections 1-8, you learned raw Tailwind CSS classes to understand how utility-first CSS works. Starting here in Section 9, we introduce DaisyUI - a component library built on Tailwind that provides pre-built, accessible UI components. This is how professional teams work: understanding the fundamentals (Tailwind) while leveraging productivity tools (DaisyUI) for faster development.
+
 ### 📁 Step-by-Step Setup
 
 **1. Create SvelteKit Project**

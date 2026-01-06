@@ -1,27 +1,717 @@
-# Tailwind CSS 4 Reference Guide
+# Tailwind CSS 4 + DaisyUI Reference Guide
 
 ## 📚 Complete Reference for All Classes Used in Svelte Study Guides
 
-This guide explains every Tailwind CSS 4 class used throughout the study materials. Use this as a quick reference while learning.
+This guide explains every Tailwind CSS 4 class and DaisyUI component used throughout the study materials. Use this as a quick reference while learning.
+
+### Learning Progression
+
+The study materials follow a deliberate progression:
+
+| Sections          | Styling Approach   | Purpose                                    |
+| ----------------- | ------------------ | ------------------------------------------ |
+| **1-8**           | Raw Tailwind CSS   | Learn utility-first CSS fundamentals       |
+| **9-21**          | Tailwind + DaisyUI | Production patterns with component library |
+| **Final Project** | Tailwind + DaisyUI | Real-world SaaS application                |
+
+This progression teaches you to understand the fundamentals (Tailwind utilities) before leveraging productivity tools (DaisyUI components) - the same approach used by professional development teams.
 
 ---
 
 ## Table of Contents
 
-1. [Layout & Display](#layout--display)
-2. [Spacing (Padding & Margin)](#spacing-padding--margin)
-3. [Sizing (Width & Height)](#sizing-width--height)
-4. [Typography](#typography)
-5. [Colors & Backgrounds](#colors--backgrounds)
-6. [Borders & Radius](#borders--radius)
-7. [Flexbox](#flexbox)
-8. [Grid](#grid)
-9. [Effects & Filters](#effects--filters)
-10. [Transitions & Animations](#transitions--animations)
-11. [Interactivity](#interactivity)
-12. [Positioning](#positioning)
-13. [Responsive Design](#responsive-design)
-14. [States (hover, focus, etc.)](#states-hover-focus-etc)
+1. [DaisyUI Components](#daisyui-components)
+2. [Layout & Display](#layout--display)
+3. [Spacing (Padding & Margin)](#spacing-padding--margin)
+4. [Sizing (Width & Height)](#sizing-width--height)
+5. [Typography](#typography)
+6. [Colors & Backgrounds](#colors--backgrounds)
+7. [Borders & Radius](#borders--radius)
+8. [Flexbox](#flexbox)
+9. [Grid](#grid)
+10. [Effects & Filters](#effects--filters)
+11. [Transitions & Animations](#transitions--animations)
+12. [Interactivity](#interactivity)
+13. [Positioning](#positioning)
+14. [Responsive Design](#responsive-design)
+15. [States (hover, focus, etc.)](#states-hover-focus-etc)
+
+---
+
+## DaisyUI Components
+
+DaisyUI provides pre-built components on top of Tailwind CSS. These are CSS-only components (no JavaScript) that work perfectly with Svelte's reactivity.
+
+### Buttons
+
+```svelte
+<!-- Basic buttons -->
+<button class="btn">Default</button>
+<button class="btn btn-primary">Primary</button>
+<button class="btn btn-secondary">Secondary</button>
+<button class="btn btn-accent">Accent</button>
+<button class="btn btn-info">Info</button>
+<button class="btn btn-success">Success</button>
+<button class="btn btn-warning">Warning</button>
+<button class="btn btn-error">Error</button>
+
+<!-- Button sizes -->
+<button class="btn btn-lg">Large</button>
+<button class="btn btn-md">Medium (default)</button>
+<button class="btn btn-sm">Small</button>
+<button class="btn btn-xs">Extra Small</button>
+
+<!-- Button variants -->
+<button class="btn btn-outline btn-primary">Outline</button>
+<button class="btn btn-ghost">Ghost</button>
+<button class="btn btn-link">Link</button>
+<button class="btn btn-active">Active</button>
+<button class="btn btn-disabled">Disabled</button>
+
+<!-- Button shapes -->
+<button class="btn btn-circle">○</button>
+<button class="btn btn-square">□</button>
+<button class="btn btn-wide">Wide Button</button>
+<button class="btn btn-block">Full Width</button>
+
+<!-- Loading state (common in Svelte) -->
+<button class="btn btn-primary" disabled={loading}>
+  {#if loading}
+    <span class="loading loading-spinner loading-sm"></span>
+  {/if}
+  {loading ? 'Loading...' : 'Submit'}
+</button>
+```
+
+### Cards
+
+```svelte
+<!-- Basic card -->
+<div class="card bg-base-100 shadow-xl">
+  <figure>
+    <img src="/image.jpg" alt="Cover" />
+  </figure>
+  <div class="card-body">
+    <h2 class="card-title">Card Title</h2>
+    <p>Card description goes here.</p>
+    <div class="card-actions justify-end">
+      <button class="btn btn-primary">Action</button>
+    </div>
+  </div>
+</div>
+
+<!-- Card variants -->
+<div class="card card-compact"><!-- Smaller padding --></div>
+<div class="card card-bordered"><!-- With border --></div>
+<div class="card card-side"><!-- Horizontal layout --></div>
+<div class="card image-full"><!-- Image as background --></div>
+
+<!-- Glass effect card -->
+<div class="card glass">
+  <div class="card-body">
+    <h2 class="card-title">Glass Card</h2>
+  </div>
+</div>
+```
+
+### Forms & Inputs
+
+```svelte
+<!-- Text input -->
+<input type="text" class="input input-bordered w-full" placeholder="Type here" />
+
+<!-- Input variants -->
+<input class="input input-primary" />
+<input class="input input-secondary" />
+<input class="input input-accent" />
+<input class="input input-info" />
+<input class="input input-success" />
+<input class="input input-warning" />
+<input class="input input-error" />
+
+<!-- Input sizes -->
+<input class="input input-lg" />
+<input class="input input-md" />
+<input class="input input-sm" />
+<input class="input input-xs" />
+
+<!-- With label (form-control) -->
+<div class="form-control w-full">
+  <label class="label">
+    <span class="label-text">Email</span>
+    <span class="label-text-alt">Required</span>
+  </label>
+  <input type="email" class="input input-bordered" />
+  <label class="label">
+    <span class="label-text-alt text-error">Error message</span>
+  </label>
+</div>
+
+<!-- Textarea -->
+<textarea class="textarea textarea-bordered" placeholder="Message"></textarea>
+
+<!-- Select -->
+<select class="select select-bordered w-full">
+  <option disabled selected>Pick one</option>
+  <option>Option 1</option>
+  <option>Option 2</option>
+</select>
+
+<!-- Checkbox -->
+<div class="form-control">
+  <label class="label cursor-pointer">
+    <span class="label-text">Remember me</span>
+    <input type="checkbox" class="checkbox checkbox-primary" />
+  </label>
+</div>
+
+<!-- Toggle -->
+<input type="checkbox" class="toggle toggle-primary" />
+
+<!-- Radio -->
+<input type="radio" name="radio-group" class="radio radio-primary" />
+
+<!-- Range slider -->
+<input type="range" class="range range-primary" min="0" max="100" />
+
+<!-- Rating -->
+<div class="rating">
+  <input type="radio" name="rating" class="mask mask-star-2 bg-orange-400" />
+  <input type="radio" name="rating" class="mask mask-star-2 bg-orange-400" checked />
+  <input type="radio" name="rating" class="mask mask-star-2 bg-orange-400" />
+</div>
+
+<!-- File input -->
+<input type="file" class="file-input file-input-bordered w-full" />
+```
+
+### Modals
+
+```svelte
+<!-- Modal with checkbox toggle -->
+<label for="my-modal" class="btn">Open Modal</label>
+<input type="checkbox" id="my-modal" class="modal-toggle" />
+<div class="modal">
+  <div class="modal-box">
+    <h3 class="font-bold text-lg">Modal Title</h3>
+    <p class="py-4">Modal content goes here.</p>
+    <div class="modal-action">
+      <label for="my-modal" class="btn">Close</label>
+    </div>
+  </div>
+  <label class="modal-backdrop" for="my-modal"></label>
+</div>
+
+<!-- Modal with Svelte state (recommended) -->
+<script>
+  let isOpen = $state(false);
+</script>
+
+<button class="btn" onclick={() => isOpen = true}>Open Modal</button>
+
+{#if isOpen}
+  <div class="modal modal-open">
+    <div class="modal-box">
+      <button
+        class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+        onclick={() => isOpen = false}
+      >✕</button>
+      <h3 class="font-bold text-lg">Title</h3>
+      <p class="py-4">Content</p>
+      <div class="modal-action">
+        <button class="btn" onclick={() => isOpen = false}>Close</button>
+      </div>
+    </div>
+    <div class="modal-backdrop" onclick={() => isOpen = false}></div>
+  </div>
+{/if}
+```
+
+### Alerts
+
+```svelte
+<!-- Alert variants -->
+<div class="alert">
+  <span>Default alert message</span>
+</div>
+<div class="alert alert-info">
+  <span>Info alert message</span>
+</div>
+<div class="alert alert-success">
+  <span>Success alert message</span>
+</div>
+<div class="alert alert-warning">
+  <span>Warning alert message</span>
+</div>
+<div class="alert alert-error">
+  <span>Error alert message</span>
+</div>
+
+<!-- Alert with icon and action -->
+<div class="alert alert-success">
+  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+  </svg>
+  <span>Your purchase has been confirmed!</span>
+  <button class="btn btn-sm">View</button>
+</div>
+```
+
+### Badges
+
+```svelte
+<!-- Badge variants -->
+<span class="badge">default</span>
+<span class="badge badge-primary">primary</span>
+<span class="badge badge-secondary">secondary</span>
+<span class="badge badge-accent">accent</span>
+<span class="badge badge-info">info</span>
+<span class="badge badge-success">success</span>
+<span class="badge badge-warning">warning</span>
+<span class="badge badge-error">error</span>
+
+<!-- Badge sizes -->
+<span class="badge badge-lg">large</span>
+<span class="badge badge-md">medium</span>
+<span class="badge badge-sm">small</span>
+<span class="badge badge-xs">tiny</span>
+
+<!-- Outline badges -->
+<span class="badge badge-outline badge-primary">outline</span>
+
+<!-- Badge in button -->
+<button class="btn gap-2">
+  Inbox
+  <span class="badge badge-sm">+99</span>
+</button>
+```
+
+### Navigation
+
+```svelte
+<!-- Navbar -->
+<div class="navbar bg-base-100">
+  <div class="flex-1">
+    <a class="btn btn-ghost text-xl">daisyUI</a>
+  </div>
+  <div class="flex-none">
+    <ul class="menu menu-horizontal px-1">
+      <li><a>Link</a></li>
+      <li>
+        <details>
+          <summary>Parent</summary>
+          <ul class="bg-base-100 rounded-t-none p-2">
+            <li><a>Link 1</a></li>
+            <li><a>Link 2</a></li>
+          </ul>
+        </details>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<!-- Menu -->
+<ul class="menu bg-base-200 rounded-box w-56">
+  <li><a>Item 1</a></li>
+  <li><a>Item 2</a></li>
+  <li><a class="active">Active Item</a></li>
+  <li>
+    <details open>
+      <summary>Parent</summary>
+      <ul>
+        <li><a>Submenu 1</a></li>
+        <li><a>Submenu 2</a></li>
+      </ul>
+    </details>
+  </li>
+</ul>
+
+<!-- Tabs -->
+<div class="tabs tabs-boxed">
+  <a class="tab">Tab 1</a>
+  <a class="tab tab-active">Tab 2</a>
+  <a class="tab">Tab 3</a>
+</div>
+
+<!-- Breadcrumbs -->
+<div class="breadcrumbs text-sm">
+  <ul>
+    <li><a>Home</a></li>
+    <li><a>Documents</a></li>
+    <li>Current Page</li>
+  </ul>
+</div>
+
+<!-- Pagination -->
+<div class="join">
+  <button class="join-item btn">«</button>
+  <button class="join-item btn">Page 1</button>
+  <button class="join-item btn btn-active">Page 2</button>
+  <button class="join-item btn">Page 3</button>
+  <button class="join-item btn">»</button>
+</div>
+```
+
+### Loading States
+
+```svelte
+<!-- Loading spinners -->
+<span class="loading loading-spinner loading-xs"></span>
+<span class="loading loading-spinner loading-sm"></span>
+<span class="loading loading-spinner loading-md"></span>
+<span class="loading loading-spinner loading-lg"></span>
+
+<!-- Loading types -->
+<span class="loading loading-dots"></span>
+<span class="loading loading-ring"></span>
+<span class="loading loading-ball"></span>
+<span class="loading loading-bars"></span>
+<span class="loading loading-infinity"></span>
+
+<!-- Colored loading -->
+<span class="loading loading-spinner text-primary"></span>
+<span class="loading loading-spinner text-secondary"></span>
+<span class="loading loading-spinner text-accent"></span>
+
+<!-- Skeleton placeholders -->
+<div class="flex flex-col gap-4 w-52">
+  <div class="skeleton h-32 w-full"></div>
+  <div class="skeleton h-4 w-28"></div>
+  <div class="skeleton h-4 w-full"></div>
+  <div class="skeleton h-4 w-full"></div>
+</div>
+```
+
+### Tooltips & Dropdowns
+
+```svelte
+<!-- Tooltip -->
+<div class="tooltip" data-tip="Hello!">
+  <button class="btn">Hover me</button>
+</div>
+
+<!-- Tooltip positions -->
+<div class="tooltip tooltip-top" data-tip="Top">...</div>
+<div class="tooltip tooltip-bottom" data-tip="Bottom">...</div>
+<div class="tooltip tooltip-left" data-tip="Left">...</div>
+<div class="tooltip tooltip-right" data-tip="Right">...</div>
+
+<!-- Dropdown -->
+<div class="dropdown">
+  <div tabindex="0" role="button" class="btn m-1">Click</div>
+  <ul tabindex="0" class="dropdown-content menu bg-base-100 rounded-box z-[1] w-52 p-2 shadow">
+    <li><a>Item 1</a></li>
+    <li><a>Item 2</a></li>
+  </ul>
+</div>
+
+<!-- Dropdown positions -->
+<div class="dropdown dropdown-end">...</div>
+<div class="dropdown dropdown-top">...</div>
+<div class="dropdown dropdown-left">...</div>
+<div class="dropdown dropdown-right">...</div>
+```
+
+### Tables
+
+```svelte
+<div class="overflow-x-auto">
+  <table class="table">
+    <!-- head -->
+    <thead>
+      <tr>
+        <th></th>
+        <th>Name</th>
+        <th>Job</th>
+        <th>Company</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- row 1 -->
+      <tr>
+        <th>1</th>
+        <td>John Doe</td>
+        <td>Developer</td>
+        <td>Acme Inc</td>
+      </tr>
+      <!-- row 2 with hover -->
+      <tr class="hover">
+        <th>2</th>
+        <td>Jane Smith</td>
+        <td>Designer</td>
+        <td>Widget Co</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Table variants -->
+<table class="table table-zebra"><!-- Striped rows --></table>
+<table class="table table-pin-rows"><!-- Sticky header --></table>
+<table class="table table-pin-cols"><!-- Sticky first column --></table>
+<table class="table table-xs"><!-- Extra small --></table>
+<table class="table table-sm"><!-- Small --></table>
+<table class="table table-md"><!-- Medium --></table>
+<table class="table table-lg"><!-- Large --></table>
+```
+
+### Toast Notifications
+
+```svelte
+<!-- Toast positioning (use with Svelte transitions) -->
+<div class="toast toast-end">
+  <div class="alert alert-success">
+    <span>Message sent successfully.</span>
+  </div>
+</div>
+
+<!-- Multiple toasts -->
+<div class="toast toast-top toast-center">
+  <div class="alert alert-info">
+    <span>New mail arrived.</span>
+  </div>
+  <div class="alert alert-success">
+    <span>Message sent.</span>
+  </div>
+</div>
+
+<!-- Svelte toast pattern -->
+<script>
+  import { fly } from 'svelte/transition';
+
+  let toasts = $state([]);
+
+  function addToast(message, type = 'info') {
+    const id = Date.now();
+    toasts = [...toasts, { id, message, type }];
+    setTimeout(() => removeToast(id), 3000);
+  }
+
+  function removeToast(id) {
+    toasts = toasts.filter(t => t.id !== id);
+  }
+</script>
+
+<div class="toast toast-end">
+  {#each toasts as toast (toast.id)}
+    <div
+      class="alert alert-{toast.type}"
+      transition:fly={{ x: 300, duration: 300 }}
+    >
+      <span>{toast.message}</span>
+      <button class="btn btn-sm btn-ghost" onclick={() => removeToast(toast.id)}>✕</button>
+    </div>
+  {/each}
+</div>
+```
+
+### Progress & Stats
+
+```svelte
+<!-- Progress bars -->
+<progress class="progress w-56" value="0" max="100"></progress>
+<progress class="progress progress-primary w-56" value="25" max="100"></progress>
+<progress class="progress progress-secondary w-56" value="50" max="100"></progress>
+<progress class="progress progress-accent w-56" value="75" max="100"></progress>
+<progress class="progress progress-info w-56" value="100" max="100"></progress>
+
+<!-- Radial progress -->
+<div class="radial-progress" style="--value:70;">70%</div>
+<div class="radial-progress text-primary" style="--value:70; --size:12rem; --thickness:2px;">70%</div>
+
+<!-- Stats display -->
+<div class="stats shadow">
+  <div class="stat">
+    <div class="stat-figure text-primary">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="inline-block w-8 h-8 stroke-current">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+      </svg>
+    </div>
+    <div class="stat-title">Total Likes</div>
+    <div class="stat-value text-primary">25.6K</div>
+    <div class="stat-desc">21% more than last month</div>
+  </div>
+</div>
+```
+
+### Collapse & Accordion
+
+```svelte
+<!-- Single collapse -->
+<div class="collapse collapse-arrow bg-base-200">
+  <input type="checkbox" />
+  <div class="collapse-title text-xl font-medium">Click to open</div>
+  <div class="collapse-content">
+    <p>Hidden content here</p>
+  </div>
+</div>
+
+<!-- Accordion (radio for single open) -->
+<div class="join join-vertical w-full">
+  <div class="collapse collapse-arrow join-item border border-base-300">
+    <input type="radio" name="accordion" checked />
+    <div class="collapse-title text-xl font-medium">Item 1</div>
+    <div class="collapse-content">
+      <p>Content for item 1</p>
+    </div>
+  </div>
+  <div class="collapse collapse-arrow join-item border border-base-300">
+    <input type="radio" name="accordion" />
+    <div class="collapse-title text-xl font-medium">Item 2</div>
+    <div class="collapse-content">
+      <p>Content for item 2</p>
+    </div>
+  </div>
+</div>
+```
+
+### Avatars
+
+```svelte
+<!-- Basic avatar -->
+<div class="avatar">
+  <div class="w-24 rounded">
+    <img src="/avatar.jpg" alt="User" />
+  </div>
+</div>
+
+<!-- Avatar shapes -->
+<div class="avatar">
+  <div class="w-24 rounded-full"><!-- Circle --></div>
+</div>
+<div class="avatar">
+  <div class="w-24 rounded-xl"><!-- Rounded square --></div>
+</div>
+<div class="avatar">
+  <div class="w-24 mask mask-hexagon"><!-- Hexagon --></div>
+</div>
+
+<!-- Avatar with status -->
+<div class="avatar online">
+  <div class="w-24 rounded-full">
+    <img src="/avatar.jpg" />
+  </div>
+</div>
+<div class="avatar offline">...</div>
+
+<!-- Avatar placeholder -->
+<div class="avatar placeholder">
+  <div class="bg-neutral text-neutral-content w-24 rounded-full">
+    <span class="text-3xl">JD</span>
+  </div>
+</div>
+
+<!-- Avatar group -->
+<div class="avatar-group -space-x-6 rtl:space-x-reverse">
+  <div class="avatar">
+    <div class="w-12">
+      <img src="/avatar1.jpg" />
+    </div>
+  </div>
+  <div class="avatar">
+    <div class="w-12">
+      <img src="/avatar2.jpg" />
+    </div>
+  </div>
+  <div class="avatar placeholder">
+    <div class="bg-neutral text-neutral-content w-12">
+      <span>+99</span>
+    </div>
+  </div>
+</div>
+```
+
+### Themes
+
+DaisyUI supports multiple themes. Configure in `tailwind.config.js`:
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: [
+      "light",
+      "dark",
+      "cupcake",
+      "emerald",
+      "corporate",
+      "synthwave",
+      "retro",
+      "cyberpunk",
+      "valentine",
+      "halloween",
+      "garden",
+      "forest",
+      "aqua",
+      "lofi",
+      "pastel",
+      "fantasy",
+      "wireframe",
+      "black",
+      "luxury",
+      "dracula",
+      "cmyk",
+      "autumn",
+      "business",
+      "acid",
+      "lemonade",
+      "night",
+      "coffee",
+      "winter",
+      "dim",
+      "nord",
+      "sunset",
+    ],
+  },
+};
+```
+
+Apply theme in HTML:
+
+```svelte
+<!-- In app.html or layout -->
+<html data-theme="dark">
+
+<!-- Theme switcher in Svelte -->
+<script>
+  let theme = $state('dark');
+
+  $effect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  });
+</script>
+
+<select class="select select-bordered" bind:value={theme}>
+  <option value="light">Light</option>
+  <option value="dark">Dark</option>
+  <option value="cupcake">Cupcake</option>
+  <option value="synthwave">Synthwave</option>
+</select>
+```
+
+### DaisyUI Best Practices
+
+1. **Use semantic colors**: `btn-primary`, `btn-error` instead of `bg-blue-500`
+2. **Responsive components**: DaisyUI components work with Tailwind breakpoints
+3. **Combine with Tailwind**: Add custom Tailwind utilities alongside DaisyUI
+4. **Keep state in Svelte**: Use `$state()` instead of DaisyUI's checkbox toggles when possible
+5. **Accessibility**: DaisyUI components have good defaults, but verify ARIA labels
+6. **Theme consistency**: Stick to one or two themes per project
+
+```svelte
+<!-- ✅ Good: Semantic colors + Svelte state -->
+<button
+  class="btn btn-primary"
+  disabled={loading}
+  onclick={handleSubmit}
+>
+  {loading ? 'Saving...' : 'Save'}
+</button>
+
+<!-- ❌ Avoid: Raw colors + DaisyUI toggle for state -->
+<button class="bg-blue-500 text-white px-4 py-2">Save</button>
+```
 
 ---
 
@@ -573,11 +1263,11 @@ Apply classes only at specific screen sizes:
 ```html
 <!-- Grid: 1 column mobile, 2 on medium, 3 on large -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-	<!-- Hide on mobile, show on medium+ -->
-	<div class="hidden md:block">
-		<!-- Full width mobile, 50% on large -->
-		<div class="w-full lg:w-1/2"></div>
-	</div>
+  <!-- Hide on mobile, show on medium+ -->
+  <div class="hidden md:block">
+    <!-- Full width mobile, 50% on large -->
+    <div class="w-full lg:w-1/2"></div>
+  </div>
 </div>
 ```
 
@@ -623,7 +1313,7 @@ Parent-child hover interaction:
 
 ```html
 <div class="group">
-	<p class="group-hover:text-blue-400">Appears blue on parent hover</p>
+  <p class="group-hover:text-blue-400">Appears blue on parent hover</p>
 </div>
 ```
 
@@ -650,7 +1340,7 @@ Apply when child is focused:
 
 ```html
 <div class="bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded-xl p-6">
-	<!-- Card content -->
+  <!-- Card content -->
 </div>
 ```
 
@@ -658,11 +1348,11 @@ Apply when child is focused:
 
 ```html
 <button
-	class="bg-blue-400 text-black font-bold px-6 py-3 rounded-lg 
+  class="bg-blue-400 text-black font-bold px-6 py-3 rounded-lg 
                hover:bg-blue-300 transition-all duration-200 
                hover:-translate-y-0.5 cursor-pointer"
 >
-	Click me
+  Click me
 </button>
 ```
 
@@ -670,7 +1360,7 @@ Apply when child is focused:
 
 ```html
 <input
-	class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] 
+  class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] 
               text-white px-4 py-3 rounded-lg text-base 
               focus:outline-none focus:border-blue-400"
 />
@@ -680,7 +1370,7 @@ Apply when child is focused:
 
 ```html
 <div class="flex items-center justify-center gap-4">
-	<!-- Items -->
+  <!-- Items -->
 </div>
 ```
 
@@ -688,7 +1378,7 @@ Apply when child is focused:
 
 ```html
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-	<!-- Grid items -->
+  <!-- Grid items -->
 </div>
 ```
 
@@ -696,7 +1386,7 @@ Apply when child is focused:
 
 ```html
 <div class="max-w-6xl mx-auto px-5">
-	<!-- Content -->
+  <!-- Content -->
 </div>
 ```
 
@@ -748,22 +1438,28 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Sticky top navigation -->
 <nav
-	class="fixed top-0 left-0 right-0 bg-[#1a1a1a] border-b border-[#3a3a3a] 
+  class="fixed top-0 left-0 right-0 bg-[#1a1a1a] border-b border-[#3a3a3a] 
             z-50 backdrop-blur-lg bg-opacity-90"
 >
-	<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-		<div class="flex items-center justify-between h-16">
-			<div class="flex items-center gap-8">
-				<h1 class="text-2xl font-bold text-[#4a9eff]">Logo</h1>
-				<div class="hidden md:flex gap-6">
-					<a href="#" class="text-[#ccc] hover:text-white transition-colors">Home</a>
-					<a href="#" class="text-[#ccc] hover:text-white transition-colors">About</a>
-					<a href="#" class="text-[#ccc] hover:text-white transition-colors">Contact</a>
-				</div>
-			</div>
-			<button class="md:hidden text-white">☰</button>
-		</div>
-	</div>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-16">
+      <div class="flex items-center gap-8">
+        <h1 class="text-2xl font-bold text-[#4a9eff]">Logo</h1>
+        <div class="hidden md:flex gap-6">
+          <a href="#" class="text-[#ccc] hover:text-white transition-colors"
+            >Home</a
+          >
+          <a href="#" class="text-[#ccc] hover:text-white transition-colors"
+            >About</a
+          >
+          <a href="#" class="text-[#ccc] hover:text-white transition-colors"
+            >Contact</a
+          >
+        </div>
+      </div>
+      <button class="md:hidden text-white">☰</button>
+    </div>
+  </div>
 </nav>
 ```
 
@@ -772,29 +1468,29 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Login form with error states -->
 <form class="w-full max-w-md mx-auto space-y-4">
-	<div>
-		<label class="block text-sm font-medium text-[#ccc] mb-2">Email</label>
-		<input
-			type="email"
-			class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white 
+  <div>
+    <label class="block text-sm font-medium text-[#ccc] mb-2">Email</label>
+    <input
+      type="email"
+      class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white 
              px-4 py-3 rounded-lg focus:outline-none focus:border-[#4a9eff]
              placeholder:text-[#888]"
-			class:border-[#ff6b6b]="{hasError}"
-			placeholder="you@example.com"
-		/>
-		{#if hasError}
-		<p class="text-[#ff6b6b] text-sm mt-1">Invalid email address</p>
-		{/if}
-	</div>
+      class:border-[#ff6b6b]="{hasError}"
+      placeholder="you@example.com"
+    />
+    {#if hasError}
+    <p class="text-[#ff6b6b] text-sm mt-1">Invalid email address</p>
+    {/if}
+  </div>
 
-	<button
-		type="submit"
-		class="w-full bg-[#4a9eff] text-black font-semibold py-3 rounded-lg
+  <button
+    type="submit"
+    class="w-full bg-[#4a9eff] text-black font-semibold py-3 rounded-lg
            hover:bg-[#6ab0ff] transition-all duration-200
            disabled:opacity-50 disabled:cursor-not-allowed"
-	>
-		Sign In
-	</button>
+  >
+    Sign In
+  </button>
 </form>
 ```
 
@@ -803,22 +1499,22 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Centered loading spinner -->
 <div class="flex items-center justify-center min-h-screen">
-	<div class="relative">
-		<div
-			class="w-16 h-16 border-4 border-[#3a3a3a] border-t-[#4a9eff] 
+  <div class="relative">
+    <div
+      class="w-16 h-16 border-4 border-[#3a3a3a] border-t-[#4a9eff] 
                 rounded-full animate-spin"
-		></div>
-		<p class="text-[#888] text-sm mt-4 text-center">Loading...</p>
-	</div>
+    ></div>
+    <p class="text-[#888] text-sm mt-4 text-center">Loading...</p>
+  </div>
 </div>
 
 <!-- Inline button spinner -->
 <button class="flex items-center gap-2 px-6 py-3 bg-[#4a9eff] rounded-lg">
-	<div
-		class="w-5 h-5 border-2 border-black border-t-transparent 
+  <div
+    class="w-5 h-5 border-2 border-black border-t-transparent 
               rounded-full animate-spin"
-	></div>
-	<span>Processing...</span>
+  ></div>
+  <span>Processing...</span>
 </button>
 ```
 
@@ -827,35 +1523,35 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Full-screen modal overlay -->
 <div
-	class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 
+  class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 
             flex items-center justify-center p-4"
 >
-	<div
-		class="bg-[#2a2a2a] rounded-xl max-w-md w-full p-6 
+  <div
+    class="bg-[#2a2a2a] rounded-xl max-w-md w-full p-6 
               shadow-2xl animate-[slideIn_0.3s_ease]"
-	>
-		<div class="flex items-center justify-between mb-4">
-			<h2 class="text-xl font-bold text-white">Confirm Action</h2>
-			<button class="text-[#888] hover:text-white transition-colors">✕</button>
-		</div>
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold text-white">Confirm Action</h2>
+      <button class="text-[#888] hover:text-white transition-colors">✕</button>
+    </div>
 
-		<p class="text-[#ccc] mb-6">Are you sure you want to proceed?</p>
+    <p class="text-[#ccc] mb-6">Are you sure you want to proceed?</p>
 
-		<div class="flex gap-3">
-			<button
-				class="flex-1 bg-[#3a3a3a] text-white py-2 rounded-lg
+    <div class="flex gap-3">
+      <button
+        class="flex-1 bg-[#3a3a3a] text-white py-2 rounded-lg
                      hover:bg-[#4a4a4a] transition-colors"
-			>
-				Cancel
-			</button>
-			<button
-				class="flex-1 bg-[#ff6b6b] text-white py-2 rounded-lg
+      >
+        Cancel
+      </button>
+      <button
+        class="flex-1 bg-[#ff6b6b] text-white py-2 rounded-lg
                      hover:bg-[#ff8787] transition-colors"
-			>
-				Confirm
-			</button>
-		</div>
-	</div>
+      >
+        Confirm
+      </button>
+    </div>
+  </div>
 </div>
 ```
 
@@ -864,18 +1560,18 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Top-right toast notification -->
 <div
-	class="fixed top-4 right-4 z-50 max-w-sm
+  class="fixed top-4 right-4 z-50 max-w-sm
             bg-[#2a2a2a] border-2 border-[#4ade80] rounded-lg p-4
             shadow-lg animate-[slideIn_0.3s_ease]"
 >
-	<div class="flex items-start gap-3">
-		<span class="text-2xl">✓</span>
-		<div class="flex-1">
-			<h3 class="font-semibold text-white mb-1">Success!</h3>
-			<p class="text-sm text-[#ccc]">Your changes have been saved.</p>
-		</div>
-		<button class="text-[#888] hover:text-white">✕</button>
-	</div>
+  <div class="flex items-start gap-3">
+    <span class="text-2xl">✓</span>
+    <div class="flex-1">
+      <h3 class="font-semibold text-white mb-1">Success!</h3>
+      <p class="text-sm text-[#ccc]">Your changes have been saved.</p>
+    </div>
+    <button class="text-[#888] hover:text-white">✕</button>
+  </div>
 </div>
 ```
 
@@ -884,30 +1580,34 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Responsive data table -->
 <div class="overflow-x-auto rounded-lg border border-[#3a3a3a]">
-	<table class="w-full">
-		<thead class="bg-[#2a2a2a] border-b border-[#3a3a3a]">
-			<tr>
-				<th class="text-left py-3 px-4 text-[#ccc] font-semibold">Name</th>
-				<th class="text-left py-3 px-4 text-[#ccc] font-semibold">Email</th>
-				<th class="text-left py-3 px-4 text-[#ccc] font-semibold">Status</th>
-				<th class="text-right py-3 px-4 text-[#ccc] font-semibold">Actions</th>
-			</tr>
-		</thead>
-		<tbody class="bg-[#1a1a1a]">
-			<tr class="border-b border-[#3a3a3a] hover:bg-[#2a2a2a] transition-colors">
-				<td class="py-3 px-4 text-white">John Doe</td>
-				<td class="py-3 px-4 text-[#888]">john@example.com</td>
-				<td class="py-3 px-4">
-					<span class="bg-[#4ade80] text-black px-2 py-1 rounded text-xs font-semibold">
-						Active
-					</span>
-				</td>
-				<td class="py-3 px-4 text-right">
-					<button class="text-[#4a9eff] hover:underline">Edit</button>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+  <table class="w-full">
+    <thead class="bg-[#2a2a2a] border-b border-[#3a3a3a]">
+      <tr>
+        <th class="text-left py-3 px-4 text-[#ccc] font-semibold">Name</th>
+        <th class="text-left py-3 px-4 text-[#ccc] font-semibold">Email</th>
+        <th class="text-left py-3 px-4 text-[#ccc] font-semibold">Status</th>
+        <th class="text-right py-3 px-4 text-[#ccc] font-semibold">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-[#1a1a1a]">
+      <tr
+        class="border-b border-[#3a3a3a] hover:bg-[#2a2a2a] transition-colors"
+      >
+        <td class="py-3 px-4 text-white">John Doe</td>
+        <td class="py-3 px-4 text-[#888]">john@example.com</td>
+        <td class="py-3 px-4">
+          <span
+            class="bg-[#4ade80] text-black px-2 py-1 rounded text-xs font-semibold"
+          >
+            Active
+          </span>
+        </td>
+        <td class="py-3 px-4 text-right">
+          <button class="text-[#4a9eff] hover:underline">Edit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
 </div>
 ```
 
@@ -916,42 +1616,42 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Dropdown with hover/focus states -->
 <div class="relative inline-block">
-	<button
-		class="flex items-center gap-2 px-4 py-2 bg-[#2a2a2a] 
+  <button
+    class="flex items-center gap-2 px-4 py-2 bg-[#2a2a2a] 
                  border border-[#3a3a3a] rounded-lg hover:bg-[#3a3a3a]"
-	>
-		<span>Options</span>
-		<span class="text-xs">▼</span>
-	</button>
+  >
+    <span>Options</span>
+    <span class="text-xs">▼</span>
+  </button>
 
-	<!-- Dropdown content -->
-	<div
-		class="absolute right-0 mt-2 w-48 bg-[#2a2a2a] border border-[#3a3a3a] 
+  <!-- Dropdown content -->
+  <div
+    class="absolute right-0 mt-2 w-48 bg-[#2a2a2a] border border-[#3a3a3a] 
               rounded-lg shadow-xl z-10 overflow-hidden"
-	>
-		<a
-			href="#"
-			class="block px-4 py-2 text-[#ccc] hover:bg-[#3a3a3a] 
+  >
+    <a
+      href="#"
+      class="block px-4 py-2 text-[#ccc] hover:bg-[#3a3a3a] 
                        hover:text-white transition-colors"
-		>
-			Edit Profile
-		</a>
-		<a
-			href="#"
-			class="block px-4 py-2 text-[#ccc] hover:bg-[#3a3a3a] 
+    >
+      Edit Profile
+    </a>
+    <a
+      href="#"
+      class="block px-4 py-2 text-[#ccc] hover:bg-[#3a3a3a] 
                        hover:text-white transition-colors"
-		>
-			Settings
-		</a>
-		<hr class="border-[#3a3a3a]" />
-		<a
-			href="#"
-			class="block px-4 py-2 text-[#ff6b6b] hover:bg-[#3a3a3a] 
+    >
+      Settings
+    </a>
+    <hr class="border-[#3a3a3a]" />
+    <a
+      href="#"
+      class="block px-4 py-2 text-[#ff6b6b] hover:bg-[#3a3a3a] 
                        transition-colors"
-		>
-			Sign Out
-		</a>
-	</div>
+    >
+      Sign Out
+    </a>
+  </div>
 </div>
 ```
 
@@ -960,16 +1660,20 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Horizontal tabs -->
 <div class="border-b border-[#3a3a3a]">
-	<div class="flex gap-1">
-		<button
-			class="px-4 py-2 text-[#4a9eff] border-b-2 border-[#4a9eff] 
+  <div class="flex gap-1">
+    <button
+      class="px-4 py-2 text-[#4a9eff] border-b-2 border-[#4a9eff] 
                    font-semibold"
-		>
-			Overview
-		</button>
-		<button class="px-4 py-2 text-[#888] hover:text-white transition-colors">Analytics</button>
-		<button class="px-4 py-2 text-[#888] hover:text-white transition-colors">Settings</button>
-	</div>
+    >
+      Overview
+    </button>
+    <button class="px-4 py-2 text-[#888] hover:text-white transition-colors">
+      Analytics
+    </button>
+    <button class="px-4 py-2 text-[#888] hover:text-white transition-colors">
+      Settings
+    </button>
+  </div>
 </div>
 ```
 
@@ -977,18 +1681,26 @@ Tailwind 4 allows arbitrary values with brackets:
 
 ```html
 <!-- Status badges -->
-<span class="bg-[#4ade80] text-black px-2 py-1 rounded text-xs font-semibold"> Success </span>
+<span class="bg-[#4ade80] text-black px-2 py-1 rounded text-xs font-semibold">
+  Success
+</span>
 
-<span class="bg-[#ffa500] text-black px-2 py-1 rounded text-xs font-semibold"> Pending </span>
+<span class="bg-[#ffa500] text-black px-2 py-1 rounded text-xs font-semibold">
+  Pending
+</span>
 
-<span class="bg-[#ff6b6b] text-white px-2 py-1 rounded text-xs font-semibold"> Error </span>
+<span class="bg-[#ff6b6b] text-white px-2 py-1 rounded text-xs font-semibold">
+  Error
+</span>
 
-<span class="bg-[#4a9eff] text-black px-2 py-1 rounded text-xs font-semibold"> Info </span>
+<span class="bg-[#4a9eff] text-black px-2 py-1 rounded text-xs font-semibold">
+  Info
+</span>
 
 <!-- Dot indicator -->
 <div class="flex items-center gap-2">
-	<span class="w-2 h-2 bg-[#4ade80] rounded-full"></span>
-	<span class="text-[#ccc]">Online</span>
+  <span class="w-2 h-2 bg-[#4ade80] rounded-full"></span>
+  <span class="text-[#ccc]">Online</span>
 </div>
 ```
 
@@ -996,28 +1708,41 @@ Tailwind 4 allows arbitrary values with brackets:
 
 ```html
 <!-- Single avatar -->
-<img src="/avatar.jpg" alt="User" class="w-10 h-10 rounded-full border-2 border-[#4a9eff]" />
+<img
+  src="/avatar.jpg"
+  alt="User"
+  class="w-10 h-10 rounded-full border-2 border-[#4a9eff]"
+/>
 
 <!-- Avatar with status -->
 <div class="relative inline-block">
-	<img src="/avatar.jpg" alt="User" class="w-12 h-12 rounded-full" />
-	<span
-		class="absolute bottom-0 right-0 w-3 h-3 bg-[#4ade80] 
+  <img src="/avatar.jpg" alt="User" class="w-12 h-12 rounded-full" />
+  <span
+    class="absolute bottom-0 right-0 w-3 h-3 bg-[#4ade80] 
                border-2 border-[#1a1a1a] rounded-full"
-	></span>
+  ></span>
 </div>
 
 <!-- Avatar stack -->
 <div class="flex -space-x-2">
-	<img src="/avatar1.jpg" class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]" />
-	<img src="/avatar2.jpg" class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]" />
-	<img src="/avatar3.jpg" class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]" />
-	<div
-		class="w-10 h-10 rounded-full bg-[#3a3a3a] border-2 border-[#1a1a1a]
+  <img
+    src="/avatar1.jpg"
+    class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]"
+  />
+  <img
+    src="/avatar2.jpg"
+    class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]"
+  />
+  <img
+    src="/avatar3.jpg"
+    class="w-10 h-10 rounded-full border-2 border-[#1a1a1a]"
+  />
+  <div
+    class="w-10 h-10 rounded-full bg-[#3a3a3a] border-2 border-[#1a1a1a]
               flex items-center justify-center text-xs text-[#ccc]"
-	>
-		+5
-	</div>
+  >
+    +5
+  </div>
 </div>
 ```
 
@@ -1026,25 +1751,25 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Content skeleton while loading -->
 <div class="space-y-4 animate-pulse">
-	<div class="h-4 bg-[#2a2a2a] rounded w-3/4"></div>
-	<div class="h-4 bg-[#2a2a2a] rounded"></div>
-	<div class="h-4 bg-[#2a2a2a] rounded w-5/6"></div>
-	<div class="h-32 bg-[#2a2a2a] rounded"></div>
+  <div class="h-4 bg-[#2a2a2a] rounded w-3/4"></div>
+  <div class="h-4 bg-[#2a2a2a] rounded"></div>
+  <div class="h-4 bg-[#2a2a2a] rounded w-5/6"></div>
+  <div class="h-32 bg-[#2a2a2a] rounded"></div>
 </div>
 
 <!-- Card skeleton -->
 <div class="bg-[#2a2a2a] rounded-lg p-6 animate-pulse">
-	<div class="flex items-center gap-4 mb-4">
-		<div class="w-12 h-12 bg-[#3a3a3a] rounded-full"></div>
-		<div class="flex-1 space-y-2">
-			<div class="h-4 bg-[#3a3a3a] rounded w-1/4"></div>
-			<div class="h-3 bg-[#3a3a3a] rounded w-1/3"></div>
-		</div>
-	</div>
-	<div class="space-y-2">
-		<div class="h-3 bg-[#3a3a3a] rounded"></div>
-		<div class="h-3 bg-[#3a3a3a] rounded w-5/6"></div>
-	</div>
+  <div class="flex items-center gap-4 mb-4">
+    <div class="w-12 h-12 bg-[#3a3a3a] rounded-full"></div>
+    <div class="flex-1 space-y-2">
+      <div class="h-4 bg-[#3a3a3a] rounded w-1/4"></div>
+      <div class="h-3 bg-[#3a3a3a] rounded w-1/3"></div>
+    </div>
+  </div>
+  <div class="space-y-2">
+    <div class="h-3 bg-[#3a3a3a] rounded"></div>
+    <div class="h-3 bg-[#3a3a3a] rounded w-5/6"></div>
+  </div>
 </div>
 ```
 
@@ -1053,20 +1778,22 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- No data empty state -->
 <div class="flex flex-col items-center justify-center py-16 text-center">
-	<div
-		class="w-20 h-20 bg-[#2a2a2a] rounded-full flex items-center 
+  <div
+    class="w-20 h-20 bg-[#2a2a2a] rounded-full flex items-center 
               justify-center text-4xl mb-4"
-	>
-		📭
-	</div>
-	<h3 class="text-xl font-semibold text-white mb-2">No items yet</h3>
-	<p class="text-[#888] mb-6 max-w-sm">Get started by creating your first item</p>
-	<button
-		class="bg-[#4a9eff] text-black px-6 py-3 rounded-lg font-semibold
+  >
+    📭
+  </div>
+  <h3 class="text-xl font-semibold text-white mb-2">No items yet</h3>
+  <p class="text-[#888] mb-6 max-w-sm">
+    Get started by creating your first item
+  </p>
+  <button
+    class="bg-[#4a9eff] text-black px-6 py-3 rounded-lg font-semibold
                  hover:bg-[#6ab0ff] transition-colors"
-	>
-		Create Item
-	</button>
+  >
+    Create Item
+  </button>
 </div>
 ```
 
@@ -1075,14 +1802,14 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Search input with icon -->
 <div class="relative max-w-md">
-	<input
-		type="search"
-		placeholder="Search..."
-		class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white 
+  <input
+    type="search"
+    placeholder="Search..."
+    class="w-full bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white 
            pl-10 pr-4 py-3 rounded-lg focus:outline-none focus:border-[#4a9eff]
            placeholder:text-[#888]"
-	/>
-	<span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#888]"> 🔍 </span>
+  />
+  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-[#888]"> 🔍 </span>
 </div>
 ```
 
@@ -1091,26 +1818,34 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Page navigation -->
 <div class="flex items-center justify-center gap-2">
-	<button
-		class="px-3 py-2 bg-[#2a2a2a] border border-[#3a3a3a] rounded
+  <button
+    class="px-3 py-2 bg-[#2a2a2a] border border-[#3a3a3a] rounded
                  hover:bg-[#3a3a3a] disabled:opacity-50"
-		disabled
-	>
-		←
-	</button>
+    disabled
+  >
+    ←
+  </button>
 
-	<button class="px-4 py-2 bg-[#4a9eff] text-black rounded font-semibold">1</button>
-	<button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">2</button>
-	<button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">3</button>
-	<span class="px-2 text-[#888]">...</span>
-	<button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">10</button>
+  <button class="px-4 py-2 bg-[#4a9eff] text-black rounded font-semibold">
+    1
+  </button>
+  <button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">
+    2
+  </button>
+  <button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">
+    3
+  </button>
+  <span class="px-2 text-[#888]">...</span>
+  <button class="px-4 py-2 bg-[#2a2a2a] text-white rounded hover:bg-[#3a3a3a]">
+    10
+  </button>
 
-	<button
-		class="px-3 py-2 bg-[#2a2a2a] border border-[#3a3a3a] rounded
+  <button
+    class="px-3 py-2 bg-[#2a2a2a] border border-[#3a3a3a] rounded
                  hover:bg-[#3a3a3a]"
-	>
-		→
-	</button>
+  >
+    →
+  </button>
 </div>
 ```
 
@@ -1119,44 +1854,44 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- App layout with sidebar -->
 <div class="flex h-screen">
-	<!-- Sidebar -->
-	<aside class="w-64 bg-[#1a1a1a] border-r border-[#3a3a3a] overflow-y-auto">
-		<div class="p-6">
-			<h2 class="text-xl font-bold text-white mb-6">Navigation</h2>
-			<nav class="space-y-2">
-				<a
-					href="#"
-					class="flex items-center gap-3 px-4 py-3 bg-[#2a2a2a] 
+  <!-- Sidebar -->
+  <aside class="w-64 bg-[#1a1a1a] border-r border-[#3a3a3a] overflow-y-auto">
+    <div class="p-6">
+      <h2 class="text-xl font-bold text-white mb-6">Navigation</h2>
+      <nav class="space-y-2">
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 bg-[#2a2a2a] 
                           text-[#4a9eff] rounded-lg"
-				>
-					<span>📊</span>
-					<span class="font-medium">Dashboard</span>
-				</a>
-				<a
-					href="#"
-					class="flex items-center gap-3 px-4 py-3 text-[#888] 
+        >
+          <span>📊</span>
+          <span class="font-medium">Dashboard</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 text-[#888] 
                           hover:bg-[#2a2a2a] hover:text-white rounded-lg transition-colors"
-				>
-					<span>📁</span>
-					<span>Projects</span>
-				</a>
-				<a
-					href="#"
-					class="flex items-center gap-3 px-4 py-3 text-[#888] 
+        >
+          <span>📁</span>
+          <span>Projects</span>
+        </a>
+        <a
+          href="#"
+          class="flex items-center gap-3 px-4 py-3 text-[#888] 
                           hover:bg-[#2a2a2a] hover:text-white rounded-lg transition-colors"
-				>
-					<span>⚙️</span>
-					<span>Settings</span>
-				</a>
-			</nav>
-		</div>
-	</aside>
+        >
+          <span>⚙️</span>
+          <span>Settings</span>
+        </a>
+      </nav>
+    </div>
+  </aside>
 
-	<!-- Main content -->
-	<main class="flex-1 overflow-y-auto bg-[#0a0a0a] p-6">
-		<h1 class="text-3xl font-bold text-white mb-6">Page Content</h1>
-		<!-- Content here -->
-	</main>
+  <!-- Main content -->
+  <main class="flex-1 overflow-y-auto bg-[#0a0a0a] p-6">
+    <h1 class="text-3xl font-bold text-white mb-6">Page Content</h1>
+    <!-- Content here -->
+  </main>
 </div>
 ```
 
@@ -1165,36 +1900,36 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Landing page hero -->
 <section
-	class="min-h-screen flex items-center justify-center 
+  class="min-h-screen flex items-center justify-center 
                 bg-gradient-to-b from-[#1a1a1a] to-[#0a0a0a] px-4"
 >
-	<div class="max-w-4xl text-center">
-		<h1
-			class="text-5xl md:text-7xl font-bold text-white mb-6 
+  <div class="max-w-4xl text-center">
+    <h1
+      class="text-5xl md:text-7xl font-bold text-white mb-6 
                leading-tight"
-		>
-			Build Amazing Apps
-		</h1>
-		<p class="text-xl text-[#ccc] mb-8 max-w-2xl mx-auto">
-			The modern framework for creating fast, reactive web applications
-		</p>
-		<div class="flex flex-col sm:flex-row gap-4 justify-center">
-			<button
-				class="bg-[#4a9eff] text-black px-8 py-4 rounded-lg 
+    >
+      Build Amazing Apps
+    </h1>
+    <p class="text-xl text-[#ccc] mb-8 max-w-2xl mx-auto">
+      The modern framework for creating fast, reactive web applications
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <button
+        class="bg-[#4a9eff] text-black px-8 py-4 rounded-lg 
                      text-lg font-bold hover:bg-[#6ab0ff] transition-all
                      hover:-translate-y-1 shadow-lg"
-			>
-				Get Started
-			</button>
-			<button
-				class="bg-transparent border-2 border-[#4a9eff] text-[#4a9eff] 
+      >
+        Get Started
+      </button>
+      <button
+        class="bg-transparent border-2 border-[#4a9eff] text-[#4a9eff] 
                      px-8 py-4 rounded-lg text-lg font-bold 
                      hover:bg-[#4a9eff] hover:text-black transition-all"
-			>
-				Learn More
-			</button>
-		</div>
-	</div>
+      >
+        Learn More
+      </button>
+    </div>
+  </div>
 </section>
 ```
 
@@ -1203,11 +1938,13 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Navigation breadcrumb trail -->
 <nav class="flex items-center gap-2 text-sm">
-	<a href="#" class="text-[#888] hover:text-white transition-colors">Home</a>
-	<span class="text-[#666]">/</span>
-	<a href="#" class="text-[#888] hover:text-white transition-colors">Products</a>
-	<span class="text-[#666]">/</span>
-	<span class="text-white font-semibold">Electronics</span>
+  <a href="#" class="text-[#888] hover:text-white transition-colors">Home</a>
+  <span class="text-[#666]">/</span>
+  <a href="#" class="text-[#888] hover:text-white transition-colors"
+    >Products</a
+  >
+  <span class="text-[#666]">/</span>
+  <span class="text-white font-semibold">Electronics</span>
 </nav>
 ```
 
@@ -1216,21 +1953,21 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Loading progress bar -->
 <div class="w-full bg-[#2a2a2a] rounded-full h-2 overflow-hidden">
-	<div
-		class="bg-[#4a9eff] h-full rounded-full transition-all duration-300"
-		style="width: 65%"
-	></div>
+  <div
+    class="bg-[#4a9eff] h-full rounded-full transition-all duration-300"
+    style="width: 65%"
+  ></div>
 </div>
 
 <!-- With label -->
 <div>
-	<div class="flex justify-between text-sm text-[#ccc] mb-2">
-		<span>Upload Progress</span>
-		<span>65%</span>
-	</div>
-	<div class="w-full bg-[#2a2a2a] rounded-full h-2">
-		<div class="bg-[#4ade80] h-full rounded-full" style="width: 65%"></div>
-	</div>
+  <div class="flex justify-between text-sm text-[#ccc] mb-2">
+    <span>Upload Progress</span>
+    <span>65%</span>
+  </div>
+  <div class="w-full bg-[#2a2a2a] rounded-full h-2">
+    <div class="bg-[#4ade80] h-full rounded-full" style="width: 65%"></div>
+  </div>
 </div>
 ```
 
@@ -1239,16 +1976,16 @@ Tailwind 4 allows arbitrary values with brackets:
 ```html
 <!-- Collapsible accordion item -->
 <div class="border border-[#3a3a3a] rounded-lg overflow-hidden">
-	<button
-		class="w-full flex items-center justify-between px-6 py-4 
+  <button
+    class="w-full flex items-center justify-between px-6 py-4 
                  bg-[#2a2a2a] hover:bg-[#3a3a3a] transition-colors text-left"
-	>
-		<span class="font-semibold text-white">What is Svelte?</span>
-		<span class="text-[#888]">▼</span>
-	</button>
-	<div class="px-6 py-4 bg-[#1a1a1a] text-[#ccc] leading-relaxed">
-		Svelte is a radical new approach to building user interfaces...
-	</div>
+  >
+    <span class="font-semibold text-white">What is Svelte?</span>
+    <span class="text-[#888]">▼</span>
+  </button>
+  <div class="px-6 py-4 bg-[#1a1a1a] text-[#ccc] leading-relaxed">
+    Svelte is a radical new approach to building user interfaces...
+  </div>
 </div>
 ```
 

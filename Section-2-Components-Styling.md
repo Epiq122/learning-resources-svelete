@@ -659,12 +659,12 @@ Create:
 <!-- Button.svelte -->
 <script lang="ts">
 	import type { Snippet } from 'svelte';
+	import type { HTMLButtonAttributes } from 'svelte/elements';
 
-	interface Props {
+	interface Props extends HTMLButtonAttributes {
 		variant?: 'primary' | 'secondary' | 'danger';
 		size?: 'sm' | 'md' | 'lg';
 		children: Snippet;
-		[key: string]: any; // Accept any other attributes
 	}
 
 	let { variant = 'primary', size = 'md', children, ...restProps }: Props = $props();
@@ -766,7 +766,7 @@ Create:
 **Key Concepts:**
 
 - **Spread props**: `{...restProps}` forwards all unhandled props
-- **Type safety**: Use `[key: string]: any` for flexible props
+- **Type safety**: Extend `HTMLButtonAttributes` from `svelte/elements` for proper typing
 - **HTML attributes**: disabled, type, aria-_, data-_, etc. work automatically
 - **Component flexibility**: Don't need to explicitly define every possible attribute
 
@@ -1276,9 +1276,12 @@ Create:
 <script lang="ts">
 	import Modal from '$lib/components/Modal.svelte';
 
-	let modal1: any;
-	let modal2: any;
-	let modal3: any;
+	// Type the component refs with the exported methods
+	type ModalRef = { open: () => void; close: () => void; toggle: () => void };
+
+	let modal1: ModalRef;
+	let modal2: ModalRef;
+	let modal3: ModalRef;
 
 	let inputRef: HTMLInputElement;
 
@@ -1661,12 +1664,12 @@ src/lib/components/
 ```typescript
 // ❌ Bad - function not accessible
 function open() {
-	isOpen = true;
+  isOpen = true;
 }
 
 // ✅ Good - exported for external use
 export function open() {
-	isOpen = true;
+  isOpen = true;
 }
 ```
 

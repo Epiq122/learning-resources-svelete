@@ -72,11 +72,13 @@ By the end of this section, you will be able to:
 **Three Key Metrics (2026 Standards):**
 
 1. **Largest Contentful Paint (LCP)** - Loading performance
+
    - **Goal:** < 2.5 seconds
    - Measures: Time until largest content element renders
    - Impact: User perceived load time
 
 2. **Interaction to Next Paint (INP)** - Interactivity (replaced FID in 2024)
+
    - **Goal:** < 200ms
    - Measures: Responsiveness to user interactions
    - Impact: How quickly app responds to clicks/taps
@@ -158,13 +160,13 @@ lighthouse https://your-site.com --view
 
 ```javascript
 // Performance profiling in code
-performance.mark('start-operation');
+performance.mark("start-operation");
 // ... expensive operation ...
-performance.mark('end-operation');
-performance.measure('operation', 'start-operation', 'end-operation');
+performance.mark("end-operation");
+performance.measure("operation", "start-operation", "end-operation");
 
 // View results
-const measures = performance.getEntriesByType('measure');
+const measures = performance.getEntriesByType("measure");
 console.log(measures);
 ```
 
@@ -176,18 +178,18 @@ npm install -D vite-bundle-analyzer
 
 ```typescript
 // vite.config.ts
-import { defineConfig } from 'vite';
-import { sveltekit } from '@sveltejs/kit/vite';
-import { analyzer } from 'vite-bundle-analyzer';
+import { defineConfig } from "vite";
+import { sveltekit } from "@sveltejs/kit/vite";
+import { analyzer } from "vite-bundle-analyzer";
 
 export default defineConfig({
-	plugins: [
-		sveltekit(),
-		analyzer({
-			analyzerMode: 'static',
-			reportFilename: 'bundle-report.html'
-		})
-	]
+  plugins: [
+    sveltekit(),
+    analyzer({
+      analyzerMode: "static",
+      reportFilename: "bundle-report.html",
+    }),
+  ],
 });
 ```
 
@@ -242,23 +244,23 @@ export default defineConfig({
 
 ```typescript
 // ❌ Bad: Imports entire library (200kb)
-import _ from 'lodash';
+import _ from "lodash";
 const result = _.debounce(fn, 300);
 
 // ✅ Good: Import only debounce (5kb)
-import debounce from 'lodash-es/debounce';
+import debounce from "lodash-es/debounce";
 const result = debounce(fn, 300);
 
 // ✅ Even better: Write your own (0.5kb)
 function debounce<T extends (...args: any[]) => any>(
-	fn: T,
-	delay: number
+  fn: T,
+  delay: number
 ): (...args: Parameters<T>) => void {
-	let timeoutId: ReturnType<typeof setTimeout>;
-	return (...args) => {
-		clearTimeout(timeoutId);
-		timeoutId = setTimeout(() => fn(...args), delay);
-	};
+  let timeoutId: ReturnType<typeof setTimeout>;
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
 }
 ```
 
@@ -266,8 +268,8 @@ function debounce<T extends (...args: any[]) => any>(
 
 ```json
 {
-	"sideEffects": false,
-	"type": "module"
+  "sideEffects": false,
+  "type": "module"
 }
 ```
 
@@ -284,15 +286,15 @@ npx depcheck
 
 ```typescript
 // ❌ Moment.js: 67kb minified
-import moment from 'moment';
-const formatted = moment().format('YYYY-MM-DD');
+import moment from "moment";
+const formatted = moment().format("YYYY-MM-DD");
 
 // ✅ Native Intl API: 0kb (built-in)
-const formatted = new Intl.DateTimeFormat('en-US').format(new Date());
+const formatted = new Intl.DateTimeFormat("en-US").format(new Date());
 
 // ✅ Or date-fns: 2kb per function
-import { format } from 'date-fns';
-const formatted = format(new Date(), 'yyyy-MM-dd');
+import { format } from "date-fns";
+const formatted = format(new Date(), "yyyy-MM-dd");
 ```
 
 **Common replacements:**
@@ -336,8 +338,11 @@ npm run build
 ```svelte
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import type { Component } from 'svelte';
 
-	let ChartComponent: any = $state(null);
+	let { props }: { props: Record<string, any> } = $props();
+
+	let ChartComponent: Component | null = $state(null);
 	let loading = $state(true);
 
 	onMount(async () => {
@@ -351,18 +356,21 @@ npm run build
 {#if loading}
 	<div class="skeleton">Loading chart...</div>
 {:else if ChartComponent}
-	<svelte:component this={ChartComponent} {...props} />
+	<ChartComponent {...props} />
 {/if}
 ```
+
+> **Note:** In Svelte 5, you can use dynamic components directly without `<svelte:component this={...}>`. The component reference is simply used as a tag: `<ChartComponent />`.
 
 **Conditional loading based on viewport:**
 
 ```svelte
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import type { Component } from 'svelte';
 
 	let visible = $state(false);
-	let VideoPlayer: any = $state(null);
+	let VideoPlayer: Component | null = $state(null);
 
 	onMount(() => {
 		const observer = new IntersectionObserver((entries) => {
@@ -384,7 +392,7 @@ npm run build
 
 <div id="video-container">
 	{#if VideoPlayer}
-		<svelte:component this={VideoPlayer} />
+		<VideoPlayer />
 	{:else}
 		<div class="placeholder">Click to load video</div>
 	{/if}
@@ -397,18 +405,18 @@ npm run build
 
 ```typescript
 // ❌ Bad: Load PDF library on initial page load (500kb)
-import { PDFDocument } from 'pdf-lib';
+import { PDFDocument } from "pdf-lib";
 
 export async function generatePDF() {
-	const doc = await PDFDocument.create();
-	// ...
+  const doc = await PDFDocument.create();
+  // ...
 }
 
 // ✅ Good: Load only when user clicks "Download PDF"
 export async function generatePDF() {
-	const { PDFDocument } = await import('pdf-lib');
-	const doc = await PDFDocument.create();
-	// ...
+  const { PDFDocument } = await import("pdf-lib");
+  const doc = await PDFDocument.create();
+  // ...
 }
 ```
 
@@ -416,7 +424,9 @@ export async function generatePDF() {
 
 ```svelte
 <script lang="ts">
-	let Editor: any = $state(null);
+	import type { Component } from 'svelte';
+
+	let Editor: Component | null = $state(null);
 	let showEditor = $state(false);
 
 	async function loadEditor() {
@@ -427,7 +437,7 @@ export async function generatePDF() {
 </script>
 
 {#if showEditor && Editor}
-	<svelte:component this={Editor} />
+	<Editor />
 {:else}
 	<button onclick={loadEditor}> Open Editor (loads 150kb on click) </button>
 {/if}
@@ -456,29 +466,29 @@ export async function generatePDF() {
 
 ```typescript
 // src/lib/server/imageOptimizer.ts
-import sharp from 'sharp';
-import { writeFile } from 'fs/promises';
+import sharp from "sharp";
+import { writeFile } from "fs/promises";
 
 export async function optimizeImage(inputPath: string, outputPath: string) {
-	const image = sharp(inputPath);
+  const image = sharp(inputPath);
 
-	// Generate multiple formats
-	await Promise.all([
-		// AVIF (smallest, best quality)
-		image
-			.clone()
-			.avif({ quality: 80 })
-			.toFile(outputPath.replace(/\.\w+$/, '.avif')),
+  // Generate multiple formats
+  await Promise.all([
+    // AVIF (smallest, best quality)
+    image
+      .clone()
+      .avif({ quality: 80 })
+      .toFile(outputPath.replace(/\.\w+$/, ".avif")),
 
-		// WebP (good fallback)
-		image
-			.clone()
-			.webp({ quality: 85 })
-			.toFile(outputPath.replace(/\.\w+$/, '.webp')),
+    // WebP (good fallback)
+    image
+      .clone()
+      .webp({ quality: 85 })
+      .toFile(outputPath.replace(/\.\w+$/, ".webp")),
 
-		// Optimized JPEG (universal fallback)
-		image.clone().jpeg({ quality: 80, progressive: true }).toFile(outputPath)
-	]);
+    // Optimized JPEG (universal fallback)
+    image.clone().jpeg({ quality: 80, progressive: true }).toFile(outputPath),
+  ]);
 }
 ```
 
@@ -511,24 +521,24 @@ export async function optimizeImage(inputPath: string, outputPath: string) {
 
 ```typescript
 // scripts/generateResponsiveImages.ts
-import sharp from 'sharp';
-import { readdir } from 'fs/promises';
+import sharp from "sharp";
+import { readdir } from "fs/promises";
 
 const SIZES = [400, 800, 1200, 1600];
 
 async function generateResponsive() {
-	const files = await readdir('static/images/originals');
+  const files = await readdir("static/images/originals");
 
-	for (const file of files) {
-		const input = `static/images/originals/${file}`;
+  for (const file of files) {
+    const input = `static/images/originals/${file}`;
 
-		for (const size of SIZES) {
-			await sharp(input)
-				.resize(size, null, { withoutEnlargement: true })
-				.webp({ quality: 85 })
-				.toFile(`static/images/${file.replace(/\.\w+$/, `-${size}.webp`)}`);
-		}
-	}
+    for (const size of SIZES) {
+      await sharp(input)
+        .resize(size, null, { withoutEnlargement: true })
+        .webp({ quality: 85 })
+        .toFile(`static/images/${file.replace(/\.\w+$/, `-${size}.webp`)}`);
+    }
+  }
 }
 
 generateResponsive();
@@ -668,7 +678,7 @@ generateResponsive();
 </style>
 ```
 
-**Using `svelte-virtual-list` library:**
+**Using `svelte-virtual-list` library (Svelte 5 compatible):**
 
 ```bash
 npm install svelte-virtual-list
@@ -678,17 +688,104 @@ npm install svelte-virtual-list
 <script lang="ts">
 	import VirtualList from 'svelte-virtual-list';
 
-	let items = Array.from({ length: 10000 }, (_, i) => ({
+	let items = $state(Array.from({ length: 10000 }, (_, i) => ({
 		id: i,
 		name: `Item ${i}`
-	}));
+	})));
 </script>
 
-<VirtualList {items} let:item height="600px" itemHeight={50}>
-	<div class="item">
-		{item.name}
-	</div>
+<VirtualList {items} height="600px" itemHeight={50}>
+	{#snippet item(data)}
+		<div class="item">
+			{data.name}
+		</div>
+	{/snippet}
 </VirtualList>
+```
+
+> **Note:** Check `svelte-virtual-list` documentation for the latest Svelte 5 snippet API. If the library hasn't been updated yet, you can use a native implementation:
+
+**Native Svelte 5 Virtual Scrolling:**
+
+```svelte
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	let {
+		items,
+		itemHeight = 50,
+		height = '400px',
+		row
+	}: {
+		items: any[];
+		itemHeight?: number;
+		height?: string;
+		row: Snippet<[{ item: any; index: number }]>;
+	} = $props();
+
+	let scrollTop = $state(0);
+	let containerHeight = $state(0);
+
+	let visibleStart = $derived(Math.floor(scrollTop / itemHeight));
+	let visibleCount = $derived(Math.ceil(containerHeight / itemHeight) + 1);
+	let visibleItems = $derived(items.slice(visibleStart, visibleStart + visibleCount));
+	let totalHeight = $derived(items.length * itemHeight);
+
+	function handleScroll(e: Event) {
+		scrollTop = (e.target as HTMLElement).scrollTop;
+	}
+</script>
+
+<div
+	class="virtual-container"
+	style:height
+	onscroll={handleScroll}
+	bind:clientHeight={containerHeight}
+>
+	<div class="virtual-spacer" style:height="{totalHeight}px">
+		<div class="virtual-items" style:transform="translateY({visibleStart * itemHeight}px)">
+			{#each visibleItems as item, i (item.id ?? visibleStart + i)}
+				{@render row({ item, index: visibleStart + i })}
+			{/each}
+		</div>
+	</div>
+</div>
+
+<style>
+	.virtual-container {
+		overflow-y: auto;
+	}
+	.virtual-spacer {
+		position: relative;
+	}
+	.virtual-items {
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+	}
+</style>
+```
+
+**Using the native implementation:**
+
+```svelte
+<script lang="ts">
+	import VirtualScroll from '$lib/components/VirtualScroll.svelte';
+
+	let items = $state(Array.from({ length: 10000 }, (_, i) => ({
+		id: i,
+		name: `Item ${i}`
+	})));
+</script>
+
+<VirtualScroll {items} height="600px" itemHeight={50}>
+	{#snippet row({ item })}
+		<div class="p-4 border-b border-gray-200">
+			{item.name}
+		</div>
+	{/snippet}
+</VirtualScroll>
 ```
 
 ### Debouncing & Throttling
@@ -728,30 +825,30 @@ npm install svelte-virtual-list
 // src/lib/utils/performance.ts
 
 export function debounce<T extends (...args: any[]) => any>(
-	fn: T,
-	delay: number
+  fn: T,
+  delay: number
 ): (...args: Parameters<T>) => void {
-	let timeoutId: ReturnType<typeof setTimeout>;
+  let timeoutId: ReturnType<typeof setTimeout>;
 
-	return (...args) => {
-		clearTimeout(timeoutId);
-		timeoutId = setTimeout(() => fn(...args), delay);
-	};
+  return (...args) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
 }
 
 export function throttle<T extends (...args: any[]) => any>(
-	fn: T,
-	limit: number
+  fn: T,
+  limit: number
 ): (...args: Parameters<T>) => void {
-	let inThrottle: boolean;
+  let inThrottle: boolean;
 
-	return (...args) => {
-		if (!inThrottle) {
-			fn(...args);
-			inThrottle = true;
-			setTimeout(() => (inThrottle = false), limit);
-		}
-	};
+  return (...args) => {
+    if (!inThrottle) {
+      fn(...args);
+      inThrottle = true;
+      setTimeout(() => (inThrottle = false), limit);
+    }
+  };
 }
 ```
 
@@ -781,38 +878,38 @@ export function throttle<T extends (...args: any[]) => any>(
 // src/lib/utils/memoize.ts
 
 export function memoize<T extends (...args: any[]) => any>(fn: T): T {
-	const cache = new Map();
+  const cache = new Map();
 
-	return ((...args: any[]) => {
-		const key = JSON.stringify(args);
+  return ((...args: any[]) => {
+    const key = JSON.stringify(args);
 
-		if (cache.has(key)) {
-			return cache.get(key);
-		}
+    if (cache.has(key)) {
+      return cache.get(key);
+    }
 
-		const result = fn(...args);
-		cache.set(key, result);
-		return result;
-	}) as T;
+    const result = fn(...args);
+    cache.set(key, result);
+    return result;
+  }) as T;
 }
 ```
 
 ```typescript
 // Example: Expensive Fibonacci calculation
 const fibonacci = memoize((n: number): number => {
-	if (n <= 1) return n;
-	return fibonacci(n - 1) + fibonacci(n - 2);
+  if (n <= 1) return n;
+  return fibonacci(n - 1) + fibonacci(n - 2);
 });
 
 // First call: ~500ms for fib(40)
-console.time('first');
+console.time("first");
 fibonacci(40); // Calculates
-console.timeEnd('first');
+console.timeEnd("first");
 
 // Second call: < 1ms (cached)
-console.time('cached');
+console.time("cached");
 fibonacci(40); // Returns cached result
-console.timeEnd('cached');
+console.timeEnd("cached");
 ```
 
 **Memoize in components:**
@@ -851,28 +948,30 @@ console.timeEnd('cached');
 ```typescript
 // ❌ Bad: Multiple sequential calls
 async function loadUserData(userId: string) {
-	const user = await fetch(`/api/users/${userId}`).then((r) => r.json());
-	const posts = await fetch(`/api/users/${userId}/posts`).then((r) => r.json());
-	const comments = await fetch(`/api/users/${userId}/comments`).then((r) => r.json());
+  const user = await fetch(`/api/users/${userId}`).then((r) => r.json());
+  const posts = await fetch(`/api/users/${userId}/posts`).then((r) => r.json());
+  const comments = await fetch(`/api/users/${userId}/comments`).then((r) =>
+    r.json()
+  );
 
-	return { user, posts, comments };
+  return { user, posts, comments };
 }
 
 // ✅ Good: Parallel requests
 async function loadUserData(userId: string) {
-	const [user, posts, comments] = await Promise.all([
-		fetch(`/api/users/${userId}`).then((r) => r.json()),
-		fetch(`/api/users/${userId}/posts`).then((r) => r.json()),
-		fetch(`/api/users/${userId}/comments`).then((r) => r.json())
-	]);
+  const [user, posts, comments] = await Promise.all([
+    fetch(`/api/users/${userId}`).then((r) => r.json()),
+    fetch(`/api/users/${userId}/posts`).then((r) => r.json()),
+    fetch(`/api/users/${userId}/comments`).then((r) => r.json()),
+  ]);
 
-	return { user, posts, comments };
+  return { user, posts, comments };
 }
 
 // ✅ Best: Single aggregated endpoint
 async function loadUserData(userId: string) {
-	return fetch(`/api/users/${userId}/dashboard`).then((r) => r.json());
-	// Returns { user, posts, comments } in one request
+  return fetch(`/api/users/${userId}/dashboard`).then((r) => r.json());
+  // Returns { user, posts, comments } in one request
 }
 ```
 
@@ -881,20 +980,20 @@ async function loadUserData(userId: string) {
 ```typescript
 // API endpoint with cursor pagination
 export const GET: RequestHandler = async ({ url }) => {
-	const cursor = url.searchParams.get('cursor');
-	const limit = 20;
+  const cursor = url.searchParams.get("cursor");
+  const limit = 20;
 
-	const posts = await db
-		.select()
-		.from(posts)
-		.where(cursor ? gt(posts.id, cursor) : undefined)
-		.limit(limit)
-		.orderBy(desc(posts.createdAt));
+  const posts = await db
+    .select()
+    .from(posts)
+    .where(cursor ? gt(posts.id, cursor) : undefined)
+    .limit(limit)
+    .orderBy(desc(posts.createdAt));
 
-	return json({
-		posts,
-		nextCursor: posts.length === limit ? posts[posts.length - 1].id : null
-	});
+  return json({
+    posts,
+    nextCursor: posts.length === limit ? posts[posts.length - 1].id : null,
+  });
 };
 ```
 
@@ -904,20 +1003,20 @@ export const GET: RequestHandler = async ({ url }) => {
 
 ```typescript
 // src/routes/api/posts/+server.ts
-import { json } from '@sveltejs/kit';
+import { json } from "@sveltejs/kit";
 
 export const GET: RequestHandler = async () => {
-	const posts = await db.select().from(posts);
+  const posts = await db.select().from(posts);
 
-	return json(posts, {
-		headers: {
-			// Cache for 5 minutes
-			'Cache-Control': 'public, max-age=300, s-maxage=300',
+  return json(posts, {
+    headers: {
+      // Cache for 5 minutes
+      "Cache-Control": "public, max-age=300, s-maxage=300",
 
-			// Revalidate in background
-			'Cache-Control': 'public, max-age=300, stale-while-revalidate=86400'
-		}
-	});
+      // Revalidate in background
+      "Cache-Control": "public, max-age=300, stale-while-revalidate=86400",
+    },
+  });
 };
 ```
 
@@ -927,33 +1026,37 @@ export const GET: RequestHandler = async () => {
 // src/lib/server/cache.ts
 const cache = new Map<string, { data: any; expires: number }>();
 
-export function getCached<T>(key: string, ttl: number, fetcher: () => Promise<T>): Promise<T> {
-	const cached = cache.get(key);
+export function getCached<T>(
+  key: string,
+  ttl: number,
+  fetcher: () => Promise<T>
+): Promise<T> {
+  const cached = cache.get(key);
 
-	if (cached && cached.expires > Date.now()) {
-		return Promise.resolve(cached.data);
-	}
+  if (cached && cached.expires > Date.now()) {
+    return Promise.resolve(cached.data);
+  }
 
-	return fetcher().then((data) => {
-		cache.set(key, {
-			data,
-			expires: Date.now() + ttl
-		});
-		return data;
-	});
+  return fetcher().then((data) => {
+    cache.set(key, {
+      data,
+      expires: Date.now() + ttl,
+    });
+    return data;
+  });
 }
 ```
 
 ```typescript
 // Usage in load function
 export const load: PageServerLoad = async () => {
-	return {
-		posts: await getCached(
-			'posts:all',
-			5 * 60 * 1000, // 5 minutes
-			() => db.select().from(posts)
-		)
-	};
+  return {
+    posts: await getCached(
+      "posts:all",
+      5 * 60 * 1000, // 5 minutes
+      () => db.select().from(posts)
+    ),
+  };
 };
 ```
 
@@ -999,23 +1102,23 @@ export const load: PageServerLoad = async () => {
 
 ```typescript
 // schema.ts
-import { pgTable, serial, text, timestamp, index } from 'drizzle-orm/pg-core';
+import { pgTable, serial, text, timestamp, index } from "drizzle-orm/pg-core";
 
 export const posts = pgTable(
-	'posts',
-	{
-		id: serial('id').primaryKey(),
-		title: text('title').notNull(),
-		userId: serial('user_id').notNull(),
-		createdAt: timestamp('created_at').defaultNow(),
-		status: text('status').notNull()
-	},
-	(table) => ({
-		// Indexes for common queries
-		userIdIdx: index('user_id_idx').on(table.userId),
-		statusIdx: index('status_idx').on(table.status),
-		createdAtIdx: index('created_at_idx').on(table.createdAt)
-	})
+  "posts",
+  {
+    id: serial("id").primaryKey(),
+    title: text("title").notNull(),
+    userId: serial("user_id").notNull(),
+    createdAt: timestamp("created_at").defaultNow(),
+    status: text("status").notNull(),
+  },
+  (table) => ({
+    // Indexes for common queries
+    userIdIdx: index("user_id_idx").on(table.userId),
+    statusIdx: index("status_idx").on(table.status),
+    createdAtIdx: index("created_at_idx").on(table.createdAt),
+  })
 );
 ```
 
@@ -1025,11 +1128,14 @@ export const posts = pgTable(
 // ❌ Bad: N+1 query problem
 const users = await db.select().from(users);
 for (const user of users) {
-	user.posts = await db.select().from(posts).where(eq(posts.userId, user.id));
+  user.posts = await db.select().from(posts).where(eq(posts.userId, user.id));
 }
 
 // ✅ Good: Single query with join
-const usersWithPosts = await db.select().from(users).leftJoin(posts, eq(users.id, posts.userId));
+const usersWithPosts = await db
+  .select()
+  .from(users)
+  .leftJoin(posts, eq(users.id, posts.userId));
 ```
 
 **Select only needed columns:**
@@ -1040,12 +1146,12 @@ const posts = await db.select().from(posts);
 
 // ✅ Good: Select only needed columns
 const posts = await db
-	.select({
-		id: posts.id,
-		title: posts.title,
-		excerpt: posts.excerpt
-	})
-	.from(posts);
+  .select({
+    id: posts.id,
+    title: posts.title,
+    excerpt: posts.excerpt,
+  })
+  .from(posts);
 ```
 
 ### Connection Pooling
@@ -1054,21 +1160,21 @@ const posts = await db
 
 ```typescript
 // src/lib/server/db.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
 
 const client = postgres(process.env.DATABASE_URL!, {
-	// Connection pooling
-	max: 10, // Maximum connections
-	idle_timeout: 20, // Close idle connections after 20s
-	connect_timeout: 10, // Timeout for new connections
+  // Connection pooling
+  max: 10, // Maximum connections
+  idle_timeout: 20, // Close idle connections after 20s
+  connect_timeout: 10, // Timeout for new connections
 
-	// Performance
-	prepare: true, // Use prepared statements
-	types: {
-		// Custom type parsing for better performance
-		bigint: postgres.BigInt
-	}
+  // Performance
+  prepare: true, // Use prepared statements
+  types: {
+    // Custom type parsing for better performance
+    bigint: postgres.BigInt,
+  },
 });
 
 export const db = drizzle(client);
@@ -1080,42 +1186,42 @@ export const db = drizzle(client);
 
 ```typescript
 // src/lib/server/redis.ts
-import { Redis } from '@upstash/redis';
+import { Redis } from "@upstash/redis";
 
 export const redis = new Redis({
-	url: process.env.UPSTASH_REDIS_URL!,
-	token: process.env.UPSTASH_REDIS_TOKEN!
+  url: process.env.UPSTASH_REDIS_URL!,
+  token: process.env.UPSTASH_REDIS_TOKEN!,
 });
 
 export async function getCachedOrFetch<T>(
-	key: string,
-	fetcher: () => Promise<T>,
-	ttl: number = 300
+  key: string,
+  fetcher: () => Promise<T>,
+  ttl: number = 300
 ): Promise<T> {
-	// Try cache first
-	const cached = await redis.get(key);
-	if (cached) return cached as T;
+  // Try cache first
+  const cached = await redis.get(key);
+  if (cached) return cached as T;
 
-	// Fetch from database
-	const data = await fetcher();
+  // Fetch from database
+  const data = await fetcher();
 
-	// Cache for next time
-	await redis.setex(key, ttl, JSON.stringify(data));
+  // Cache for next time
+  await redis.setex(key, ttl, JSON.stringify(data));
 
-	return data;
+  return data;
 }
 ```
 
 ```typescript
 // Usage in API route
 export const GET: RequestHandler = async ({ params }) => {
-	const post = await getCachedOrFetch(
-		`post:${params.id}`,
-		() => db.select().from(posts).where(eq(posts.id, params.id)),
-		600 // Cache for 10 minutes
-	);
+  const post = await getCachedOrFetch(
+    `post:${params.id}`,
+    () => db.select().from(posts).where(eq(posts.id, params.id)),
+    600 // Cache for 10 minutes
+  );
 
-	return json(post);
+  return json(post);
 };
 ```
 
@@ -1129,29 +1235,29 @@ export const GET: RequestHandler = async ({ params }) => {
 
 ```typescript
 // src/lib/workers/dataProcessor.worker.ts
-self.addEventListener('message', (e) => {
-	const { data, operation } = e.data;
+self.addEventListener("message", (e) => {
+  const { data, operation } = e.data;
 
-	let result;
+  let result;
 
-	switch (operation) {
-		case 'processLargeDataset':
-			result = processLargeDataset(data);
-			break;
-		case 'calculateStatistics':
-			result = calculateStatistics(data);
-			break;
-	}
+  switch (operation) {
+    case "processLargeDataset":
+      result = processLargeDataset(data);
+      break;
+    case "calculateStatistics":
+      result = calculateStatistics(data);
+      break;
+  }
 
-	self.postMessage(result);
+  self.postMessage(result);
 });
 
 function processLargeDataset(data: any[]) {
-	// CPU-intensive work happens in worker thread
-	return data.map((item) => ({
-		...item,
-		computed: expensiveCalculation(item)
-	}));
+  // CPU-intensive work happens in worker thread
+  return data.map((item) => ({
+    ...item,
+    computed: expensiveCalculation(item),
+  }));
 }
 ```
 
@@ -1194,38 +1300,42 @@ function processLargeDataset(data: any[]) {
 
 ```typescript
 // src/service-worker.ts
-import { build, files, version } from '$service-worker';
+import { build, files, version } from "$service-worker";
 
 const CACHE = `cache-${version}`;
 const ASSETS = [...build, ...files];
 
 // Install: Cache all assets
-self.addEventListener('install', (event) => {
-	event.waitUntil(
-		caches
-			.open(CACHE)
-			.then((cache) => cache.addAll(ASSETS))
-			.then(() => self.skipWaiting())
-	);
+self.addEventListener("install", (event) => {
+  event.waitUntil(
+    caches
+      .open(CACHE)
+      .then((cache) => cache.addAll(ASSETS))
+      .then(() => self.skipWaiting())
+  );
 });
 
 // Activate: Clean up old caches
-self.addEventListener('activate', (event) => {
-	event.waitUntil(
-		caches
-			.keys()
-			.then((keys) =>
-				Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
-			)
-			.then(() => self.clients.claim())
-	);
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches
+      .keys()
+      .then((keys) =>
+        Promise.all(
+          keys.filter((key) => key !== CACHE).map((key) => caches.delete(key))
+        )
+      )
+      .then(() => self.clients.claim())
+  );
 });
 
 // Fetch: Serve from cache, fallback to network
-self.addEventListener('fetch', (event) => {
-	if (event.request.method !== 'GET') return;
+self.addEventListener("fetch", (event) => {
+  if (event.request.method !== "GET") return;
 
-	event.respondWith(caches.match(event.request).then((cached) => cached || fetch(event.request)));
+  event.respondWith(
+    caches.match(event.request).then((cached) => cached || fetch(event.request))
+  );
 });
 ```
 
@@ -1235,16 +1345,16 @@ self.addEventListener('fetch', (event) => {
 
 ```typescript
 // src/routes/feed/+page.server.ts
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	return {
-		// Stream the posts as they're ready
-		streamed: {
-			posts: fetchPosts(), // Returns a Promise
-			suggestions: fetchSuggestions() // Returns a Promise
-		}
-	};
+  return {
+    // Stream the posts as they're ready
+    streamed: {
+      posts: fetchPosts(), // Returns a Promise
+      suggestions: fetchSuggestions(), // Returns a Promise
+    },
+  };
 };
 ```
 

@@ -72,42 +72,42 @@ Svelte 5's reactivity works ANYWHERE - not just in components! Create reactive s
 
 ```typescript
 // lib/stores/theme.svelte.ts
-type Theme = 'light' | 'dark' | 'auto';
+type Theme = "light" | "dark" | "auto";
 
 class ThemeManager {
-	current = $state<Theme>('dark');
-	systemPreference = $state<'light' | 'dark'>('dark');
+  current = $state<Theme>("dark");
+  systemPreference = $state<"light" | "dark">("dark");
 
-	get effective(): 'light' | 'dark' {
-		if (this.current === 'auto') {
-			return this.systemPreference;
-		}
-		return this.current;
-	}
+  get effective(): "light" | "dark" {
+    if (this.current === "auto") {
+      return this.systemPreference;
+    }
+    return this.current;
+  }
 
-	get isDark() {
-		return this.effective === 'dark';
-	}
+  get isDark() {
+    return this.effective === "dark";
+  }
 
-	constructor() {
-		// Check system preference
-		if (typeof window !== 'undefined') {
-			const media = window.matchMedia('(prefers-color-scheme: dark)');
-			this.systemPreference = media.matches ? 'dark' : 'light';
+  constructor() {
+    // Check system preference
+    if (typeof window !== "undefined") {
+      const media = window.matchMedia("(prefers-color-scheme: dark)");
+      this.systemPreference = media.matches ? "dark" : "light";
 
-			media.addEventListener('change', (e) => {
-				this.systemPreference = e.matches ? 'dark' : 'light';
-			});
-		}
-	}
+      media.addEventListener("change", (e) => {
+        this.systemPreference = e.matches ? "dark" : "light";
+      });
+    }
+  }
 
-	setTheme(theme: Theme) {
-		this.current = theme;
-	}
+  setTheme(theme: Theme) {
+    this.current = theme;
+  }
 
-	toggle() {
-		this.current = this.effective === 'dark' ? 'light' : 'dark';
-	}
+  toggle() {
+    this.current = this.effective === "dark" ? "light" : "dark";
+  }
 }
 
 // Export singleton instance
@@ -198,87 +198,92 @@ Reuse reactive logic across components without duplication.
 ```typescript
 // lib/utils/validation.svelte.ts
 export interface ValidationRule<T> {
-	validate: (value: T) => boolean;
-	message: string;
+  validate: (value: T) => boolean;
+  message: string;
 }
 
-export function createValidator<T>(initialValue: T, rules: ValidationRule<T>[]) {
-	let value = $state(initialValue);
-	let touched = $state(false);
+export function createValidator<T>(
+  initialValue: T,
+  rules: ValidationRule<T>[]
+) {
+  let value = $state(initialValue);
+  let touched = $state(false);
 
-	const errors = $derived(() => {
-		if (!touched) return [];
-		return rules.filter((rule) => !rule.validate(value)).map((rule) => rule.message);
-	});
+  const errors = $derived.by(() => {
+    if (!touched) return [];
+    return rules
+      .filter((rule) => !rule.validate(value))
+      .map((rule) => rule.message);
+  });
 
-	const isValid = $derived(errors.length === 0);
+  const isValid = $derived(errors.length === 0);
 
-	function validate() {
-		touched = true;
-	}
+  function validate() {
+    touched = true;
+  }
 
-	function reset() {
-		value = initialValue;
-		touched = false;
-	}
+  function reset() {
+    value = initialValue;
+    touched = false;
+  }
 
-	return {
-		get value() {
-			return value;
-		},
-		set value(v: T) {
-			value = v;
-		},
-		get errors() {
-			return errors;
-		},
-		get isValid() {
-			return isValid;
-		},
-		get touched() {
-			return touched;
-		},
-		validate,
-		reset
-	};
+  return {
+    get value() {
+      return value;
+    },
+    set value(v: T) {
+      value = v;
+    },
+    get errors() {
+      return errors;
+    },
+    get isValid() {
+      return isValid;
+    },
+    get touched() {
+      return touched;
+    },
+    validate,
+    reset,
+  };
 }
 
 // Pre-built rules
 export const rules = {
-	required: (message = 'This field is required'): ValidationRule<string> => ({
-		validate: (value) => value.trim().length > 0,
-		message
-	}),
+  required: (message = "This field is required"): ValidationRule<string> => ({
+    validate: (value) => value.trim().length > 0,
+    message,
+  }),
 
-	minLength: (min: number, message?: string): ValidationRule<string> => ({
-		validate: (value) => value.length >= min,
-		message: message || `Must be at least ${min} characters`
-	}),
+  minLength: (min: number, message?: string): ValidationRule<string> => ({
+    validate: (value) => value.length >= min,
+    message: message || `Must be at least ${min} characters`,
+  }),
 
-	maxLength: (max: number, message?: string): ValidationRule<string> => ({
-		validate: (value) => value.length <= max,
-		message: message || `Must be at most ${max} characters`
-	}),
+  maxLength: (max: number, message?: string): ValidationRule<string> => ({
+    validate: (value) => value.length <= max,
+    message: message || `Must be at most ${max} characters`,
+  }),
 
-	email: (message = 'Must be a valid email'): ValidationRule<string> => ({
-		validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
-		message
-	}),
+  email: (message = "Must be a valid email"): ValidationRule<string> => ({
+    validate: (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value),
+    message,
+  }),
 
-	pattern: (regex: RegExp, message: string): ValidationRule<string> => ({
-		validate: (value) => regex.test(value),
-		message
-	}),
+  pattern: (regex: RegExp, message: string): ValidationRule<string> => ({
+    validate: (value) => regex.test(value),
+    message,
+  }),
 
-	min: (min: number, message?: string): ValidationRule<number> => ({
-		validate: (value) => value >= min,
-		message: message || `Must be at least ${min}`
-	}),
+  min: (min: number, message?: string): ValidationRule<number> => ({
+    validate: (value) => value >= min,
+    message: message || `Must be at least ${min}`,
+  }),
 
-	max: (max: number, message?: string): ValidationRule<number> => ({
-		validate: (value) => value <= max,
-		message: message || `Must be at most ${max}`
-	})
+  max: (max: number, message?: string): ValidationRule<number> => ({
+    validate: (value) => value <= max,
+    message: message || `Must be at most ${max}`,
+  }),
 };
 ```
 
@@ -402,129 +407,129 @@ Encapsulate complex state and behavior in a reusable class.
 ```typescript
 // lib/dataTable.svelte.ts
 export interface Column<T> {
-	key: keyof T;
-	label: string;
-	sortable?: boolean;
-	filterable?: boolean;
+  key: keyof T;
+  label: string;
+  sortable?: boolean;
+  filterable?: boolean;
 }
 
-export type SortDirection = 'asc' | 'desc' | null;
+export type SortDirection = "asc" | "desc" | null;
 
 export class DataTable<T extends Record<string, any>> {
-	data = $state<T[]>([]);
-	columns = $state<Column<T>[]>([]);
+  data = $state<T[]>([]);
+  columns = $state<Column<T>[]>([]);
 
-	// Sorting
-	sortColumn = $state<keyof T | null>(null);
-	sortDirection = $state<SortDirection>(null);
+  // Sorting
+  sortColumn = $state<keyof T | null>(null);
+  sortDirection = $state<SortDirection>(null);
 
-	// Filtering
-	filters = $state<Partial<Record<keyof T, string>>>({});
+  // Filtering
+  filters = $state<Partial<Record<keyof T, string>>>({});
 
-	// Pagination
-	page = $state(1);
-	pageSize = $state(10);
+  // Pagination
+  page = $state(1);
+  pageSize = $state(10);
 
-	constructor(data: T[], columns: Column<T>[]) {
-		this.data = data;
-		this.columns = columns;
-	}
+  constructor(data: T[], columns: Column<T>[]) {
+    this.data = data;
+    this.columns = columns;
+  }
 
-	// Computed filtered data
-	get filtered(): T[] {
-		let result = [...this.data];
+  // Computed filtered data
+  get filtered(): T[] {
+    let result = [...this.data];
 
-		// Apply filters
-		for (const [key, value] of Object.entries(this.filters)) {
-			if (value) {
-				result = result.filter((row) =>
-					String(row[key]).toLowerCase().includes(value.toLowerCase())
-				);
-			}
-		}
+    // Apply filters
+    for (const [key, value] of Object.entries(this.filters)) {
+      if (value) {
+        result = result.filter((row) =>
+          String(row[key]).toLowerCase().includes(value.toLowerCase())
+        );
+      }
+    }
 
-		return result;
-	}
+    return result;
+  }
 
-	// Computed sorted data
-	get sorted(): T[] {
-		if (!this.sortColumn) return this.filtered;
+  // Computed sorted data
+  get sorted(): T[] {
+    if (!this.sortColumn) return this.filtered;
 
-		return [...this.filtered].sort((a, b) => {
-			const aVal = a[this.sortColumn!];
-			const bVal = b[this.sortColumn!];
+    return [...this.filtered].sort((a, b) => {
+      const aVal = a[this.sortColumn!];
+      const bVal = b[this.sortColumn!];
 
-			if (aVal < bVal) return this.sortDirection === 'asc' ? -1 : 1;
-			if (aVal > bVal) return this.sortDirection === 'asc' ? 1 : -1;
-			return 0;
-		});
-	}
+      if (aVal < bVal) return this.sortDirection === "asc" ? -1 : 1;
+      if (aVal > bVal) return this.sortDirection === "asc" ? 1 : -1;
+      return 0;
+    });
+  }
 
-	// Computed paginated data
-	get paginated(): T[] {
-		const start = (this.page - 1) * this.pageSize;
-		const end = start + this.pageSize;
-		return this.sorted.slice(start, end);
-	}
+  // Computed paginated data
+  get paginated(): T[] {
+    const start = (this.page - 1) * this.pageSize;
+    const end = start + this.pageSize;
+    return this.sorted.slice(start, end);
+  }
 
-	get totalPages(): number {
-		return Math.ceil(this.sorted.length / this.pageSize);
-	}
+  get totalPages(): number {
+    return Math.ceil(this.sorted.length / this.pageSize);
+  }
 
-	get stats() {
-		return {
-			total: this.data.length,
-			filtered: this.filtered.length,
-			showing: this.paginated.length
-		};
-	}
+  get stats() {
+    return {
+      total: this.data.length,
+      filtered: this.filtered.length,
+      showing: this.paginated.length,
+    };
+  }
 
-	// Methods
-	sort(column: keyof T) {
-		if (this.sortColumn === column) {
-			// Cycle through: asc → desc → null
-			if (this.sortDirection === 'asc') {
-				this.sortDirection = 'desc';
-			} else if (this.sortDirection === 'desc') {
-				this.sortColumn = null;
-				this.sortDirection = null;
-			} else {
-				this.sortDirection = 'asc';
-			}
-		} else {
-			this.sortColumn = column;
-			this.sortDirection = 'asc';
-		}
-		this.page = 1; // Reset to first page
-	}
+  // Methods
+  sort(column: keyof T) {
+    if (this.sortColumn === column) {
+      // Cycle through: asc → desc → null
+      if (this.sortDirection === "asc") {
+        this.sortDirection = "desc";
+      } else if (this.sortDirection === "desc") {
+        this.sortColumn = null;
+        this.sortDirection = null;
+      } else {
+        this.sortDirection = "asc";
+      }
+    } else {
+      this.sortColumn = column;
+      this.sortDirection = "asc";
+    }
+    this.page = 1; // Reset to first page
+  }
 
-	setFilter(column: keyof T, value: string) {
-		this.filters[column] = value;
-		this.page = 1; // Reset to first page
-	}
+  setFilter(column: keyof T, value: string) {
+    this.filters[column] = value;
+    this.page = 1; // Reset to first page
+  }
 
-	clearFilters() {
-		this.filters = {};
-		this.page = 1;
-	}
+  clearFilters() {
+    this.filters = {};
+    this.page = 1;
+  }
 
-	nextPage() {
-		if (this.page < this.totalPages) {
-			this.page++;
-		}
-	}
+  nextPage() {
+    if (this.page < this.totalPages) {
+      this.page++;
+    }
+  }
 
-	prevPage() {
-		if (this.page > 1) {
-			this.page--;
-		}
-	}
+  prevPage() {
+    if (this.page > 1) {
+      this.page--;
+    }
+  }
 
-	goToPage(page: number) {
-		if (page >= 1 && page <= this.totalPages) {
-			this.page = page;
-		}
-	}
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.page = page;
+    }
+  }
 }
 ```
 
@@ -667,55 +672,55 @@ Three methods: modules, Context API, or props.
 ```typescript
 // lib/notifications.svelte.ts
 export interface Notification {
-	id: number;
-	message: string;
-	type: 'info' | 'success' | 'warning' | 'error';
-	duration?: number;
+  id: number;
+  message: string;
+  type: "info" | "success" | "warning" | "error";
+  duration?: number;
 }
 
 class NotificationManager {
-	notifications = $state<Notification[]>([]);
-	nextId = 1;
+  notifications = $state<Notification[]>([]);
+  nextId = 1;
 
-	add(message: string, type: Notification['type'] = 'info', duration = 5000) {
-		const notification: Notification = {
-			id: this.nextId++,
-			message,
-			type,
-			duration
-		};
+  add(message: string, type: Notification["type"] = "info", duration = 5000) {
+    const notification: Notification = {
+      id: this.nextId++,
+      message,
+      type,
+      duration,
+    };
 
-		this.notifications.push(notification);
+    this.notifications.push(notification);
 
-		if (duration > 0) {
-			setTimeout(() => this.remove(notification.id), duration);
-		}
-	}
+    if (duration > 0) {
+      setTimeout(() => this.remove(notification.id), duration);
+    }
+  }
 
-	remove(id: number) {
-		this.notifications = this.notifications.filter((n) => n.id !== id);
-	}
+  remove(id: number) {
+    this.notifications = this.notifications.filter((n) => n.id !== id);
+  }
 
-	clear() {
-		this.notifications = [];
-	}
+  clear() {
+    this.notifications = [];
+  }
 
-	// Convenience methods
-	info(message: string, duration?: number) {
-		this.add(message, 'info', duration);
-	}
+  // Convenience methods
+  info(message: string, duration?: number) {
+    this.add(message, "info", duration);
+  }
 
-	success(message: string, duration?: number) {
-		this.add(message, 'success', duration);
-	}
+  success(message: string, duration?: number) {
+    this.add(message, "success", duration);
+  }
 
-	warning(message: string, duration?: number) {
-		this.add(message, 'warning', duration);
-	}
+  warning(message: string, duration?: number) {
+    this.add(message, "warning", duration);
+  }
 
-	error(message: string, duration?: number) {
-		this.add(message, 'error', duration);
-	}
+  error(message: string, duration?: number) {
+    this.add(message, "error", duration);
+  }
 }
 
 export const notifications = new NotificationManager();
@@ -840,84 +845,87 @@ Run effects at module level, outside components.
 ```typescript
 // lib/analytics.svelte.ts
 interface AnalyticsEvent {
-	name: string;
-	timestamp: Date;
-	data?: Record<string, any>;
+  name: string;
+  timestamp: Date;
+  data?: Record<string, any>;
 }
 
 class Analytics {
-	events = $state<AnalyticsEvent[]>([]);
-	enabled = $state(true);
-	sessionStart = new Date();
+  events = $state<AnalyticsEvent[]>([]);
+  enabled = $state(true);
+  sessionStart = new Date();
 
-	get sessionDuration() {
-		return Date.now() - this.sessionStart.getTime();
-	}
+  get sessionDuration() {
+    return Date.now() - this.sessionStart.getTime();
+  }
 
-	get eventCount() {
-		return this.events.length;
-	}
+  get eventCount() {
+    return this.events.length;
+  }
 
-	constructor() {
-		// Global effect: Track page visibility
-		$effect(() => {
-			if (typeof document === 'undefined') return;
+  constructor() {
+    // Global effect: Track page visibility
+    $effect(() => {
+      if (typeof document === "undefined") return;
 
-			const handleVisibilityChange = () => {
-				this.track(document.hidden ? 'page_hidden' : 'page_visible');
-			};
+      const handleVisibilityChange = () => {
+        this.track(document.hidden ? "page_hidden" : "page_visible");
+      };
 
-			document.addEventListener('visibilitychange', handleVisibilityChange);
+      document.addEventListener("visibilitychange", handleVisibilityChange);
 
-			return () => {
-				document.removeEventListener('visibilitychange', handleVisibilityChange);
-			};
-		});
+      return () => {
+        document.removeEventListener(
+          "visibilitychange",
+          handleVisibilityChange
+        );
+      };
+    });
 
-		// Global effect: Track online/offline
-		$effect(() => {
-			if (typeof window === 'undefined') return;
+    // Global effect: Track online/offline
+    $effect(() => {
+      if (typeof window === "undefined") return;
 
-			const handleOnline = () => this.track('online');
-			const handleOffline = () => this.track('offline');
+      const handleOnline = () => this.track("online");
+      const handleOffline = () => this.track("offline");
 
-			window.addEventListener('online', handleOnline);
-			window.addEventListener('offline', handleOffline);
+      window.addEventListener("online", handleOnline);
+      window.addEventListener("offline", handleOffline);
 
-			return () => {
-				window.removeEventListener('online', handleOnline);
-				window.removeEventListener('offline', handleOffline);
-			};
-		});
+      return () => {
+        window.removeEventListener("online", handleOnline);
+        window.removeEventListener("offline", handleOffline);
+      };
+    });
 
-		// Log session stats every 30 seconds
-		$effect(() => {
-			const interval = setInterval(() => {
-				console.log(
-					`Session: ${this.eventCount} events in ${Math.round(this.sessionDuration / 1000)}s`
-				);
-			}, 30000);
+    // Log session stats every 30 seconds
+    $effect(() => {
+      const interval = setInterval(() => {
+        console.log(
+          `Session: ${this.eventCount} events in ${Math.round(this.sessionDuration / 1000)}s`
+        );
+      }, 30000);
 
-			return () => clearInterval(interval);
-		});
-	}
+      return () => clearInterval(interval);
+    });
+  }
 
-	track(name: string, data?: Record<string, any>) {
-		if (!this.enabled) return;
+  track(name: string, data?: Record<string, any>) {
+    if (!this.enabled) return;
 
-		const event: AnalyticsEvent = {
-			name,
-			timestamp: new Date(),
-			data
-		};
+    const event: AnalyticsEvent = {
+      name,
+      timestamp: new Date(),
+      data,
+    };
 
-		this.events.push(event);
-		console.log('📊 Analytics:', event);
-	}
+    this.events.push(event);
+    console.log("📊 Analytics:", event);
+  }
 
-	clear() {
-		this.events = [];
-	}
+  clear() {
+    this.events = [];
+  }
 }
 
 export const analytics = new Analytics();
@@ -945,40 +953,40 @@ Sync reactive state with localStorage automatically.
 ```typescript
 // lib/storage.svelte.ts
 export function createPersistentState<T>(key: string, initialValue: T) {
-	// Load from localStorage on initialization
-	let storedValue: T = initialValue;
+  // Load from localStorage on initialization
+  let storedValue: T = initialValue;
 
-	if (typeof localStorage !== 'undefined') {
-		const stored = localStorage.getItem(key);
-		if (stored) {
-			try {
-				storedValue = JSON.parse(stored);
-			} catch (e) {
-				console.error('Failed to parse stored value:', e);
-			}
-		}
-	}
+  if (typeof localStorage !== "undefined") {
+    const stored = localStorage.getItem(key);
+    if (stored) {
+      try {
+        storedValue = JSON.parse(stored);
+      } catch (e) {
+        console.error("Failed to parse stored value:", e);
+      }
+    }
+  }
 
-	let value = $state<T>(storedValue);
+  let value = $state<T>(storedValue);
 
-	// Sync to localStorage whenever value changes
-	$effect(() => {
-		if (typeof localStorage !== 'undefined') {
-			localStorage.setItem(key, JSON.stringify(value));
-		}
-	});
+  // Sync to localStorage whenever value changes
+  $effect(() => {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+  });
 
-	return {
-		get value() {
-			return value;
-		},
-		set value(v: T) {
-			value = v;
-		},
-		reset() {
-			value = initialValue;
-		}
-	};
+  return {
+    get value() {
+      return value;
+    },
+    set value(v: T) {
+      value = v;
+    },
+    reset() {
+      value = initialValue;
+    },
+  };
 }
 ```
 
@@ -1087,69 +1095,69 @@ An alternative approach using a generic helper function to create persistent rea
 
 ```typescript
 // src/lib/utils/persisted.ts
-import { untrack } from 'svelte';
+import { untrack } from "svelte";
 
 export interface PersistedOptions<T> {
-	key: string;
-	initial: T;
-	storage?: Storage;
-	serializer?: {
-		parse: (text: string) => T;
-		stringify: (object: T) => string;
-	};
+  key: string;
+  initial: T;
+  storage?: Storage;
+  serializer?: {
+    parse: (text: string) => T;
+    stringify: (object: T) => string;
+  };
 }
 
 export function persisted<T>(options: PersistedOptions<T>) {
-	const {
-		key,
-		initial,
-		storage = typeof window !== 'undefined' ? window.localStorage : undefined,
-		serializer = JSON
-	} = options;
+  const {
+    key,
+    initial,
+    storage = typeof window !== "undefined" ? window.localStorage : undefined,
+    serializer = JSON,
+  } = options;
 
-	// Load from storage
-	let value = $state<T>(initial);
+  // Load from storage
+  let value = $state<T>(initial);
 
-	if (storage) {
-		const stored = storage.getItem(key);
-		if (stored) {
-			try {
-				value = serializer.parse(stored);
-			} catch (e) {
-				console.error(`Failed to parse stored value for key "${key}":`, e);
-			}
-		}
-	}
+  if (storage) {
+    const stored = storage.getItem(key);
+    if (stored) {
+      try {
+        value = serializer.parse(stored);
+      } catch (e) {
+        console.error(`Failed to parse stored value for key "${key}":`, e);
+      }
+    }
+  }
 
-	// Watch for changes and save
-	$effect(() => {
-		// Access value to track it
-		const current = value;
+  // Watch for changes and save
+  $effect(() => {
+    // Access value to track it
+    const current = value;
 
-		// Skip saving on initial load
-		untrack(() => {
-			if (storage) {
-				try {
-					storage.setItem(key, serializer.stringify(current));
-				} catch (e) {
-					console.error(`Failed to save value for key "${key}":`, e);
-				}
-			}
-		});
-	});
+    // Skip saving on initial load
+    untrack(() => {
+      if (storage) {
+        try {
+          storage.setItem(key, serializer.stringify(current));
+        } catch (e) {
+          console.error(`Failed to save value for key "${key}":`, e);
+        }
+      }
+    });
+  });
 
-	return {
-		get value() {
-			return value;
-		},
-		set value(newValue: T) {
-			value = newValue;
-		},
-		clear() {
-			value = initial;
-			storage?.removeItem(key);
-		}
-	};
+  return {
+    get value() {
+      return value;
+    },
+    set value(newValue: T) {
+      value = newValue;
+    },
+    clear() {
+      value = initial;
+      storage?.removeItem(key);
+    },
+  };
 }
 ```
 
@@ -1817,190 +1825,190 @@ export function persisted<T>(options: PersistedOptions<T>) {
 
 ```typescript
 // src/lib/stores/customStore.ts
-import { createSubscriber } from 'svelte/reactivity';
+import { createSubscriber } from "svelte/reactivity";
 
 export interface WebSocketMessage {
-	type: string;
-	data: unknown;
-	timestamp: Date;
+  type: string;
+  data: unknown;
+  timestamp: Date;
 }
 
 // Example 1: Simple reactive value with createSubscriber
 export function createReactiveValue<T>(initial: T) {
-	let value = $state(initial);
+  let value = $state(initial);
 
-	const subscriber = createSubscriber((update) => {
-		$effect(() => {
-			// Track value changes
-			const current = value;
-			// Notify subscribers
-			update();
-		});
+  const subscriber = createSubscriber((update) => {
+    $effect(() => {
+      // Track value changes
+      const current = value;
+      // Notify subscribers
+      update();
+    });
 
-		return () => {
-			// Cleanup if needed
-		};
-	});
+    return () => {
+      // Cleanup if needed
+    };
+  });
 
-	return {
-		get value() {
-			subscriber.subscribe();
-			return value;
-		},
-		set value(newValue: T) {
-			value = newValue;
-		}
-	};
+  return {
+    get value() {
+      subscriber.subscribe();
+      return value;
+    },
+    set value(newValue: T) {
+      value = newValue;
+    },
+  };
 }
 
 // Example 2: WebSocket manager
 export function createWebSocketStore(url: string) {
-	let socket: WebSocket | null = null;
-	let messages = $state<WebSocketMessage[]>([]);
-	let isConnected = $state(false);
-	let error = $state<string | null>(null);
+  let socket: WebSocket | null = null;
+  let messages = $state<WebSocketMessage[]>([]);
+  let isConnected = $state(false);
+  let error = $state<string | null>(null);
 
-	const subscriber = createSubscriber((update) => {
-		$effect(() => {
-			// Track messages, isConnected, error
-			messages;
-			isConnected;
-			error;
-			// Notify subscribers
-			update();
-		});
+  const subscriber = createSubscriber((update) => {
+    $effect(() => {
+      // Track messages, isConnected, error
+      messages;
+      isConnected;
+      error;
+      // Notify subscribers
+      update();
+    });
 
-		return () => {
-			// Cleanup
-			if (socket) {
-				socket.close();
-			}
-		};
-	});
+    return () => {
+      // Cleanup
+      if (socket) {
+        socket.close();
+      }
+    };
+  });
 
-	function connect() {
-		try {
-			socket = new WebSocket(url);
+  function connect() {
+    try {
+      socket = new WebSocket(url);
 
-			socket.onopen = () => {
-				isConnected = true;
-				error = null;
-			};
+      socket.onopen = () => {
+        isConnected = true;
+        error = null;
+      };
 
-			socket.onmessage = (event) => {
-				messages.push({
-					type: 'message',
-					data: event.data,
-					timestamp: new Date()
-				});
-				messages = messages; // Trigger reactivity
-			};
+      socket.onmessage = (event) => {
+        messages.push({
+          type: "message",
+          data: event.data,
+          timestamp: new Date(),
+        });
+        messages = messages; // Trigger reactivity
+      };
 
-			socket.onerror = () => {
-				error = 'Connection error';
-				isConnected = false;
-			};
+      socket.onerror = () => {
+        error = "Connection error";
+        isConnected = false;
+      };
 
-			socket.onclose = () => {
-				isConnected = false;
-			};
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Failed to connect';
-		}
-	}
+      socket.onclose = () => {
+        isConnected = false;
+      };
+    } catch (e) {
+      error = e instanceof Error ? e.message : "Failed to connect";
+    }
+  }
 
-	function send(data: string) {
-		if (socket && isConnected) {
-			socket.send(data);
-		}
-	}
+  function send(data: string) {
+    if (socket && isConnected) {
+      socket.send(data);
+    }
+  }
 
-	function disconnect() {
-		if (socket) {
-			socket.close();
-			socket = null;
-		}
-	}
+  function disconnect() {
+    if (socket) {
+      socket.close();
+      socket = null;
+    }
+  }
 
-	return {
-		get messages() {
-			subscriber.subscribe();
-			return messages;
-		},
-		get isConnected() {
-			subscriber.subscribe();
-			return isConnected;
-		},
-		get error() {
-			subscriber.subscribe();
-			return error;
-		},
-		connect,
-		send,
-		disconnect,
-		clear: () => {
-			messages = [];
-		}
-	};
+  return {
+    get messages() {
+      subscriber.subscribe();
+      return messages;
+    },
+    get isConnected() {
+      subscriber.subscribe();
+      return isConnected;
+    },
+    get error() {
+      subscriber.subscribe();
+      return error;
+    },
+    connect,
+    send,
+    disconnect,
+    clear: () => {
+      messages = [];
+    },
+  };
 }
 
 // Example 3: Interval counter with createSubscriber
 export function createIntervalCounter(intervalMs: number = 1000) {
-	let count = $state(0);
-	let isRunning = $state(false);
-	let intervalId: number | null = null;
+  let count = $state(0);
+  let isRunning = $state(false);
+  let intervalId: number | null = null;
 
-	const subscriber = createSubscriber((update) => {
-		$effect(() => {
-			// Track count and isRunning
-			count;
-			isRunning;
-			// Notify subscribers
-			update();
-		});
+  const subscriber = createSubscriber((update) => {
+    $effect(() => {
+      // Track count and isRunning
+      count;
+      isRunning;
+      // Notify subscribers
+      update();
+    });
 
-		return () => {
-			if (intervalId !== null) {
-				clearInterval(intervalId);
-			}
-		};
-	});
+    return () => {
+      if (intervalId !== null) {
+        clearInterval(intervalId);
+      }
+    };
+  });
 
-	function start() {
-		if (isRunning) return;
+  function start() {
+    if (isRunning) return;
 
-		isRunning = true;
-		intervalId = window.setInterval(() => {
-			count++;
-		}, intervalMs);
-	}
+    isRunning = true;
+    intervalId = window.setInterval(() => {
+      count++;
+    }, intervalMs);
+  }
 
-	function stop() {
-		if (intervalId !== null) {
-			clearInterval(intervalId);
-			intervalId = null;
-		}
-		isRunning = false;
-	}
+  function stop() {
+    if (intervalId !== null) {
+      clearInterval(intervalId);
+      intervalId = null;
+    }
+    isRunning = false;
+  }
 
-	function reset() {
-		stop();
-		count = 0;
-	}
+  function reset() {
+    stop();
+    count = 0;
+  }
 
-	return {
-		get count() {
-			subscriber.subscribe();
-			return count;
-		},
-		get isRunning() {
-			subscriber.subscribe();
-			return isRunning;
-		},
-		start,
-		stop,
-		reset
-	};
+  return {
+    get count() {
+      subscriber.subscribe();
+      return count;
+    },
+    get isRunning() {
+      subscriber.subscribe();
+      return isRunning;
+    },
+    start,
+    stop,
+    reset,
+  };
 }
 ```
 
@@ -2242,23 +2250,23 @@ export function createIntervalCounter(intervalMs: number = 1000) {
 ```typescript
 // ✅ Use classes for complex state with multiple methods
 class UserManager {
-	users = $state<User[]>([]);
-	loading = $state(false);
+  users = $state<User[]>([]);
+  loading = $state(false);
 
-	async loadUsers() {
-		/* ... */
-	}
-	findById(id: number) {
-		/* ... */
-	}
-	updateUser(id: number, data: Partial<User>) {
-		/* ... */
-	}
+  async loadUsers() {
+    /* ... */
+  }
+  findById(id: number) {
+    /* ... */
+  }
+  updateUser(id: number, data: Partial<User>) {
+    /* ... */
+  }
 }
 
 // ✅ Use functions for simple, stateless logic
 function calculateDiscount(price: number, percent: number) {
-	return price * (1 - percent / 100);
+  return price * (1 - percent / 100);
 }
 ```
 
@@ -2266,25 +2274,25 @@ function calculateDiscount(price: number, percent: number) {
 
 ```typescript
 // ✅ Use Method 2 (persisted utility) for multiple values
-const theme = persisted({ key: 'theme', initial: 'light' });
-const user = persisted({ key: 'user', initial: null });
+const theme = persisted({ key: "theme", initial: "light" });
+const user = persisted({ key: "user", initial: null });
 
 // ✅ Add error handling for corrupted data
 try {
-	const data = JSON.parse(localStorage.getItem(key) || '');
+  const data = JSON.parse(localStorage.getItem(key) || "");
 } catch {
-	console.warn('Failed to parse storage, using defaults');
-	return initialValue;
+  console.warn("Failed to parse storage, using defaults");
+  return initialValue;
 }
 
 // ✅ Use custom serializers for complex types (Dates, Maps, Sets)
 const lastVisit = persisted({
-	key: 'lastVisit',
-	initial: new Date(),
-	serializer: {
-		parse: (text) => new Date(text),
-		stringify: (date) => date.toISOString()
-	}
+  key: "lastVisit",
+  initial: new Date(),
+  serializer: {
+    parse: (text) => new Date(text),
+    stringify: (date) => date.toISOString(),
+  },
 });
 ```
 
@@ -2311,14 +2319,14 @@ src/lib/
 ```typescript
 // ❌ Bad - saves on every read, infinite loop
 $effect(() => {
-	const current = value;
-	storage.setItem(key, JSON.stringify(current));
+  const current = value;
+  storage.setItem(key, JSON.stringify(current));
 });
 
 // ✅ Good - untrack prevents re-triggering
 $effect(() => {
-	const current = value;
-	untrack(() => storage.setItem(key, JSON.stringify(current)));
+  const current = value;
+  untrack(() => storage.setItem(key, JSON.stringify(current)));
 });
 ```
 
@@ -2329,7 +2337,7 @@ $effect(() => {
 const stored = localStorage.getItem(key);
 
 // ✅ Good - checks for browser environment
-const stored = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+const stored = typeof window !== "undefined" ? localStorage.getItem(key) : null;
 ```
 
 3. **Overusing reactive classes** - simple state doesn't need classes:
@@ -2337,10 +2345,10 @@ const stored = typeof window !== 'undefined' ? localStorage.getItem(key) : null;
 ```typescript
 // ❌ Bad - overkill for simple counter
 class Counter {
-	count = $state(0);
-	increment() {
-		this.count++;
-	}
+  count = $state(0);
+  increment() {
+    this.count++;
+  }
 }
 
 // ✅ Good - simple state stays simple
@@ -2361,16 +2369,16 @@ let count = $state(0);
 // Mock localStorage for tests
 const mockStorage = new Map();
 global.localStorage = {
-	getItem: (key) => mockStorage.get(key),
-	setItem: (key, value) => mockStorage.set(key, value),
-	clear: () => mockStorage.clear()
+  getItem: (key) => mockStorage.get(key),
+  setItem: (key, value) => mockStorage.set(key, value),
+  clear: () => mockStorage.clear(),
 };
 
 // Test reactive classes
-test('UserManager loads users', async () => {
-	const manager = new UserManager();
-	await manager.loadUsers();
-	expect(manager.users.length).toBeGreaterThan(0);
+test("UserManager loads users", async () => {
+  const manager = new UserManager();
+  await manager.loadUsers();
+  expect(manager.users.length).toBeGreaterThan(0);
 });
 ```
 

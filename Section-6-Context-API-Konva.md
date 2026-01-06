@@ -152,6 +152,7 @@ Without context, you'd pass `user` as props through 5+ component layers. With co
 ```svelte
 <script lang="ts">
 	import { setContext } from 'svelte';
+	import type { Snippet } from 'svelte';
 
 	// Define the authenticated user structure
 	interface AuthUser {
@@ -161,6 +162,8 @@ Without context, you'd pass `user` as props through 5+ component layers. With co
 		role: 'author' | 'editor' | 'admin';
 		avatar: string;
 	}
+
+	let { children }: { children: Snippet } = $props();
 
 	// In a real app, this would come from your auth service/API
 	let user = $state<AuthUser>({
@@ -191,7 +194,7 @@ Without context, you'd pass `user` as props through 5+ component layers. With co
 	</div>
 
 	<!-- All child components can now access user via context -->
-	<slot />
+	{@render children()}
 </div>
 ```
 
@@ -317,6 +320,8 @@ Context creates **tree-scoped state** - only available to children of the compon
 			theme = theme === 'dark' ? 'light' : 'dark';
 		}
 	});
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div
@@ -326,9 +331,11 @@ Context creates **tree-scoped state** - only available to children of the compon
 	class:bg-[#f0f0f0]={theme === 'light'}
 	class:text-[#1a1a1a]={theme === 'light'}
 >
-	<slot />
+	{@render children()}
 </div>
 ```
+
+> **Note:** Add `import type { Snippet } from 'svelte';` at the top of the script.
 
 ### Component: ThemeButton.svelte
 
@@ -431,56 +438,57 @@ Instead of exposing raw context in every component, create a helper function. Th
 
 ```typescript
 // contexts/modal.svelte.ts
-import { getContext, setContext } from 'svelte';
+import { getContext, setContext } from "svelte";
 
 // Define the modal context interface
 export interface ModalContext {
-	isOpen: boolean;
-	content: (() => any) | null;
-	open: (content: () => any) => void;
-	close: () => void;
+  isOpen: boolean;
+  content: (() => any) | null;
+  open: (content: () => any) => void;
+  close: () => void;
 }
 
 // Unique symbol as key (prevents naming conflicts)
-const MODAL_KEY = Symbol('modal');
+const MODAL_KEY = Symbol("modal");
 
 // Helper function to CREATE modal context (used in provider)
 export function createModalContext(): ModalContext {
-	let isOpen = $state(false);
-	let content = $state<(() => any) | null>(null);
+  let isOpen = $state(false);
+  let content = $state<(() => any) | null>(null);
 
-	const context: ModalContext = {
-		get isOpen() {
-			return isOpen;
-		},
-		get content() {
-			return content;
-		},
-		open(modalContent: () => any) {
-			content = modalContent;
-			isOpen = true;
-		},
-		close() {
-			isOpen = false;
-			content = null;
-		}
-	};
+  const context: ModalContext = {
+    get isOpen() {
+      return isOpen;
+    },
+    get content() {
+      return content;
+    },
+    open(modalContent: () => any) {
+      content = modalContent;
+      isOpen = true;
+    },
+    close() {
+      isOpen = false;
+      content = null;
+    },
+  };
 
-	setContext(MODAL_KEY, context);
-	return context;
+  setContext(MODAL_KEY, context);
+  return context;
 }
 
 // Helper function to GET modal context (used in children)
 export function getModalContext(): ModalContext {
-	const context = getContext<ModalContext | undefined>(MODAL_KEY);
+  const context = getContext<ModalContext | undefined>(MODAL_KEY);
 
-	if (!context) {
-		throw new Error(
-			'Modal context not found. ' + 'Make sure to use this component inside <ModalProvider>'
-		);
-	}
+  if (!context) {
+    throw new Error(
+      "Modal context not found. " +
+        "Make sure to use this component inside <ModalProvider>"
+    );
+  }
 
-	return context;
+  return context;
 }
 ```
 
@@ -491,14 +499,17 @@ export function getModalContext(): ModalContext {
 ```svelte
 <script lang="ts">
 	import { createModalContext } from './contexts/modal.svelte';
+	import type { Snippet } from 'svelte';
 
 	// Create and set the modal context
 	const modal = createModalContext();
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="bg-[#1a1a1a] min-h-screen p-5">
 	<!-- App content -->
-	<slot />
+	{@render children()}
 </div>
 
 <!-- Modal overlay (shown when modal is open) -->
@@ -614,37 +625,37 @@ npm install --save-dev @types/konva
 
 ```typescript
 // contexts/konva.svelte.ts
-import { getContext, setContext } from 'svelte';
-import type Konva from 'konva';
+import { getContext, setContext } from "svelte";
+import type Konva from "konva";
 
 // Stage context (the root Konva container)
-const STAGE_KEY = Symbol('konva-stage');
+const STAGE_KEY = Symbol("konva-stage");
 
 export function setStageContext(stage: Konva.Stage) {
-	setContext(STAGE_KEY, stage);
+  setContext(STAGE_KEY, stage);
 }
 
 export function getStageContext(): Konva.Stage {
-	const stage = getContext<Konva.Stage | undefined>(STAGE_KEY);
-	if (!stage) {
-		throw new Error('Stage context not found. Use <Stage> component');
-	}
-	return stage;
+  const stage = getContext<Konva.Stage | undefined>(STAGE_KEY);
+  if (!stage) {
+    throw new Error("Stage context not found. Use <Stage> component");
+  }
+  return stage;
 }
 
 // Layer context (Konva layer within stage)
-const LAYER_KEY = Symbol('konva-layer');
+const LAYER_KEY = Symbol("konva-layer");
 
 export function setLayerContext(layer: Konva.Layer) {
-	setContext(LAYER_KEY, layer);
+  setContext(LAYER_KEY, layer);
 }
 
 export function getLayerContext(): Konva.Layer {
-	const layer = getContext<Konva.Layer | undefined>(LAYER_KEY);
-	if (!layer) {
-		throw new Error('Layer context not found. Use <Layer> component');
-	}
-	return layer;
+  const layer = getContext<Konva.Layer | undefined>(LAYER_KEY);
+  if (!layer) {
+    throw new Error("Layer context not found. Use <Layer> component");
+  }
+  return layer;
 }
 ```
 
@@ -728,9 +739,12 @@ export function getLayerContext(): Konva.Layer {
 >
 	<!-- Only render children after stage is created -->
 	{#if stage}
-		<slot />
+		{@render children()}
 	{/if}
 </div>
+```
+
+> **Note:** Add `import type { Snippet } from 'svelte';` and `let { children, ...props }: { children: Snippet; width: number; height: number } = $props();` in the script section.
 
 <style>
 	/* Style the Konva canvas inside */
@@ -738,7 +752,8 @@ export function getLayerContext(): Konva.Layer {
 		display: block;
 	}
 </style>
-```
+
+````
 
 **Key Concepts:**
 
@@ -790,9 +805,11 @@ export function getLayerContext(): Konva.Layer {
 
 <!-- Slot for child shapes -->
 {#if layer}
-	<slot />
+	{@render children()}
 {/if}
-```
+````
+
+> **Note:** Add `import type { Snippet } from 'svelte';` and `let { children }: { children: Snippet } = $props();` in the script section.
 
 **Key Concepts:**
 

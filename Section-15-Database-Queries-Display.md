@@ -52,22 +52,22 @@ Let's query real data from your database.
 
 ```typescript
 // src/routes/+page.server.ts
-import { db } from '$lib/server/db';
-import { workspaces } from '$lib/server/db/schema';
-import { desc } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import { workspaces } from "$lib/server/db/schema";
+import { desc } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	// Your first query!
-	const allWorkspaces = await db
-		.select()
-		.from(workspaces)
-		.orderBy(desc(workspaces.createdAt))
-		.limit(10);
+  // Your first query!
+  const allWorkspaces = await db
+    .select()
+    .from(workspaces)
+    .orderBy(desc(workspaces.createdAt))
+    .limit(10);
 
-	return {
-		workspaces: allWorkspaces
-	};
+  return {
+    workspaces: allWorkspaces,
+  };
 };
 ```
 
@@ -108,13 +108,16 @@ const all = await db.select().from(workspaces);
 const names = await db.select({ name: workspaces.name }).from(workspaces);
 
 // Where clause
-const active = await db.select().from(workspaces).where(eq(workspaces.isActive, true));
+const active = await db
+  .select()
+  .from(workspaces)
+  .where(eq(workspaces.isActive, true));
 
 // Join
 const withOwners = await db
-	.select()
-	.from(workspaces)
-	.innerJoin(users, eq(workspaces.ownerId, users.id));
+  .select()
+  .from(workspaces)
+  .innerJoin(users, eq(workspaces.ownerId, users.id));
 
 // Count
 const [{ count }] = await db.select({ count: count() }).from(workspaces);
@@ -132,35 +135,35 @@ Layout load functions provide data to all child pages.
 
 ```typescript
 // src/routes/(app)/+layout.server.ts
-import { redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { workspaces, workspaceMembers } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { LayoutServerLoad } from './$types';
+import { redirect } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { workspaces, workspaceMembers } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	// Check authentication (set in hooks)
-	if (!locals.user) {
-		throw redirect(303, '/login');
-	}
+  // Check authentication (set in hooks)
+  if (!locals.user) {
+    throw redirect(303, "/login");
+  }
 
-	// Query user's workspaces
-	const userWorkspaces = await db
-		.select({
-			id: workspaces.id,
-			name: workspaces.name,
-			slug: workspaces.slug,
-			role: workspaceMembers.role
-		})
-		.from(workspaceMembers)
-		.innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
-		.where(eq(workspaceMembers.userId, locals.user.id))
-		.orderBy(workspaces.name);
+  // Query user's workspaces
+  const userWorkspaces = await db
+    .select({
+      id: workspaces.id,
+      name: workspaces.name,
+      slug: workspaces.slug,
+      role: workspaceMembers.role,
+    })
+    .from(workspaceMembers)
+    .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+    .where(eq(workspaceMembers.userId, locals.user.id))
+    .orderBy(workspaces.name);
 
-	return {
-		user: locals.user,
-		workspaces: userWorkspaces
-	};
+  return {
+    user: locals.user,
+    workspaces: userWorkspaces,
+  };
 };
 ```
 
@@ -296,6 +299,12 @@ src/routes/
 
 ```svelte
 <!-- src/routes/(app)/+layout.svelte -->
+<script lang=\"ts\">
+\timport type { Snippet } from 'svelte';\n\timport type { LayoutData } from './$types';
+
+\tlet { data, children }: { data: LayoutData; children: Snippet } = $props();
+</script>
+
 <div class="app-container">
 	<!-- Top Navigation -->
 	<nav class="navbar">
@@ -309,7 +318,7 @@ src/routes/
 			<Navigation />
 		</aside>
 		<main class="content">
-			<slot />
+			{@render children()}
 		</main>
 	</div>
 </div>
@@ -325,60 +334,60 @@ Load workspace-specific data in a nested layout.
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/+layout.server.ts
-import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { workspaces, pages, workspaceMembers } from '$lib/server/db/schema';
-import { eq, and, desc } from 'drizzle-orm';
-import type { LayoutServerLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { workspaces, pages, workspaceMembers } from "$lib/server/db/schema";
+import { eq, and, desc } from "drizzle-orm";
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ params, locals, parent }) => {
-	// Get parent data (user info)
-	await parent();
+  // Get parent data (user info)
+  await parent();
 
-	// Find workspace by slug
-	const [workspace] = await db
-		.select()
-		.from(workspaces)
-		.where(eq(workspaces.slug, params.slug))
-		.limit(1);
+  // Find workspace by slug
+  const [workspace] = await db
+    .select()
+    .from(workspaces)
+    .where(eq(workspaces.slug, params.slug))
+    .limit(1);
 
-	if (!workspace) {
-		throw error(404, 'Workspace not found');
-	}
+  if (!workspace) {
+    throw error(404, "Workspace not found");
+  }
 
-	// Check if user is a member
-	const [membership] = await db
-		.select()
-		.from(workspaceMembers)
-		.where(
-			and(
-				eq(workspaceMembers.workspaceId, workspace.id),
-				eq(workspaceMembers.userId, locals.user!.id)
-			)
-		)
-		.limit(1);
+  // Check if user is a member
+  const [membership] = await db
+    .select()
+    .from(workspaceMembers)
+    .where(
+      and(
+        eq(workspaceMembers.workspaceId, workspace.id),
+        eq(workspaceMembers.userId, locals.user!.id)
+      )
+    )
+    .limit(1);
 
-	if (!membership) {
-		throw error(403, 'You are not a member of this workspace');
-	}
+  if (!membership) {
+    throw error(403, "You are not a member of this workspace");
+  }
 
-	// Get workspace pages
-	const workspacePages = await db
-		.select({
-			id: pages.id,
-			title: pages.title,
-			isPublished: pages.isPublished,
-			updatedAt: pages.updatedAt
-		})
-		.from(pages)
-		.where(eq(pages.workspaceId, workspace.id))
-		.orderBy(desc(pages.updatedAt));
+  // Get workspace pages
+  const workspacePages = await db
+    .select({
+      id: pages.id,
+      title: pages.title,
+      isPublished: pages.isPublished,
+      updatedAt: pages.updatedAt,
+    })
+    .from(pages)
+    .where(eq(pages.workspaceId, workspace.id))
+    .orderBy(desc(pages.updatedAt));
 
-	return {
-		workspace,
-		pages: workspacePages,
-		userRole: membership.role
-	};
+  return {
+    workspace,
+    pages: workspacePages,
+    userRole: membership.role,
+  };
 };
 ```
 
@@ -471,44 +480,44 @@ Display a single page with full details.
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/pages/[pageId]/+page.server.ts
-import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { pages, users } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { pages, users } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params, parent }) => {
-	// Get workspace data from parent layout
-	const { workspace } = await parent();
+  // Get workspace data from parent layout
+  const { workspace } = await parent();
 
-	// Query page with author info
-	const [pageData] = await db
-		.select({
-			page: pages,
-			author: {
-				id: users.id,
-				name: users.name,
-				avatarUrl: users.avatarUrl
-			}
-		})
-		.from(pages)
-		.innerJoin(users, eq(pages.authorId, users.id))
-		.where(eq(pages.id, parseInt(params.pageId)))
-		.limit(1);
+  // Query page with author info
+  const [pageData] = await db
+    .select({
+      page: pages,
+      author: {
+        id: users.id,
+        name: users.name,
+        avatarUrl: users.avatarUrl,
+      },
+    })
+    .from(pages)
+    .innerJoin(users, eq(pages.authorId, users.id))
+    .where(eq(pages.id, parseInt(params.pageId)))
+    .limit(1);
 
-	if (!pageData) {
-		throw error(404, 'Page not found');
-	}
+  if (!pageData) {
+    throw error(404, "Page not found");
+  }
 
-	// Verify page belongs to this workspace
-	if (pageData.page.workspaceId !== workspace.id) {
-		throw error(404, 'Page not found in this workspace');
-	}
+  // Verify page belongs to this workspace
+  if (pageData.page.workspaceId !== workspace.id) {
+    throw error(404, "Page not found in this workspace");
+  }
 
-	return {
-		page: pageData.page,
-		author: pageData.author
-	};
+  return {
+    page: pageData.page,
+    author: pageData.author,
+  };
 };
 ```
 
@@ -641,65 +650,65 @@ src/
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/+page.server.ts
-import { db } from '$lib/server/db';
-import { pages, users, workspaceMembers } from '$lib/server/db/schema';
-import { eq, desc, count } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import { pages, users, workspaceMembers } from "$lib/server/db/schema";
+import { eq, desc, count } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ parent }) => {
-	const { workspace } = await parent();
+  const { workspace } = await parent();
 
-	// Get recent pages
-	const recentPages = await db
-		.select({
-			id: pages.id,
-			title: pages.title,
-			isPublished: pages.isPublished,
-			updatedAt: pages.updatedAt,
-			author: {
-				name: users.name,
-				avatarUrl: users.avatarUrl
-			}
-		})
-		.from(pages)
-		.innerJoin(users, eq(pages.authorId, users.id))
-		.where(eq(pages.workspaceId, workspace.id))
-		.orderBy(desc(pages.updatedAt))
-		.limit(10);
+  // Get recent pages
+  const recentPages = await db
+    .select({
+      id: pages.id,
+      title: pages.title,
+      isPublished: pages.isPublished,
+      updatedAt: pages.updatedAt,
+      author: {
+        name: users.name,
+        avatarUrl: users.avatarUrl,
+      },
+    })
+    .from(pages)
+    .innerJoin(users, eq(pages.authorId, users.id))
+    .where(eq(pages.workspaceId, workspace.id))
+    .orderBy(desc(pages.updatedAt))
+    .limit(10);
 
-	// Get workspace stats
-	const [stats] = await db
-		.select({
-			totalPages: count(pages.id),
-			totalMembers: count(workspaceMembers.id)
-		})
-		.from(pages)
-		.where(eq(pages.workspaceId, workspace.id))
-		.leftJoin(workspaceMembers, eq(workspaceMembers.workspaceId, workspace.id));
+  // Get workspace stats
+  const [stats] = await db
+    .select({
+      totalPages: count(pages.id),
+      totalMembers: count(workspaceMembers.id),
+    })
+    .from(pages)
+    .where(eq(pages.workspaceId, workspace.id))
+    .leftJoin(workspaceMembers, eq(workspaceMembers.workspaceId, workspace.id));
 
-	// Get workspace members
-	const members = await db
-		.select({
-			id: workspaceMembers.id,
-			role: workspaceMembers.role,
-			joinedAt: workspaceMembers.joinedAt,
-			user: {
-				id: users.id,
-				name: users.name,
-				email: users.email,
-				avatarUrl: users.avatarUrl
-			}
-		})
-		.from(workspaceMembers)
-		.innerJoin(users, eq(workspaceMembers.userId, users.id))
-		.where(eq(workspaceMembers.workspaceId, workspace.id))
-		.orderBy(workspaceMembers.joinedAt);
+  // Get workspace members
+  const members = await db
+    .select({
+      id: workspaceMembers.id,
+      role: workspaceMembers.role,
+      joinedAt: workspaceMembers.joinedAt,
+      user: {
+        id: users.id,
+        name: users.name,
+        email: users.email,
+        avatarUrl: users.avatarUrl,
+      },
+    })
+    .from(workspaceMembers)
+    .innerJoin(users, eq(workspaceMembers.userId, users.id))
+    .where(eq(workspaceMembers.workspaceId, workspace.id))
+    .orderBy(workspaceMembers.joinedAt);
 
-	return {
-		recentPages,
-		stats,
-		members
-	};
+  return {
+    recentPages,
+    stats,
+    members,
+  };
 };
 ```
 
@@ -895,37 +904,37 @@ export const load: PageServerLoad = async ({ parent }) => {
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/pages/new/+server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { pages } from '$lib/server/db/schema';
-import type { Actions } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { pages } from "$lib/server/db/schema";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request, params, locals, parent }) => {
-		const { workspace } = await parent();
-		const data = await request.formData();
+  default: async ({ request, params, locals, parent }) => {
+    const { workspace } = await parent();
+    const data = await request.formData();
 
-		const title = data.get('title')?.toString();
-		const content = data.get('content')?.toString();
-		const isPublished = data.get('isPublished') === 'on';
+    const title = data.get("title")?.toString();
+    const content = data.get("content")?.toString();
+    const isPublished = data.get("isPublished") === "on";
 
-		if (!title) {
-			return fail(400, { error: 'Title is required' });
-		}
+    if (!title) {
+      return fail(400, { error: "Title is required" });
+    }
 
-		const [page] = await db
-			.insert(pages)
-			.values({
-				workspaceId: workspace.id,
-				title,
-				content: content || '',
-				authorId: locals.user!.id,
-				isPublished
-			})
-			.returning();
+    const [page] = await db
+      .insert(pages)
+      .values({
+        workspaceId: workspace.id,
+        title,
+        content: content || "",
+        authorId: locals.user!.id,
+        isPublished,
+      })
+      .returning();
 
-		throw redirect(303, `/workspaces/${workspace.slug}/pages/${page.id}`);
-	}
+    throw redirect(303, `/workspaces/${workspace.slug}/pages/${page.id}`);
+  },
 };
 ```
 
@@ -933,50 +942,52 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/api/search/+server.ts
-import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { pages, workspaces } from '$lib/server/db/schema';
-import { like, or, and, eq } from 'drizzle-orm';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { pages, workspaces } from "$lib/server/db/schema";
+import { like, or, and, eq } from "drizzle-orm";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ url, locals }) => {
-	if (!locals.user) {
-		return json({ results: [] });
-	}
+  if (!locals.user) {
+    return json({ results: [] });
+  }
 
-	const query = url.searchParams.get('q') || '';
-	const workspaceId = url.searchParams.get('workspaceId');
+  const query = url.searchParams.get("q") || "";
+  const workspaceId = url.searchParams.get("workspaceId");
 
-	if (!query) {
-		return json({ results: [] });
-	}
+  if (!query) {
+    return json({ results: [] });
+  }
 
-	let searchQuery = db
-		.select({
-			id: pages.id,
-			title: pages.title,
-			content: pages.content,
-			workspaceId: pages.workspaceId,
-			workspaceName: workspaces.name,
-			workspaceSlug: workspaces.slug
-		})
-		.from(pages)
-		.innerJoin(workspaces, eq(pages.workspaceId, workspaces.id))
-		.where(or(like(pages.title, `%${query}%`), like(pages.content, `%${query}%`)))
-		.limit(20);
+  let searchQuery = db
+    .select({
+      id: pages.id,
+      title: pages.title,
+      content: pages.content,
+      workspaceId: pages.workspaceId,
+      workspaceName: workspaces.name,
+      workspaceSlug: workspaces.slug,
+    })
+    .from(pages)
+    .innerJoin(workspaces, eq(pages.workspaceId, workspaces.id))
+    .where(
+      or(like(pages.title, `%${query}%`), like(pages.content, `%${query}%`))
+    )
+    .limit(20);
 
-	if (workspaceId) {
-		searchQuery = searchQuery.where(
-			and(
-				eq(pages.workspaceId, parseInt(workspaceId)),
-				or(like(pages.title, `%${query}%`), like(pages.content, `%${query}%`))
-			)
-		);
-	}
+  if (workspaceId) {
+    searchQuery = searchQuery.where(
+      and(
+        eq(pages.workspaceId, parseInt(workspaceId)),
+        or(like(pages.title, `%${query}%`), like(pages.content, `%${query}%`))
+      )
+    );
+  }
 
-	const results = await searchQuery;
+  const results = await searchQuery;
 
-	return json({ results, query });
+  return json({ results, query });
 };
 ```
 

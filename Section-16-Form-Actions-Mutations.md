@@ -60,20 +60,20 @@ Form actions run on the server and handle form submissions.
 
 ```typescript
 // src/routes/contact/+page.server.ts
-import type { Actions } from './$types';
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	// Named action: "default"
-	default: async ({ request }) => {
-		const data = await request.formData();
-		const name = data.get('name')?.toString();
-		const email = data.get('email')?.toString();
-		const message = data.get('message')?.toString();
+  // Named action: "default"
+  default: async ({ request }) => {
+    const data = await request.formData();
+    const name = data.get("name")?.toString();
+    const email = data.get("email")?.toString();
+    const message = data.get("message")?.toString();
 
-		console.log({ name, email, message });
+    console.log({ name, email, message });
 
-		return { success: true };
-	}
+    return { success: true };
+  },
 };
 ```
 
@@ -125,22 +125,22 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/tasks/+page.server.ts
-import type { Actions } from './$types';
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	create: async ({ request }) => {
-		const data = await request.formData();
-		const title = data.get('title')?.toString();
-		// Create task
-		return { success: true, action: 'create' };
-	},
+  create: async ({ request }) => {
+    const data = await request.formData();
+    const title = data.get("title")?.toString();
+    // Create task
+    return { success: true, action: "create" };
+  },
 
-	delete: async ({ request }) => {
-		const data = await request.formData();
-		const id = data.get('id')?.toString();
-		// Delete task
-		return { success: true, action: 'delete' };
-	}
+  delete: async ({ request }) => {
+    const data = await request.formData();
+    const id = data.get("id")?.toString();
+    // Delete task
+    return { success: true, action: "delete" };
+  },
 };
 ```
 
@@ -169,44 +169,44 @@ Validate input and return helpful error messages.
 
 ```typescript
 // src/routes/register/+page.server.ts
-import { fail } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import { fail } from "@sveltejs/kit";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request }) => {
-		const data = await request.formData();
-		const username = data.get('username')?.toString();
-		const email = data.get('email')?.toString();
-		const password = data.get('password')?.toString();
+  default: async ({ request }) => {
+    const data = await request.formData();
+    const username = data.get("username")?.toString();
+    const email = data.get("email")?.toString();
+    const password = data.get("password")?.toString();
 
-		// Validation
-		const errors: Record<string, string> = {};
+    // Validation
+    const errors: Record<string, string> = {};
 
-		if (!username || username.length < 3) {
-			errors.username = 'Username must be at least 3 characters';
-		}
+    if (!username || username.length < 3) {
+      errors.username = "Username must be at least 3 characters";
+    }
 
-		if (!email || !email.includes('@')) {
-			errors.email = 'Please enter a valid email';
-		}
+    if (!email || !email.includes("@")) {
+      errors.email = "Please enter a valid email";
+    }
 
-		if (!password || password.length < 8) {
-			errors.password = 'Password must be at least 8 characters';
-		}
+    if (!password || password.length < 8) {
+      errors.password = "Password must be at least 8 characters";
+    }
 
-		if (Object.keys(errors).length > 0) {
-			return fail(400, {
-				errors,
-				values: { username, email } // Return values to repopulate form
-			});
-		}
+    if (Object.keys(errors).length > 0) {
+      return fail(400, {
+        errors,
+        values: { username, email }, // Return values to repopulate form
+      });
+    }
 
-		// Success
-		return {
-			success: true,
-			message: 'Registration successful!'
-		};
-	}
+    // Success
+    return {
+      success: true,
+      message: "Registration successful!",
+    };
+  },
 };
 ```
 
@@ -298,62 +298,66 @@ Insert validated data into PostgreSQL.
 
 ```typescript
 // src/routes/workspaces/new/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { workspaces } from '$lib/server/db/schema';
-import type { Actions } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { workspaces } from "$lib/server/db/schema";
+import type { Actions } from "./$types";
 
 function generateSlug(name: string): string {
-	return name
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, '-')
-		.replace(/^-+|-+$/g, '');
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
 }
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
-		if (!locals.user) {
-			return fail(401, { error: 'You must be logged in' });
-		}
+  default: async ({ request, locals }) => {
+    if (!locals.user) {
+      return fail(401, { error: "You must be logged in" });
+    }
 
-		const data = await request.formData();
-		const name = data.get('name')?.toString();
-		const description = data.get('description')?.toString();
+    const data = await request.formData();
+    const name = data.get("name")?.toString();
+    const description = data.get("description")?.toString();
 
-		// Validation
-		if (!name || name.length < 3) {
-			return fail(400, {
-				error: 'Workspace name must be at least 3 characters',
-				values: { name, description }
-			});
-		}
+    // Validation
+    if (!name || name.length < 3) {
+      return fail(400, {
+        error: "Workspace name must be at least 3 characters",
+        values: { name, description },
+      });
+    }
 
-		const slug = generateSlug(name);
+    const slug = generateSlug(name);
 
-		// Check if slug exists
-		const existing = await db.select().from(workspaces).where(eq(workspaces.slug, slug)).limit(1);
+    // Check if slug exists
+    const existing = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.slug, slug))
+      .limit(1);
 
-		if (existing.length > 0) {
-			return fail(400, {
-				error: 'A workspace with this name already exists',
-				values: { name, description }
-			});
-		}
+    if (existing.length > 0) {
+      return fail(400, {
+        error: "A workspace with this name already exists",
+        values: { name, description },
+      });
+    }
 
-		// Insert into database
-		const [workspace] = await db
-			.insert(workspaces)
-			.values({
-				name,
-				slug,
-				description: description || null,
-				ownerId: locals.user.id
-			})
-			.returning();
+    // Insert into database
+    const [workspace] = await db
+      .insert(workspaces)
+      .values({
+        name,
+        slug,
+        description: description || null,
+        ownerId: locals.user.id,
+      })
+      .returning();
 
-		// Redirect to new workspace
-		throw redirect(303, `/workspaces/${workspace.slug}`);
-	}
+    // Redirect to new workspace
+    throw redirect(303, `/workspaces/${workspace.slug}`);
+  },
 };
 ```
 
@@ -554,12 +558,12 @@ npm install -D @tailwindcss/forms
 
 ```typescript
 // src/lib/schemas/workspace.ts
-import { z } from 'zod';
+import { z } from "zod";
 
 export const workspaceSchema = z.object({
-	name: z.string().min(3, 'Name must be at least 3 characters'),
-	description: z.string().max(500, 'Description too long').optional(),
-	isPublic: z.boolean().default(false)
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  description: z.string().max(500, "Description too long").optional(),
+  isPublic: z.boolean().default(false),
 });
 
 export type WorkspaceSchema = z.infer<typeof workspaceSchema>;
@@ -569,45 +573,125 @@ export type WorkspaceSchema = z.infer<typeof workspaceSchema>;
 
 ```typescript
 // src/routes/workspaces/new/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import { workspaceSchema } from '$lib/schemas/workspace';
-import { db } from '$lib/server/db';
-import { workspaces } from '$lib/server/db/schema';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import { workspaceSchema } from "$lib/schemas/workspace";
+import { db } from "$lib/server/db";
+import { workspaces } from "$lib/server/db/schema";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	const form = await superValidate(zod(workspaceSchema));
-	return { form };
+  const form = await superValidate(zod(workspaceSchema));
+  return { form };
 };
 
 export const actions: Actions = {
-	default: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(workspaceSchema));
+  default: async ({ request, locals }) => {
+    const form = await superValidate(request, zod(workspaceSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		const slug = generateSlug(form.data.name);
+    const slug = generateSlug(form.data.name);
 
-		const [workspace] = await db
-			.insert(workspaces)
-			.values({
-				name: form.data.name,
-				slug,
-				description: form.data.description,
-				ownerId: locals.user!.id
-			})
-			.returning();
+    const [workspace] = await db
+      .insert(workspaces)
+      .values({
+        name: form.data.name,
+        slug,
+        description: form.data.description,
+        ownerId: locals.user!.id,
+      })
+      .returning();
 
-		throw redirect(303, `/workspaces/${workspace.slug}`);
-	}
+    throw redirect(303, `/workspaces/${workspace.slug}`);
+  },
 };
 ```
 
 **Client form with Formsnap:**
+
+> **⚠️ Library Note:** The Formsnap examples below use the library's slot directive syntax (`let:attrs`). Check the [Formsnap documentation](https://formsnap.dev) for Svelte 5 updates. The standard form approach below works without third-party dependencies.
+
+**Standard Svelte 5 Form (No Dependencies):**
+
+```svelte
+<!-- src/routes/workspaces/new/+page.svelte -->
+<script lang="ts">
+	import { superForm } from 'sveltekit-superforms';
+	import { zodClient } from 'sveltekit-superforms/adapters';
+	import { workspaceSchema } from '$lib/schemas/workspace';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
+
+	const form = superForm(data.form, {
+		validators: zodClient(workspaceSchema),
+		resetForm: true
+	});
+
+	const { form: formData, enhance, errors, delayed } = form;
+</script>
+
+<div class="container mx-auto max-w-2xl p-6">
+	<h1 class="text-3xl font-bold mb-6">Create Workspace</h1>
+
+	<form method="POST" use:enhance class="space-y-4">
+		<div class="form-control w-full">
+			<label class="label" for="name">
+				<span class="label-text">Workspace Name</span>
+			</label>
+			<input
+				id="name"
+				name="name"
+				bind:value={$formData.name}
+				class="input input-bordered w-full"
+				class:input-error={$errors.name}
+			/>
+			{#if $errors.name}
+				<span class="text-error text-sm mt-1">{$errors.name}</span>
+			{/if}
+		</div>
+
+		<div class="form-control w-full">
+			<label class="label" for="description">
+				<span class="label-text">Description</span>
+			</label>
+			<textarea
+				id="description"
+				name="description"
+				bind:value={$formData.description}
+				class="textarea textarea-bordered w-full"
+				class:textarea-error={$errors.description}
+				rows={4}
+			/>
+			{#if $errors.description}
+				<span class="text-error text-sm mt-1">{$errors.description}</span>
+			{/if}
+		</div>
+
+		<div class="form-control">
+			<label class="label cursor-pointer justify-start gap-4">
+				<input
+					type="checkbox"
+					name="isPublic"
+					bind:checked={$formData.isPublic}
+					class="checkbox"
+				/>
+				<span class="label-text">Make workspace public</span>
+			</label>
+		</div>
+
+		<button type="submit" class="btn btn-primary" disabled={$delayed}>
+			{$delayed ? 'Creating...' : 'Create Workspace'}
+		</button>
+	</form>
+</div>
+```
+
+**Formsnap Library Approach (for reference):**
 
 ```svelte
 <!-- src/routes/workspaces/new/+page.svelte -->
@@ -669,6 +753,8 @@ export const actions: Actions = {
 </div>
 ```
 
+> **Note:** The Formsnap example above uses `let:attrs` which is Svelte 4 slot directive syntax. The library may update to use Svelte 5 snippets - always check latest documentation. The standard form approach above is the recommended pattern.
+
 **Benefits:**
 
 - ✅ Client-side validation with Zod
@@ -683,17 +769,25 @@ export const actions: Actions = {
 
 ### Clean Form Code
 
-Extract form components for reusability.
+Extract form components for reusability using Svelte 5 snippets.
 
 ```svelte
 <!-- src/lib/components/forms/WorkspaceForm.svelte -->
 <script lang="ts">
+	import type { Snippet } from 'svelte';
 	import { superForm } from 'sveltekit-superforms';
 	import { zodClient } from 'sveltekit-superforms/adapters';
 	import { workspaceSchema } from '$lib/schemas/workspace';
-	import * as Form from 'formsnap';
 
-	let { data, action = '?/default' }: { data: any; action?: string } = $props();
+	let {
+		data,
+		action = '?/default',
+		submitButton
+	}: {
+		data: any;
+		action?: string;
+		submitButton: Snippet<[{ delayed: boolean }]>;
+	} = $props();
 
 	const form = superForm(data, {
 		validators: zodClient(workspaceSchema)
@@ -703,32 +797,36 @@ Extract form components for reusability.
 </script>
 
 <form method="POST" {action} use:enhance class="space-y-4">
-	<Form.Field {form} name="name">
-		<Form.Control let:attrs>
-			<Form.Label>Workspace Name</Form.Label>
-			<input {...attrs} bind:value={$formData.name} class="input input-bordered w-full" />
-		</Form.Control>
-		<Form.FieldErrors class="text-error text-sm mt-1" />
-	</Form.Field>
+	<div class="form-control w-full">
+		<label class="label" for="name">
+			<span class="label-text">Workspace Name</span>
+		</label>
+		<input
+			id="name"
+			name="name"
+			bind:value={$formData.name}
+			class="input input-bordered w-full"
+		/>
+	</div>
 
-	<Form.Field {form} name="description">
-		<Form.Control let:attrs>
-			<Form.Label>Description</Form.Label>
-			<textarea
-				{...attrs}
-				bind:value={$formData.description}
-				class="textarea textarea-bordered w-full"
-				rows="4"
-			/>
-		</Form.Control>
-		<Form.FieldErrors class="text-error text-sm mt-1" />
-	</Form.Field>
+	<div class="form-control w-full">
+		<label class="label" for="description">
+			<span class="label-text">Description</span>
+		</label>
+		<textarea
+			id="description"
+			name="description"
+			bind:value={$formData.description}
+			class="textarea textarea-bordered w-full"
+			rows={4}
+		/>
+	</div>
 
-	<slot {delayed} />
+	{@render submitButton({ delayed })}
 </form>
 ```
 
-**Usage:**
+**Usage with Svelte 5 Snippets:**
 
 ```svelte
 <script lang="ts">
@@ -738,12 +836,16 @@ Extract form components for reusability.
 	let { data }: { data: PageData } = $props();
 </script>
 
-<WorkspaceForm data={data.form} let:delayed>
-	<button type="submit" class="btn btn-primary" disabled={delayed}>
-		{delayed ? 'Creating...' : 'Create Workspace'}
-	</button>
+<WorkspaceForm data={data.form}>
+	{#snippet submitButton({ delayed })}
+		<button type="submit" class="btn btn-primary" disabled={delayed}>
+			{delayed ? 'Creating...' : 'Create Workspace'}
+		</button>
+	{/snippet}
 </WorkspaceForm>
 ```
+
+> **Note:** This example demonstrates the Svelte 5 snippet pattern for passing content with data. The `submitButton` snippet receives `{ delayed }` as a parameter, enabling the submit button to show loading state.
 
 ---
 
@@ -755,59 +857,59 @@ Implement full CRUD operations.
 
 ```typescript
 // src/routes/workspaces/[slug]/settings/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import { workspaceSchema } from '$lib/schemas/workspace';
-import { db } from '$lib/server/db';
-import { workspaces } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import { workspaceSchema } from "$lib/schemas/workspace";
+import { db } from "$lib/server/db";
+import { workspaces } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ parent }) => {
-	const { workspace } = await parent();
+  const { workspace } = await parent();
 
-	// Pre-populate form with existing data
-	const form = await superValidate(
-		{
-			name: workspace.name,
-			description: workspace.description || '',
-			isPublic: workspace.isPublic
-		},
-		zod(workspaceSchema)
-	);
+  // Pre-populate form with existing data
+  const form = await superValidate(
+    {
+      name: workspace.name,
+      description: workspace.description || "",
+      isPublic: workspace.isPublic,
+    },
+    zod(workspaceSchema)
+  );
 
-	return { form };
+  return { form };
 };
 
 export const actions: Actions = {
-	update: async ({ request, params, locals }) => {
-		const form = await superValidate(request, zod(workspaceSchema));
+  update: async ({ request, params, locals }) => {
+    const form = await superValidate(request, zod(workspaceSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		const slug = generateSlug(form.data.name);
+    const slug = generateSlug(form.data.name);
 
-		await db
-			.update(workspaces)
-			.set({
-				name: form.data.name,
-				slug,
-				description: form.data.description,
-				updatedAt: new Date()
-			})
-			.where(eq(workspaces.slug, params.slug));
+    await db
+      .update(workspaces)
+      .set({
+        name: form.data.name,
+        slug,
+        description: form.data.description,
+        updatedAt: new Date(),
+      })
+      .where(eq(workspaces.slug, params.slug));
 
-		throw redirect(303, `/workspaces/${slug}/settings`);
-	},
+    throw redirect(303, `/workspaces/${slug}/settings`);
+  },
 
-	delete: async ({ params, locals }) => {
-		await db.delete(workspaces).where(eq(workspaces.slug, params.slug));
+  delete: async ({ params, locals }) => {
+    await db.delete(workspaces).where(eq(workspaces.slug, params.slug));
 
-		throw redirect(303, '/workspaces');
-	}
+    throw redirect(303, "/workspaces");
+  },
 };
 ```
 
@@ -828,10 +930,12 @@ export const actions: Actions = {
 	<div class="card bg-base-100 shadow mb-6">
 		<div class="card-body">
 			<h2 class="card-title">General Settings</h2>
-			<WorkspaceForm data={data.form} action="?/update" let:delayed>
-				<button type="submit" class="btn btn-primary" disabled={delayed}>
-					{delayed ? 'Saving...' : 'Save Changes'}
-				</button>
+			<WorkspaceForm data={data.form} action="?/update">
+				{#snippet submitButton({ delayed })}
+					<button type="submit" class="btn btn-primary" disabled={delayed}>
+						{delayed ? 'Saving...' : 'Save Changes'}
+					</button>
+				{/snippet}
 			</WorkspaceForm>
 		</div>
 	</div>
@@ -875,21 +979,21 @@ Open routes in modals while preserving URL state.
 ```typescript
 // src/routes/workspaces/+page.server.ts
 export const load: PageServerLoad = async ({ url }) => {
-	const workspaces = await db.select().from(workspaces);
+  const workspaces = await db.select().from(workspaces);
 
-	// Check if modal should be shown
-	const showNewModal = url.searchParams.has('new');
+  // Check if modal should be shown
+  const showNewModal = url.searchParams.has("new");
 
-	let newWorkspaceForm;
-	if (showNewModal) {
-		newWorkspaceForm = await superValidate(zod(workspaceSchema));
-	}
+  let newWorkspaceForm;
+  if (showNewModal) {
+    newWorkspaceForm = await superValidate(zod(workspaceSchema));
+  }
 
-	return {
-		workspaces,
-		showNewModal,
-		newWorkspaceForm
-	};
+  return {
+    workspaces,
+    showNewModal,
+    newWorkspaceForm,
+  };
 };
 ```
 
@@ -941,13 +1045,15 @@ export const load: PageServerLoad = async ({ url }) => {
 
 			<h3 class="font-bold text-lg mb-4">Create Workspace</h3>
 
-			<WorkspaceForm data={data.newWorkspaceForm} let:delayed>
-				<div class="modal-action">
-					<button type="button" class="btn btn-ghost" onclick={closeModal}> Cancel </button>
-					<button type="submit" class="btn btn-primary" disabled={delayed}>
-						{delayed ? 'Creating...' : 'Create'}
-					</button>
-				</div>
+			<WorkspaceForm data={data.newWorkspaceForm}>
+				{#snippet submitButton({ delayed })}
+					<div class="modal-action">
+						<button type="button" class="btn btn-ghost" onclick={closeModal}> Cancel </button>
+						<button type="submit" class="btn btn-primary" disabled={delayed}>
+							{delayed ? 'Creating...' : 'Create'}
+						</button>
+					</div>
+				{/snippet}
 			</WorkspaceForm>
 		</div>
 		<div class="modal-backdrop" onclick={closeModal}></div>
@@ -1016,41 +1122,45 @@ src/
 
 ```typescript
 // src/lib/stores/toast.ts
-import { writable } from 'svelte/store';
+import { writable } from "svelte/store";
 
 type Toast = {
-	id: number;
-	message: string;
-	type: 'success' | 'error' | 'info';
+  id: number;
+  message: string;
+  type: "success" | "error" | "info";
 };
 
 function createToastStore() {
-	const { subscribe, update } = writable<Toast[]>([]);
+  const { subscribe, update } = writable<Toast[]>([]);
 
-	let nextId = 0;
+  let nextId = 0;
 
-	function show(message: string, type: Toast['type'] = 'info', duration = 3000) {
-		const id = nextId++;
-		const toast: Toast = { id, message, type };
+  function show(
+    message: string,
+    type: Toast["type"] = "info",
+    duration = 3000
+  ) {
+    const id = nextId++;
+    const toast: Toast = { id, message, type };
 
-		update((toasts) => [...toasts, toast]);
+    update((toasts) => [...toasts, toast]);
 
-		setTimeout(() => {
-			remove(id);
-		}, duration);
-	}
+    setTimeout(() => {
+      remove(id);
+    }, duration);
+  }
 
-	function remove(id: number) {
-		update((toasts) => toasts.filter((t) => t.id !== id));
-	}
+  function remove(id: number) {
+    update((toasts) => toasts.filter((t) => t.id !== id));
+  }
 
-	return {
-		subscribe,
-		success: (message: string) => show(message, 'success'),
-		error: (message: string) => show(message, 'error'),
-		info: (message: string) => show(message, 'info'),
-		remove
-	};
+  return {
+    subscribe,
+    success: (message: string) => show(message, "success"),
+    error: (message: string) => show(message, "error"),
+    info: (message: string) => show(message, "info"),
+    remove,
+  };
 }
 
 export const toast = createToastStore();
@@ -1083,128 +1193,130 @@ export const toast = createToastStore();
 
 ### Workspaces List Page
 
+> **⚠️ Library Note:** This example uses Formsnap with `let:attrs` slot directive syntax. This is Svelte 4 syntax that may be updated in future Formsnap versions. For Svelte 5 native forms, refer to the standard form approach shown earlier in this section.
+
 ```typescript
 // src/routes/workspaces/+page.server.ts
-import { superValidate } from 'sveltekit-superforms';
-import { zod } from 'sveltekit-superforms/adapters';
-import { workspaceSchema } from '$lib/schemas/workspace';
-import { db } from '$lib/server/db';
-import { workspaces, workspaceMembers } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import { superValidate } from "sveltekit-superforms";
+import { zod } from "sveltekit-superforms/adapters";
+import { workspaceSchema } from "$lib/schemas/workspace";
+import { db } from "$lib/server/db";
+import { workspaces, workspaceMembers } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals, url }) => {
-	const userWorkspaces = await db
-		.select({
-			id: workspaces.id,
-			name: workspaces.name,
-			slug: workspaces.slug,
-			description: workspaces.description,
-			isPublic: workspaces.isPublic,
-			createdAt: workspaces.createdAt,
-			role: workspaceMembers.role
-		})
-		.from(workspaceMembers)
-		.innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
-		.where(eq(workspaceMembers.userId, locals.user!.id));
+  const userWorkspaces = await db
+    .select({
+      id: workspaces.id,
+      name: workspaces.name,
+      slug: workspaces.slug,
+      description: workspaces.description,
+      isPublic: workspaces.isPublic,
+      createdAt: workspaces.createdAt,
+      role: workspaceMembers.role,
+    })
+    .from(workspaceMembers)
+    .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+    .where(eq(workspaceMembers.userId, locals.user!.id));
 
-	// Modal states
-	const showNew = url.searchParams.has('new');
-	const editSlug = url.searchParams.get('edit');
+  // Modal states
+  const showNew = url.searchParams.has("new");
+  const editSlug = url.searchParams.get("edit");
 
-	let newForm, editForm, editWorkspace;
+  let newForm, editForm, editWorkspace;
 
-	if (showNew) {
-		newForm = await superValidate(zod(workspaceSchema));
-	}
+  if (showNew) {
+    newForm = await superValidate(zod(workspaceSchema));
+  }
 
-	if (editSlug) {
-		const [workspace] = await db
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.slug, editSlug))
-			.limit(1);
+  if (editSlug) {
+    const [workspace] = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.slug, editSlug))
+      .limit(1);
 
-		if (workspace) {
-			editWorkspace = workspace;
-			editForm = await superValidate(
-				{
-					name: workspace.name,
-					description: workspace.description || '',
-					isPublic: workspace.isPublic
-				},
-				zod(workspaceSchema)
-			);
-		}
-	}
+    if (workspace) {
+      editWorkspace = workspace;
+      editForm = await superValidate(
+        {
+          name: workspace.name,
+          description: workspace.description || "",
+          isPublic: workspace.isPublic,
+        },
+        zod(workspaceSchema)
+      );
+    }
+  }
 
-	return {
-		workspaces: userWorkspaces,
-		showNew,
-		newForm,
-		editSlug,
-		editForm,
-		editWorkspace
-	};
+  return {
+    workspaces: userWorkspaces,
+    showNew,
+    newForm,
+    editSlug,
+    editForm,
+    editWorkspace,
+  };
 };
 
 export const actions: Actions = {
-	create: async ({ request, locals }) => {
-		const form = await superValidate(request, zod(workspaceSchema));
+  create: async ({ request, locals }) => {
+    const form = await superValidate(request, zod(workspaceSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		const slug = generateSlug(form.data.name);
+    const slug = generateSlug(form.data.name);
 
-		await db.insert(workspaces).values({
-			name: form.data.name,
-			slug,
-			description: form.data.description,
-			ownerId: locals.user!.id
-		});
+    await db.insert(workspaces).values({
+      name: form.data.name,
+      slug,
+      description: form.data.description,
+      ownerId: locals.user!.id,
+    });
 
-		return { form, success: true };
-	},
+    return { form, success: true };
+  },
 
-	update: async ({ request, url }) => {
-		const editSlug = url.searchParams.get('edit');
-		if (!editSlug) {
-			return fail(400, { error: 'Missing workspace' });
-		}
+  update: async ({ request, url }) => {
+    const editSlug = url.searchParams.get("edit");
+    if (!editSlug) {
+      return fail(400, { error: "Missing workspace" });
+    }
 
-		const form = await superValidate(request, zod(workspaceSchema));
+    const form = await superValidate(request, zod(workspaceSchema));
 
-		if (!form.valid) {
-			return fail(400, { form });
-		}
+    if (!form.valid) {
+      return fail(400, { form });
+    }
 
-		const newSlug = generateSlug(form.data.name);
+    const newSlug = generateSlug(form.data.name);
 
-		await db
-			.update(workspaces)
-			.set({
-				name: form.data.name,
-				slug: newSlug,
-				description: form.data.description,
-				updatedAt: new Date()
-			})
-			.where(eq(workspaces.slug, editSlug));
+    await db
+      .update(workspaces)
+      .set({
+        name: form.data.name,
+        slug: newSlug,
+        description: form.data.description,
+        updatedAt: new Date(),
+      })
+      .where(eq(workspaces.slug, editSlug));
 
-		return { form, success: true };
-	},
+    return { form, success: true };
+  },
 
-	delete: async ({ url }) => {
-		const editSlug = url.searchParams.get('edit');
-		if (!editSlug) {
-			return fail(400, { error: 'Missing workspace' });
-		}
+  delete: async ({ url }) => {
+    const editSlug = url.searchParams.get("edit");
+    if (!editSlug) {
+      return fail(400, { error: "Missing workspace" });
+    }
 
-		await db.delete(workspaces).where(eq(workspaces.slug, editSlug));
+    await db.delete(workspaces).where(eq(workspaces.slug, editSlug));
 
-		return { success: true, deleted: true };
-	}
+    return { success: true, deleted: true };
+  },
 };
 ```
 

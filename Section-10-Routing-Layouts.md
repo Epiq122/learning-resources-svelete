@@ -111,7 +111,7 @@ Layouts automatically wrap all child routes. Each route gets:
 **⚠️ Common Mistakes:**
 
 - Don't create a layout for every page - only when you need shared UI
-- Don't forget `<slot />` in layouts - it's where child content renders
+- Don't forget `{@render children()}` in layouts - it's where child content renders (Svelte 5 uses snippets, not `<slot />`)
 - Don't put business logic in layouts - use page/layout load functions
 
 ---
@@ -260,13 +260,13 @@ src/routes/
 ```typescript
 // src/routes/blog/[slug]/+page.ts
 export const load = ({ params }) => {
-	return {
-		post: {
-			slug: params.slug,
-			title: `Post about ${params.slug}`,
-			content: 'This would come from your database...'
-		}
-	};
+  return {
+    post: {
+      slug: params.slug,
+      title: `Post about ${params.slug}`,
+      content: "This would come from your database...",
+    },
+  };
 };
 ```
 
@@ -321,6 +321,9 @@ src/routes/
 <!-- src/routes/dashboard/+layout.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="drawer lg:drawer-open">
@@ -345,7 +348,7 @@ src/routes/
 
 		<!-- Page content -->
 		<div class="p-4">
-			<slot />
+			{@render children()}
 		</div>
 	</div>
 
@@ -383,8 +386,9 @@ Change layout behavior based on route data or user state.
 <!-- src/routes/dashboard/+layout.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
 
-	let { data } = $props();
+	let { data, children }: { data: any; children: Snippet } = $props();
 
 	// Conditionally show sidebar based on route or user
 	const showSidebar = $derived(!$page.url.pathname.includes('/fullscreen'));
@@ -398,7 +402,7 @@ Change layout behavior based on route data or user state.
 	{/if}
 
 	<div class="drawer-content">
-		<slot />
+		{@render children()}
 	</div>
 </div>
 ```
@@ -462,8 +466,14 @@ src/routes/
 
 ```svelte
 <!-- src/routes/dashboard/login/+layout@.svelte -->
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
+</script>
+
 <div class="min-h-screen flex items-center justify-center bg-base-200">
-	<slot />
+	{@render children()}
 </div>
 ```
 
@@ -521,12 +531,12 @@ src/routes/
 ```typescript
 // src/routes/[[lang]]/+page.ts
 export const load = ({ params }) => {
-	const lang = params.lang || 'en'; // Default to 'en'
+  const lang = params.lang || "en"; // Default to 'en'
 
-	return {
-		lang,
-		greeting: lang === 'es' ? 'Hola' : 'Hello'
-	};
+  return {
+    lang,
+    greeting: lang === "es" ? "Hola" : "Hello",
+  };
 };
 ```
 
@@ -544,10 +554,10 @@ Create custom matchers to validate route parameters.
 
 ```typescript
 // src/params/integer.ts
-import type { ParamMatcher } from '@sveltejs/kit';
+import type { ParamMatcher } from "@sveltejs/kit";
 
 export const match: ParamMatcher = (param) => {
-	return /^\d+$/.test(param);
+  return /^\d+$/.test(param);
 };
 ```
 
@@ -579,12 +589,14 @@ src/routes/
 ```typescript
 // src/params/uuid.ts
 export const match = (param) => {
-	return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(param);
+  return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    param
+  );
 };
 
 // src/params/slug.ts
 export const match = (param) => {
-	return /^[a-z0-9-]+$/.test(param);
+  return /^[a-z0-9-]+$/.test(param);
 };
 ```
 
@@ -652,9 +664,12 @@ src/
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import '../app.css';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
-<slot />
+{@render children()}
 ```
 
 ### Marketing Layout
@@ -664,12 +679,15 @@ src/
 <script lang="ts">
 	import MarketingNav from '$lib/components/MarketingNav.svelte';
 	import Footer from '$lib/components/Footer.svelte';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="min-h-screen flex flex-col">
 	<MarketingNav />
 	<main class="flex-1">
-		<slot />
+		{@render children()}
 	</main>
 	<Footer />
 </div>
@@ -712,6 +730,9 @@ src/
 <script lang="ts">
 	import DashboardNav from '$lib/components/DashboardNav.svelte';
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <div class="drawer lg:drawer-open">
@@ -751,7 +772,7 @@ src/
 
 		<!-- Page content -->
 		<main class="flex-1 p-6 bg-base-200">
-			<slot />
+			{@render children()}
 		</main>
 	</div>
 
@@ -1006,19 +1027,19 @@ src/
 
 ```typescript
 // src/params/integer.ts
-import type { ParamMatcher } from '@sveltejs/kit';
+import type { ParamMatcher } from "@sveltejs/kit";
 
 export const match: ParamMatcher = (param) => {
-	return /^\d+$/.test(param);
+  return /^\d+$/.test(param);
 };
 ```
 
 ```typescript
 // src/params/slug.ts
-import type { ParamMatcher } from '@sveltejs/kit';
+import type { ParamMatcher } from "@sveltejs/kit";
 
 export const match: ParamMatcher = (param) => {
-	return /^[a-z0-9-]+$/.test(param);
+  return /^[a-z0-9-]+$/.test(param);
 };
 ```
 

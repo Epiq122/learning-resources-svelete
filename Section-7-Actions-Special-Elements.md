@@ -71,19 +71,19 @@ Actions are functions that run when an element is **mounted** and **unmounted**.
 
 ```typescript
 function actionName(node: HTMLElement, parameters?: any) {
-	// Setup code runs when element is added to DOM
+  // Setup code runs when element is added to DOM
 
-	return {
-		// Optional: Update when parameters change
-		update(newParameters: any) {
-			// Update logic
-		},
+  return {
+    // Optional: Update when parameters change
+    update(newParameters: any) {
+      // Update logic
+    },
 
-		// Optional: Cleanup when element is removed
-		destroy() {
-			// Cleanup logic (remove listeners, etc.)
-		}
-	};
+    // Optional: Cleanup when element is removed
+    destroy() {
+      // Cleanup logic (remove listeners, etc.)
+    },
+  };
 }
 ```
 
@@ -773,8 +773,11 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 		</button>
 	</div>
 {:else}
-	<slot />
+	{@render children()}
 {/if}
+```
+
+> **Note:** Add `import type { Snippet } from 'svelte';` and `let { children }: { children: Snippet } = $props();` in the script section.
 
 <style>
 	@keyframes shake {
@@ -831,7 +834,8 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 		transform: translateY(-2px);
 	}
 </style>
-```
+
+````
 
 ### Usage Example: Protected Data Display
 
@@ -894,7 +898,7 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 		{/if}
 	</ErrorBoundary>
 </div>
-```
+````
 
 **Key Concepts:**
 
@@ -1550,23 +1554,23 @@ src/lib/actions/
 
 ```typescript
 export function myAction(node: HTMLElement, params?: ActionParams) {
-	// 1. Setup - Initialize library/listeners
-	const instance = library.create(node, params);
+  // 1. Setup - Initialize library/listeners
+  const instance = library.create(node, params);
 
-	// 2. Update - Handle parameter changes
-	function update(newParams?: ActionParams) {
-		instance.setOptions(newParams);
-	}
+  // 2. Update - Handle parameter changes
+  function update(newParams?: ActionParams) {
+    instance.setOptions(newParams);
+  }
 
-	// 3. Cleanup - CRITICAL for memory leaks
-	function destroy() {
-		instance.destroy();
-		// Remove event listeners
-		// Cancel timers
-		// Clear references
-	}
+  // 3. Cleanup - CRITICAL for memory leaks
+  function destroy() {
+    instance.destroy();
+    // Remove event listeners
+    // Cancel timers
+    // Clear references
+  }
 
-	return { update, destroy };
+  return { update, destroy };
 }
 ```
 
@@ -1597,18 +1601,18 @@ export function myAction(node: HTMLElement, params?: ActionParams) {
 ```typescript
 // ❌ Bad - listeners never removed
 export function clickOutside(node: HTMLElement) {
-	window.addEventListener('click', handler);
-	// Missing destroy!
+  window.addEventListener("click", handler);
+  // Missing destroy!
 }
 
 // ✅ Good - cleanup in destroy
 export function clickOutside(node: HTMLElement) {
-	window.addEventListener('click', handler);
-	return {
-		destroy() {
-			window.removeEventListener('click', handler);
-		}
-	};
+  window.addEventListener("click", handler);
+  return {
+    destroy() {
+      window.removeEventListener("click", handler);
+    },
+  };
 }
 ```
 
@@ -1617,13 +1621,13 @@ export function clickOutside(node: HTMLElement) {
 ```typescript
 // ❌ Bad - crashes during SSR
 export function action(node: HTMLElement) {
-	const instance = new BrowserOnlyLibrary(node);
+  const instance = new BrowserOnlyLibrary(node);
 }
 
 // ✅ Good - checks for browser
 export function action(node: HTMLElement) {
-	if (typeof window === 'undefined') return;
-	const instance = new BrowserOnlyLibrary(node);
+  if (typeof window === "undefined") return;
+  const instance = new BrowserOnlyLibrary(node);
 }
 ```
 
@@ -1652,21 +1656,21 @@ import { getTheme, getUser, getCart } from '$lib/contexts';
 ### 🧪 Testing Actions
 
 ```typescript
-import { tick } from 'svelte';
-import { render } from '@testing-library/svelte';
-import { clickOutside } from './clickOutside';
+import { tick } from "svelte";
+import { render } from "@testing-library/svelte";
+import { clickOutside } from "./clickOutside";
 
-test('clickOutside triggers callback', async () => {
-	const callback = vi.fn();
-	const node = document.createElement('div');
+test("clickOutside triggers callback", async () => {
+  const callback = vi.fn();
+  const node = document.createElement("div");
 
-	clickOutside(node, callback);
+  clickOutside(node, callback);
 
-	// Click outside
-	document.body.click();
-	await tick();
+  // Click outside
+  document.body.click();
+  await tick();
 
-	expect(callback).toHaveBeenCalled();
+  expect(callback).toHaveBeenCalled();
 });
 ```
 

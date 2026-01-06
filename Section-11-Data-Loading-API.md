@@ -99,12 +99,12 @@ Load functions fetch data **before** a page renders. They run on the server duri
 ```typescript
 // src/routes/blog/+page.ts
 export const load = async () => {
-	return {
-		posts: [
-			{ id: 1, title: 'First Post', slug: 'first-post' },
-			{ id: 2, title: 'Second Post', slug: 'second-post' }
-		]
-	};
+  return {
+    posts: [
+      { id: 1, title: "First Post", slug: "first-post" },
+      { id: 2, title: "Second Post", slug: "second-post" },
+    ],
+  };
 };
 ```
 
@@ -141,10 +141,10 @@ Universal loads (`+page.ts`) run on both server and client.
 ```typescript
 // src/routes/products/+page.ts
 export const load = async ({ fetch }) => {
-	const response = await fetch('https://api.example.com/products');
-	const products = await response.json();
+  const response = await fetch("https://api.example.com/products");
+  const products = await response.json();
 
-	return { products };
+  return { products };
 };
 ```
 
@@ -165,10 +165,10 @@ SvelteKit generates types automatically from your load functions!
 ```typescript
 // src/routes/blog/+page.ts
 export const load = async () => {
-	return {
-		title: 'Blog',
-		posts: [{ id: 1, title: 'Post 1' }]
-	};
+  return {
+    title: "Blog",
+    posts: [{ id: 1, title: "Post 1" }],
+  };
 };
 ```
 
@@ -197,15 +197,15 @@ Use `+page.server.ts` for database queries and secrets.
 
 ```typescript
 // src/routes/dashboard/+page.server.ts
-import { db } from '$lib/server/database';
+import { db } from "$lib/server/database";
 
 export const load = async ({ locals }) => {
-	// Only runs on server - safe for secrets!
-	const user = await db.users.findUnique({
-		where: { id: locals.userId }
-	});
+  // Only runs on server - safe for secrets!
+  const user = await db.users.findUnique({
+    where: { id: locals.userId },
+  });
 
-	return { user };
+  return { user };
 };
 ```
 
@@ -227,13 +227,13 @@ Layout load functions provide data to all child pages.
 ```typescript
 // src/routes/dashboard/+layout.server.ts
 export const load = async ({ locals }) => {
-	return {
-		user: locals.user,
-		navigation: [
-			{ label: 'Overview', href: '/dashboard' },
-			{ label: 'Settings', href: '/dashboard/settings' }
-		]
-	};
+  return {
+    user: locals.user,
+    navigation: [
+      { label: "Overview", href: "/dashboard" },
+      { label: "Settings", href: "/dashboard/settings" },
+    ],
+  };
 };
 ```
 
@@ -258,12 +258,12 @@ Access parent load data using `await parent()`.
 ```typescript
 // src/routes/dashboard/settings/+page.ts
 export const load = async ({ parent }) => {
-	const { user } = await parent(); // Get layout data
+  const { user } = await parent(); // Get layout data
 
-	return {
-		user, // Pass it down
-		settings: { theme: 'dark', notifications: true }
-	};
+  return {
+    user, // Pass it down
+    settings: { theme: "dark", notifications: true },
+  };
 };
 ```
 
@@ -296,13 +296,16 @@ Use the `page` store to pass data up to layouts.
 <!-- src/routes/+layout.svelte -->
 <script lang="ts">
 	import { page } from '$app/stores';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
 <svelte:head>
 	<title>{$page.data.meta?.title || 'Default Title'}</title>
 </svelte:head>
 
-<slot />
+{@render children()}
 ```
 
 ---
@@ -315,15 +318,15 @@ Create API endpoints with `+server.ts` files.
 
 ```typescript
 // src/routes/api/posts/+server.ts
-import { json } from '@sveltejs/kit';
+import { json } from "@sveltejs/kit";
 
 export const GET = async () => {
-	const posts = [
-		{ id: 1, title: 'First Post' },
-		{ id: 2, title: 'Second Post' }
-	];
+  const posts = [
+    { id: 1, title: "First Post" },
+    { id: 2, title: "Second Post" },
+  ];
 
-	return json(posts);
+  return json(posts);
 };
 ```
 
@@ -337,19 +340,19 @@ export const GET = async () => {
 
 ```typescript
 // src/routes/api/posts/+server.ts
-import { json } from '@sveltejs/kit';
+import { json } from "@sveltejs/kit";
 
 export const POST = async ({ request }) => {
-	const body = await request.json();
+  const body = await request.json();
 
-	// Save to database
-	const newPost = {
-		id: Date.now(),
-		title: body.title,
-		content: body.content
-	};
+  // Save to database
+  const newPost = {
+    id: Date.now(),
+    title: body.title,
+    content: body.content,
+  };
 
-	return json(newPost, { status: 201 });
+  return json(newPost, { status: 201 });
 };
 ```
 
@@ -401,15 +404,15 @@ src/routes/contact/
 
 ```typescript
 // src/routes/contact/+server.ts
-import { json } from '@sveltejs/kit';
+import { json } from "@sveltejs/kit";
 
 export const POST = async ({ request }) => {
-	const { message } = await request.json();
+  const { message } = await request.json();
 
-	// Send email, save to DB, etc.
-	console.log('Received message:', message);
+  // Send email, save to DB, etc.
+  console.log("Received message:", message);
 
-	return json({ success: true });
+  return json({ success: true });
 };
 ```
 
@@ -424,11 +427,11 @@ Use the enhanced `fetch` in load functions for automatic SSR support.
 ```typescript
 // src/routes/weather/+page.ts
 export const load = async ({ fetch }) => {
-	// This fetch works on both server and client!
-	const response = await fetch('https://api.weather.com/forecast');
-	const data = await response.json();
+  // This fetch works on both server and client!
+  const response = await fetch("https://api.weather.com/forecast");
+  const data = await response.json();
 
-	return { weather: data };
+  return { weather: data };
 };
 ```
 
@@ -443,17 +446,17 @@ export const load = async ({ fetch }) => {
 ```typescript
 // src/routes/blog/+page.ts
 export const load = async ({ url, fetch }) => {
-	const page = Number(url.searchParams.get('page') || '1');
-	const limit = 10;
+  const page = Number(url.searchParams.get("page") || "1");
+  const limit = 10;
 
-	const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
-	const { posts, total } = await response.json();
+  const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
+  const { posts, total } = await response.json();
 
-	return {
-		posts,
-		page,
-		totalPages: Math.ceil(total / limit)
-	};
+  return {
+    posts,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 ```
 
@@ -528,19 +531,19 @@ export const load = async ({ url, fetch }) => {
 ```typescript
 // src/routes/dashboard/+page.server.ts
 export const load = async () => {
-	// ❌ Slow: Sequential
-	// const user = await fetchUser();
-	// const stats = await fetchStats();
-	// const notifications = await fetchNotifications();
+  // ❌ Slow: Sequential
+  // const user = await fetchUser();
+  // const stats = await fetchStats();
+  // const notifications = await fetchNotifications();
 
-	// ✅ Fast: Parallel
-	const [user, stats, notifications] = await Promise.all([
-		fetchUser(),
-		fetchStats(),
-		fetchNotifications()
-	]);
+  // ✅ Fast: Parallel
+  const [user, stats, notifications] = await Promise.all([
+    fetchUser(),
+    fetchStats(),
+    fetchNotifications(),
+  ]);
 
-	return { user, stats, notifications };
+  return { user, stats, notifications };
 };
 ```
 
@@ -555,13 +558,13 @@ export const load = async () => {
 ```typescript
 // src/routes/dashboard/+page.server.ts
 export const load = async () => {
-	return {
-		// Fast data - loads immediately
-		user: await fetchUser(),
+  return {
+    // Fast data - loads immediately
+    user: await fetchUser(),
 
-		// Slow data - streams in later
-		analytics: fetchAnalytics() // No await!
-	};
+    // Slow data - streams in later
+    analytics: fetchAnalytics(), // No await!
+  };
 };
 ```
 
@@ -612,8 +615,10 @@ export const load = async () => {
 	<div class="fixed top-0 left-0 w-full h-1 bg-primary z-50" style="width: {progress}%"></div>
 {/if}
 
-<slot />
+{@render children()}
 ```
+
+> **Note:** Add `import type { Snippet } from 'svelte';` and `let { children }: { children: Snippet } = $props();` in the script section.
 
 ---
 
@@ -643,24 +648,24 @@ Hooks run on every request before route handlers.
 
 ```typescript
 // src/hooks.server.ts
-import { redirect } from '@sveltejs/kit';
-import type { Handle } from '@sveltejs/kit';
+import { redirect } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Get session from cookie
-	const sessionId = event.cookies.get('session');
+  // Get session from cookie
+  const sessionId = event.cookies.get("session");
 
-	if (sessionId) {
-		// Fetch user from database
-		event.locals.user = await getUserBySession(sessionId);
-	}
+  if (sessionId) {
+    // Fetch user from database
+    event.locals.user = await getUserBySession(sessionId);
+  }
 
-	// Protect dashboard routes
-	if (event.url.pathname.startsWith('/dashboard') && !event.locals.user) {
-		throw redirect(303, '/login');
-	}
+  // Protect dashboard routes
+  if (event.url.pathname.startsWith("/dashboard") && !event.locals.user) {
+    throw redirect(303, "/login");
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 ```
 
@@ -669,9 +674,9 @@ export const handle: Handle = async ({ event, resolve }) => {
 ```typescript
 // Any +page.server.ts or +layout.server.ts
 export const load = async ({ locals }) => {
-	return {
-		user: locals.user // Set in hooks!
-	};
+  return {
+    user: locals.user, // Set in hooks!
+  };
 };
 ```
 
@@ -683,19 +688,19 @@ export const load = async ({ locals }) => {
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import { error } from '@sveltejs/kit';
+import { error } from "@sveltejs/kit";
 
 export const load = async ({ params }) => {
-	const post = await db.posts.findUnique({
-		where: { slug: params.slug }
-	});
+  const post = await db.posts.findUnique({
+    where: { slug: params.slug },
+  });
 
-	if (!post) {
-		// Expected error - shows custom error page
-		throw error(404, 'Post not found');
-	}
+  if (!post) {
+    // Expected error - shows custom error page
+    throw error(404, "Post not found");
+  }
 
-	return { post };
+  return { post };
 };
 ```
 
@@ -786,111 +791,115 @@ src/
 ```typescript
 // src/lib/server/db.ts
 export interface Post {
-	id: number;
-	title: string;
-	slug: string;
-	content: string;
-	excerpt: string;
-	published: boolean;
-	createdAt: string;
+  id: number;
+  title: string;
+  slug: string;
+  content: string;
+  excerpt: string;
+  published: boolean;
+  createdAt: string;
 }
 
 export interface User {
-	id: number;
-	email: string;
-	name: string;
-	role: 'admin' | 'user';
+  id: number;
+  email: string;
+  name: string;
+  role: "admin" | "user";
 }
 
 // Mock data
 let posts: Post[] = [
-	{
-		id: 1,
-		title: 'Getting Started with SvelteKit',
-		slug: 'getting-started-sveltekit',
-		content: 'Full content here...',
-		excerpt: 'Learn the basics of SvelteKit',
-		published: true,
-		createdAt: '2024-01-01'
-	},
-	{
-		id: 2,
-		title: 'Advanced Routing Patterns',
-		slug: 'advanced-routing',
-		content: 'Full content here...',
-		excerpt: 'Master SvelteKit routing',
-		published: true,
-		createdAt: '2024-01-02'
-	}
+  {
+    id: 1,
+    title: "Getting Started with SvelteKit",
+    slug: "getting-started-sveltekit",
+    content: "Full content here...",
+    excerpt: "Learn the basics of SvelteKit",
+    published: true,
+    createdAt: "2024-01-01",
+  },
+  {
+    id: 2,
+    title: "Advanced Routing Patterns",
+    slug: "advanced-routing",
+    content: "Full content here...",
+    excerpt: "Master SvelteKit routing",
+    published: true,
+    createdAt: "2024-01-02",
+  },
 ];
 
-let users: User[] = [{ id: 1, email: 'admin@example.com', name: 'Admin User', role: 'admin' }];
+let users: User[] = [
+  { id: 1, email: "admin@example.com", name: "Admin User", role: "admin" },
+];
 
 const sessions = new Map<string, number>(); // sessionId -> userId
 
 export const db = {
-	posts: {
-		findMany: async ({ skip = 0, take = 10, where = {} }) => {
-			let filtered = posts.filter((p) => {
-				if (where.published !== undefined && p.published !== where.published) return false;
-				return true;
-			});
-			return filtered.slice(skip, skip + take);
-		},
-		count: async ({ where = {} }) => {
-			return posts.filter((p) => {
-				if (where.published !== undefined && p.published !== where.published) return false;
-				return true;
-			}).length;
-		},
-		findUnique: async ({ where }) => {
-			if (where.id) return posts.find((p) => p.id === where.id);
-			if (where.slug) return posts.find((p) => p.slug === where.slug);
-			return undefined;
-		},
-		create: async (data: Omit<Post, 'id' | 'createdAt'>) => {
-			const post: Post = {
-				...data,
-				id: posts.length + 1,
-				createdAt: new Date().toISOString()
-			};
-			posts.push(post);
-			return post;
-		},
-		update: async ({ where, data }) => {
-			const index = posts.findIndex((p) => p.id === where.id);
-			if (index === -1) return null;
-			posts[index] = { ...posts[index], ...data };
-			return posts[index];
-		},
-		delete: async ({ where }) => {
-			const index = posts.findIndex((p) => p.id === where.id);
-			if (index === -1) return null;
-			const deleted = posts[index];
-			posts.splice(index, 1);
-			return deleted;
-		}
-	},
-	users: {
-		findUnique: async ({ where }) => {
-			if (where.email) return users.find((u) => u.email === where.email);
-			if (where.id) return users.find((u) => u.id === where.id);
-			return undefined;
-		}
-	},
-	sessions: {
-		create: (userId: number) => {
-			const sessionId = Math.random().toString(36).slice(2);
-			sessions.set(sessionId, userId);
-			return sessionId;
-		},
-		get: (sessionId: string) => {
-			return sessions.get(sessionId);
-		},
-		delete: (sessionId: string) => {
-			sessions.delete(sessionId);
-		}
-	}
+  posts: {
+    findMany: async ({ skip = 0, take = 10, where = {} }) => {
+      let filtered = posts.filter((p) => {
+        if (where.published !== undefined && p.published !== where.published)
+          return false;
+        return true;
+      });
+      return filtered.slice(skip, skip + take);
+    },
+    count: async ({ where = {} }) => {
+      return posts.filter((p) => {
+        if (where.published !== undefined && p.published !== where.published)
+          return false;
+        return true;
+      }).length;
+    },
+    findUnique: async ({ where }) => {
+      if (where.id) return posts.find((p) => p.id === where.id);
+      if (where.slug) return posts.find((p) => p.slug === where.slug);
+      return undefined;
+    },
+    create: async (data: Omit<Post, "id" | "createdAt">) => {
+      const post: Post = {
+        ...data,
+        id: posts.length + 1,
+        createdAt: new Date().toISOString(),
+      };
+      posts.push(post);
+      return post;
+    },
+    update: async ({ where, data }) => {
+      const index = posts.findIndex((p) => p.id === where.id);
+      if (index === -1) return null;
+      posts[index] = { ...posts[index], ...data };
+      return posts[index];
+    },
+    delete: async ({ where }) => {
+      const index = posts.findIndex((p) => p.id === where.id);
+      if (index === -1) return null;
+      const deleted = posts[index];
+      posts.splice(index, 1);
+      return deleted;
+    },
+  },
+  users: {
+    findUnique: async ({ where }) => {
+      if (where.email) return users.find((u) => u.email === where.email);
+      if (where.id) return users.find((u) => u.id === where.id);
+      return undefined;
+    },
+  },
+  sessions: {
+    create: (userId: number) => {
+      const sessionId = Math.random().toString(36).slice(2);
+      sessions.set(sessionId, userId);
+      return sessionId;
+    },
+    get: (sessionId: string) => {
+      return sessions.get(sessionId);
+    },
+    delete: (sessionId: string) => {
+      sessions.delete(sessionId);
+    },
+  },
 };
 ```
 
@@ -898,28 +907,28 @@ export const db = {
 
 ```typescript
 // src/lib/server/auth.ts
-import { db } from './db';
+import { db } from "./db";
 
 export async function validateSession(sessionId: string | undefined) {
-	if (!sessionId) return null;
+  if (!sessionId) return null;
 
-	const userId = db.sessions.get(sessionId);
-	if (!userId) return null;
+  const userId = db.sessions.get(sessionId);
+  if (!userId) return null;
 
-	const user = await db.users.findUnique({ where: { id: userId } });
-	return user || null;
+  const user = await db.users.findUnique({ where: { id: userId } });
+  return user || null;
 }
 
 export async function login(email: string, password: string) {
-	// In production: verify password hash
-	const user = await db.users.findUnique({ where: { email } });
+  // In production: verify password hash
+  const user = await db.users.findUnique({ where: { email } });
 
-	if (!user || password !== 'password123') {
-		return null;
-	}
+  if (!user || password !== "password123") {
+    return null;
+  }
 
-	const sessionId = db.sessions.create(user.id);
-	return { user, sessionId };
+  const sessionId = db.sessions.create(user.id);
+  return { user, sessionId };
 }
 ```
 
@@ -927,21 +936,21 @@ export async function login(email: string, password: string) {
 
 ```typescript
 // src/hooks.server.ts
-import { validateSession } from '$lib/server/auth';
-import { redirect } from '@sveltejs/kit';
-import type { Handle } from '@sveltejs/kit';
+import { validateSession } from "$lib/server/auth";
+import { redirect } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	const sessionId = event.cookies.get('session');
-	event.locals.user = await validateSession(sessionId);
+  const sessionId = event.cookies.get("session");
+  event.locals.user = await validateSession(sessionId);
 
-	// Protect admin routes
-	if (event.url.pathname.startsWith('/admin') && !event.locals.user) {
-		throw redirect(303, '/login?redirect=' + event.url.pathname);
-	}
+  // Protect admin routes
+  if (event.url.pathname.startsWith("/admin") && !event.locals.user) {
+    throw redirect(303, "/login?redirect=" + event.url.pathname);
+  }
 
-	const response = await resolve(event);
-	return response;
+  const response = await resolve(event);
+  return response;
 };
 ```
 
@@ -949,14 +958,14 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ```typescript
 // src/app.d.ts
-import type { User } from '$lib/server/db';
+import type { User } from "$lib/server/db";
 
 declare global {
-	namespace App {
-		interface Locals {
-			user: User | null;
-		}
-	}
+  namespace App {
+    interface Locals {
+      user: User | null;
+    }
+  }
 }
 
 export {};
@@ -966,20 +975,20 @@ export {};
 
 ```typescript
 // src/routes/(public)/blog/+page.ts
-import type { PageLoad } from './$types';
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ url, fetch }) => {
-	const page = Number(url.searchParams.get('page') || '1');
-	const limit = 6;
+  const page = Number(url.searchParams.get("page") || "1");
+  const limit = 6;
 
-	const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
-	const { posts, total } = await response.json();
+  const response = await fetch(`/api/posts?page=${page}&limit=${limit}`);
+  const { posts, total } = await response.json();
 
-	return {
-		posts,
-		page,
-		totalPages: Math.ceil(total / limit)
-	};
+  return {
+    posts,
+    page,
+    totalPages: Math.ceil(total / limit),
+  };
 };
 ```
 
@@ -1010,18 +1019,18 @@ export const load: PageLoad = async ({ url, fetch }) => {
 
 ```typescript
 // src/routes/(public)/blog/[slug]/+page.ts
-import { error } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ params, fetch }) => {
-	const response = await fetch(`/api/posts/${params.slug}`);
+  const response = await fetch(`/api/posts/${params.slug}`);
 
-	if (!response.ok) {
-		throw error(404, 'Post not found');
-	}
+  if (!response.ok) {
+    throw error(404, "Post not found");
+  }
 
-	const post = await response.json();
-	return { post };
+  const post = await response.json();
+  return { post };
 };
 ```
 
@@ -1115,36 +1124,36 @@ export const load: PageLoad = async ({ params, fetch }) => {
 
 ```typescript
 // src/routes/(public)/login/+server.ts
-import { login } from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import { login } from "$lib/server/auth";
+import { fail, redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request, cookies, url }) => {
-		const data = await request.formData();
-		const email = data.get('email')?.toString();
-		const password = data.get('password')?.toString();
+  default: async ({ request, cookies, url }) => {
+    const data = await request.formData();
+    const email = data.get("email")?.toString();
+    const password = data.get("password")?.toString();
 
-		if (!email || !password) {
-			return fail(400, { error: 'Missing email or password' });
-		}
+    if (!email || !password) {
+      return fail(400, { error: "Missing email or password" });
+    }
 
-		const result = await login(email, password);
+    const result = await login(email, password);
 
-		if (!result) {
-			return fail(401, { error: 'Invalid credentials' });
-		}
+    if (!result) {
+      return fail(401, { error: "Invalid credentials" });
+    }
 
-		cookies.set('session', result.sessionId, {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			maxAge: 60 * 60 * 24 * 7 // 7 days
-		});
+    cookies.set("session", result.sessionId, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      maxAge: 60 * 60 * 24 * 7, // 7 days
+    });
 
-		const redirectTo = url.searchParams.get('redirect') || '/admin';
-		throw redirect(303, redirectTo);
-	}
+    const redirectTo = url.searchParams.get("redirect") || "/admin";
+    throw redirect(303, redirectTo);
+  },
 };
 ```
 
@@ -1152,12 +1161,12 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/(admin)/+layout.server.ts
-import type { LayoutServerLoad } from './$types';
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	return {
-		user: locals.user
-	};
+  return {
+    user: locals.user,
+  };
 };
 ```
 
@@ -1206,24 +1215,24 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 ```typescript
 // src/routes/(admin)/admin/+page.server.ts
-import { db } from '$lib/server/db';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
-	// Run in parallel!
-	const [totalPosts, publishedPosts, draftPosts] = await Promise.all([
-		db.posts.count({}),
-		db.posts.count({ where: { published: true } }),
-		db.posts.count({ where: { published: false } })
-	]);
+  // Run in parallel!
+  const [totalPosts, publishedPosts, draftPosts] = await Promise.all([
+    db.posts.count({}),
+    db.posts.count({ where: { published: true } }),
+    db.posts.count({ where: { published: false } }),
+  ]);
 
-	return {
-		stats: {
-			total: totalPosts,
-			published: publishedPosts,
-			drafts: draftPosts
-		}
-	};
+  return {
+    stats: {
+      total: totalPosts,
+      published: publishedPosts,
+      drafts: draftPosts,
+    },
+  };
 };
 ```
 
@@ -1262,38 +1271,38 @@ export const load: PageServerLoad = async () => {
 
 ```typescript
 // src/routes/api/posts/+server.ts
-import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ url }) => {
-	const page = Number(url.searchParams.get('page') || '1');
-	const limit = Number(url.searchParams.get('limit') || '10');
-	const skip = (page - 1) * limit;
+  const page = Number(url.searchParams.get("page") || "1");
+  const limit = Number(url.searchParams.get("limit") || "10");
+  const skip = (page - 1) * limit;
 
-	const [posts, total] = await Promise.all([
-		db.posts.findMany({ skip, take: limit, where: { published: true } }),
-		db.posts.count({ where: { published: true } })
-	]);
+  const [posts, total] = await Promise.all([
+    db.posts.findMany({ skip, take: limit, where: { published: true } }),
+    db.posts.count({ where: { published: true } }),
+  ]);
 
-	return json({ posts, total });
+  return json({ posts, total });
 };
 ```
 
 ```typescript
 // src/routes/api/posts/[slug]/+server.ts
-import { json, error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json, error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
-	const post = await db.posts.findUnique({ where: { slug: params.slug } });
+  const post = await db.posts.findUnique({ where: { slug: params.slug } });
 
-	if (!post) {
-		throw error(404, 'Post not found');
-	}
+  if (!post) {
+    throw error(404, "Post not found");
+  }
 
-	return json(post);
+  return json(post);
 };
 ```
 
@@ -1413,8 +1422,10 @@ export const GET: RequestHandler = async ({ params }) => {
 	></div>
 {/if}
 
-<slot />
+{@render children()}
 ```
+
+> **Note:** Add `import type { Snippet } from 'svelte';` and `let { children }: { children: Snippet } = $props();` in the script section.
 
 **Key Features Demonstrated:**
 

@@ -139,12 +139,12 @@ npx tailwindcss init
 **3. Configure Tailwind (vite.config.ts)**
 
 ```typescript
-import { sveltekit } from '@sveltejs/kit/vite';
-import { defineConfig } from 'vite';
-import tailwindcss from '@tailwindcss/vite';
+import { sveltekit } from "@sveltejs/kit/vite";
+import { defineConfig } from "vite";
+import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-	plugins: [sveltekit(), tailwindcss()]
+  plugins: [sveltekit(), tailwindcss()],
 });
 ```
 
@@ -159,28 +159,28 @@ npm install -D daisyui@latest
 ```javascript
 /** @type {import('tailwindcss').Config} */
 export default {
-	content: ['./src/**/*.{html,js,svelte,ts}'],
-	theme: {
-		extend: {}
-	},
-	plugins: [require('daisyui')],
-	daisyui: {
-		themes: ['light', 'dark', 'cupcake', 'cyberpunk'], // Add your favorite themes
-		darkTheme: 'dark', // name of one of the included themes
-		base: true, // applies background color and foreground color
-		styled: true, // include daisyUI colors and design decisions
-		utils: true, // adds responsive and modifier utility classes
-		prefix: '', // prefix for daisyUI classnames (components, modifiers and responsive class names)
-		logs: true, // Shows info about daisyUI version and used config
-		themeRoot: ':root' // The element that receives theme color CSS variables
-	}
+  content: ["./src/**/*.{html,js,svelte,ts}"],
+  theme: {
+    extend: {},
+  },
+  plugins: [require("daisyui")],
+  daisyui: {
+    themes: ["light", "dark", "cupcake", "cyberpunk"], // Add your favorite themes
+    darkTheme: "dark", // name of one of the included themes
+    base: true, // applies background color and foreground color
+    styled: true, // include daisyUI colors and design decisions
+    utils: true, // adds responsive and modifier utility classes
+    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names)
+    logs: true, // Shows info about daisyUI version and used config
+    themeRoot: ":root", // The element that receives theme color CSS variables
+  },
 };
 ```
 
 **6. Create Global CSS (src/app.css)**
 
 ```css
-@import 'tailwindcss';
+@import "tailwindcss";
 ```
 
 **7. Import CSS in Layout (src/routes/+layout.svelte)**
@@ -188,9 +188,12 @@ export default {
 ```svelte
 <script lang="ts">
 	import '../app.css';
+	import type { Snippet } from 'svelte';
+
+	let { children }: { children: Snippet } = $props();
 </script>
 
-<slot />
+{@render children()}
 ```
 
 **8. Test the Setup (src/routes/+page.svelte)**
@@ -379,12 +382,12 @@ The `$lib` alias is a **magic import path** that always points to `src/lib/`.
 
 ```typescript
 // ❌ Bad: Relative imports get messy
-import Button from '../../../lib/components/ui/Button.svelte';
+import Button from "../../../lib/components/ui/Button.svelte";
 
 // ✅ Good: Clean $lib imports
-import Button from '$lib/components/ui/Button.svelte';
-import { formatDate } from '$lib/utils/formatters';
-import type { User } from '$lib/types/user';
+import Button from "$lib/components/ui/Button.svelte";
+import { formatDate } from "$lib/utils/formatters";
+import type { User } from "$lib/types/user";
 ```
 
 ### Custom Aliases
@@ -392,22 +395,22 @@ import type { User } from '$lib/types/user';
 You can add custom aliases in `svelte.config.js`:
 
 ```javascript
-import adapter from '@sveltejs/adapter-auto';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import adapter from "@sveltejs/adapter-auto";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	preprocess: vitePreprocess(),
-	kit: {
-		adapter: adapter(),
-		alias: {
-			$lib: 'src/lib',
-			$components: 'src/lib/components',
-			$utils: 'src/lib/utils',
-			$types: 'src/lib/types',
-			$stores: 'src/lib/stores'
-		}
-	}
+  preprocess: vitePreprocess(),
+  kit: {
+    adapter: adapter(),
+    alias: {
+      $lib: "src/lib",
+      $components: "src/lib/components",
+      $utils: "src/lib/utils",
+      $types: "src/lib/types",
+      $stores: "src/lib/stores",
+    },
+  },
 };
 
 export default config;
@@ -416,9 +419,9 @@ export default config;
 **Now you can use:**
 
 ```typescript
-import Button from '$components/ui/Button.svelte';
-import { formatDate } from '$utils/formatters';
-import type { User } from '$types/user';
+import Button from "$components/ui/Button.svelte";
+import { formatDate } from "$utils/formatters";
+import type { User } from "$types/user";
 ```
 
 ### Practical Example: Barrel Exports
@@ -427,15 +430,15 @@ Create `src/lib/index.ts` for convenient imports:
 
 ```typescript
 // src/lib/index.ts
-export { default as Button } from './components/ui/Button.svelte';
-export { default as Card } from './components/ui/Card.svelte';
-export { default as Modal } from './components/ui/Modal.svelte';
-export { default as Header } from './components/layout/Header.svelte';
+export { default as Button } from "./components/ui/Button.svelte";
+export { default as Card } from "./components/ui/Card.svelte";
+export { default as Modal } from "./components/ui/Modal.svelte";
+export { default as Header } from "./components/layout/Header.svelte";
 
-export * from './utils/formatters';
-export * from './utils/validators';
-export * from './stores/user';
-export * from './stores/theme';
+export * from "./utils/formatters";
+export * from "./utils/validators";
+export * from "./stores/user";
+export * from "./stores/theme";
 ```
 
 **Usage:**
@@ -552,13 +555,13 @@ Create `.vscode/extensions.json`:
 
 ```json
 {
-	"recommendations": [
-		"svelte.svelte-vscode",
-		"bradlc.vscode-tailwindcss",
-		"dbaeumer.vscode-eslint",
-		"esbenp.prettier-vscode",
-		"yoavbls.pretty-ts-errors"
-	]
+  "recommendations": [
+    "svelte.svelte-vscode",
+    "bradlc.vscode-tailwindcss",
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "yoavbls.pretty-ts-errors"
+  ]
 }
 ```
 
@@ -570,36 +573,36 @@ Create `.vscode/settings.json`:
 
 ```json
 {
-	// Svelte
-	"svelte.enable-ts-plugin": true,
+  // Svelte
+  "svelte.enable-ts-plugin": true,
 
-	// Editor
-	"editor.formatOnSave": true,
-	"editor.defaultFormatter": "esbenp.prettier-vscode",
-	"editor.codeActionsOnSave": {
-		"source.fixAll.eslint": "explicit",
-		"source.organizeImports": "never"
-	},
+  // Editor
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never"
+  },
 
-	// File associations
-	"files.associations": {
-		"*.svelte": "svelte"
-	},
+  // File associations
+  "files.associations": {
+    "*.svelte": "svelte"
+  },
 
-	// Tailwind
-	"tailwindCSS.experimental.classRegex": [
-		["class:\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*?)"],
-		["class\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*?)"]
-	],
+  // Tailwind
+  "tailwindCSS.experimental.classRegex": [
+    ["class:\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*?)"],
+    ["class\\s*=\\s*[\"'`]([^\"'`]*)[\"'`]", "([^\"'`]*?)"]
+  ],
 
-	// Emmet
-	"emmet.includeLanguages": {
-		"svelte": "html"
-	},
+  // Emmet
+  "emmet.includeLanguages": {
+    "svelte": "html"
+  },
 
-	// TypeScript
-	"typescript.tsdk": "node_modules/typescript/lib",
-	"typescript.enablePromptUseWorkspaceTsdk": true
+  // TypeScript
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }
 ```
 
@@ -609,19 +612,19 @@ Create `.prettierrc`:
 
 ```json
 {
-	"useTabs": true,
-	"singleQuote": true,
-	"trailingComma": "none",
-	"printWidth": 100,
-	"plugins": ["prettier-plugin-svelte"],
-	"overrides": [
-		{
-			"files": "*.svelte",
-			"options": {
-				"parser": "svelte"
-			}
-		}
-	]
+  "useTabs": true,
+  "singleQuote": true,
+  "trailingComma": "none",
+  "printWidth": 100,
+  "plugins": ["prettier-plugin-svelte"],
+  "overrides": [
+    {
+      "files": "*.svelte",
+      "options": {
+        "parser": "svelte"
+      }
+    }
+  ]
 }
 ```
 
@@ -631,34 +634,34 @@ The SvelteKit wizard already creates `.eslintrc.cjs`. Enhance it:
 
 ```javascript
 module.exports = {
-	root: true,
-	extends: [
-		'eslint:recommended',
-		'plugin:@typescript-eslint/recommended',
-		'plugin:svelte/recommended',
-		'prettier'
-	],
-	parser: '@typescript-eslint/parser',
-	plugins: ['@typescript-eslint'],
-	parserOptions: {
-		sourceType: 'module',
-		ecmaVersion: 2020,
-		extraFileExtensions: ['.svelte']
-	},
-	env: {
-		browser: true,
-		es2017: true,
-		node: true
-	},
-	overrides: [
-		{
-			files: ['*.svelte'],
-			parser: 'svelte-eslint-parser',
-			parserOptions: {
-				parser: '@typescript-eslint/parser'
-			}
-		}
-	]
+  root: true,
+  extends: [
+    "eslint:recommended",
+    "plugin:@typescript-eslint/recommended",
+    "plugin:svelte/recommended",
+    "prettier",
+  ],
+  parser: "@typescript-eslint/parser",
+  plugins: ["@typescript-eslint"],
+  parserOptions: {
+    sourceType: "module",
+    ecmaVersion: 2020,
+    extraFileExtensions: [".svelte"],
+  },
+  env: {
+    browser: true,
+    es2017: true,
+    node: true,
+  },
+  overrides: [
+    {
+      files: ["*.svelte"],
+      parser: "svelte-eslint-parser",
+      parserOptions: {
+        parser: "@typescript-eslint/parser",
+      },
+    },
+  ],
 };
 ```
 
@@ -668,14 +671,14 @@ Add to `.vscode/keybindings.json`:
 
 ```json
 [
-	{
-		"key": "ctrl+shift+f",
-		"command": "editor.action.formatDocument"
-	},
-	{
-		"key": "ctrl+shift+o",
-		"command": "workbench.action.gotoSymbol"
-	}
+  {
+    "key": "ctrl+shift+f",
+    "command": "editor.action.formatDocument"
+  },
+  {
+    "key": "ctrl+shift+o",
+    "command": "workbench.action.gotoSymbol"
+  }
 ]
 ```
 

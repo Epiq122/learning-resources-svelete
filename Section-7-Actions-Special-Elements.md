@@ -191,8 +191,8 @@ Instead of showing a confirmation dialog, use longpress to delete items. Common 
 		<div
 			class="bg-gray-900 px-4 py-4 mb-2 rounded-lg border-2 border-gray-700 cursor-pointer transition-all flex justify-between items-center select-none hover:border-blue-400"
 			class:border-red-400={deletingId === todo.id}
-			class:bg-[#2a1a1a]={deletingId === todo.id}
-			class:animate-[shake_0.3s]={deletingId === todo.id}
+			class:bg-red-900/30={deletingId === todo.id}
+			class:animate-shake={deletingId === todo.id}
 			use:longpress={800}
 			onlongpress={() => handleLongpress(todo.id)}
 		>
@@ -312,7 +312,7 @@ npm install tippy.js
 	</div>
 
 	<div class="mb-5">
-		<label for="email" class="flex items-center gap-2 text-[#ccc] text-sm font-semibold mb-2">
+		<label for="email" class="flex items-center gap-2 text-gray-300 text-sm font-semibold mb-2">
 			Email
 			<span
 				class="cursor-help text-base opacity-70 transition-opacity hover:opacity-100"
@@ -329,12 +329,12 @@ npm install tippy.js
 			type="email"
 			bind:value={formData.email}
 			placeholder="john@example.com"
-			class="w-full px-4 py-3 bg-[#1a1a1a] border-2 border-[#3a3a3a] rounded-lg text-white text-base transition-colors focus:outline-none focus:border-[#4a9eff]"
+			class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white text-base transition-colors focus:outline-none focus:border-blue-500"
 		/>
 	</div>
 
 	<div class="mb-5">
-		<label for="password" class="flex items-center gap-2 text-[#ccc] text-sm font-semibold mb-2">
+		<label for="password" class="flex items-center gap-2 text-gray-300 text-sm font-semibold mb-2">
 			Password
 			<span
 				class="cursor-help text-base opacity-70 transition-opacity hover:opacity-100"
@@ -352,13 +352,13 @@ npm install tippy.js
 			type="password"
 			bind:value={formData.password}
 			placeholder="••••••••"
-			class="w-full px-4 py-3 bg-[#1a1a1a] border-2 border-[#3a3a3a] rounded-lg text-white text-base transition-colors focus:outline-none focus:border-[#4a9eff]"
+			class="w-full px-4 py-3 bg-gray-900 border-2 border-gray-700 rounded-lg text-white text-base transition-colors focus:outline-none focus:border-blue-500"
 		/>
 	</div>
 
 	<button
 		type="submit"
-		class="w-full bg-[#4a9eff] text-black border-none py-[14px] rounded-lg text-base font-bold cursor-pointer transition-all mt-2 hover:bg-[#6ab0ff] hover:-translate-y-0.5"
+		class="w-full bg-blue-500 text-black border-none py-3.5 rounded-lg text-base font-bold cursor-pointer transition-all mt-2 hover:bg-blue-400 hover:-translate-y-0.5"
 		use:tooltip={{
 			content: 'Click to create your account',
 			placement: 'bottom'
@@ -458,7 +458,7 @@ Close dropdowns/modals when user clicks outside. Essential for good UX!
 
 <div class="relative">
 	<button
-		class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-white px-4 py-[10px] rounded-lg flex items-center gap-3 cursor-pointer transition-all hover:border-[#4a9eff]"
+		class="bg-gray-800 border-2 border-gray-700 text-white px-4 py-2.5 rounded-lg flex items-center gap-3 cursor-pointer transition-all hover:border-blue-500"
 		onclick={() => (isOpen = !isOpen)}
 	>
 		<span class="text-2xl">{user.avatar}</span>
@@ -468,40 +468,40 @@ Close dropdowns/modals when user clicks outside. Essential for good UX!
 
 	{#if isOpen}
 		<div
-			class="absolute top-[calc(100%+8px)] right-0 bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl min-w-[280px] shadow-[0_8px_24px_rgba(0,0,0,0.5)] animate-[slideDown_0.2s_ease] z-[100]"
+			class="absolute top-full mt-2 right-0 bg-gray-800 border border-gray-700 rounded-xl min-w-72 shadow-2xl animate-slideDown z-50"
 			use:clickOutside
 			onclickoutside={() => (isOpen = false)}
 		>
 			<div class="p-4 flex items-center gap-3">
 				<span class="text-5xl">{user.avatar}</span>
 				<div class="flex flex-col gap-1">
-					<strong class="text-white text-[15px]">{user.name}</strong>
-					<span class="text-[#888] text-[13px]">{user.email}</span>
+					<strong class="text-white text-base">{user.name}</strong>
+					<span class="text-gray-500 text-sm">{user.email}</span>
 				</div>
 			</div>
 
-			<div class="h-px bg-[#3a3a3a] my-2"></div>
+			<div class="h-px bg-gray-700 my-2"></div>
 
 			<button
-				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-[10px] hover:bg-[#1a1a1a]"
+				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-2.5 hover:bg-gray-900"
 			>
 				⚙️ Settings
 			</button>
 			<button
-				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-[10px] hover:bg-[#1a1a1a]"
+				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-2.5 hover:bg-gray-900"
 			>
 				🎨 Appearance
 			</button>
 			<button
-				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-[10px] hover:bg-[#1a1a1a]"
+				class="w-full bg-transparent border-none text-white px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-2.5 hover:bg-gray-900"
 			>
 				📊 Analytics
 			</button>
 
-			<div class="h-px bg-[#3a3a3a] my-2"></div>
+			<div class="h-px bg-gray-700 my-2"></div>
 
 			<button
-				class="w-full bg-transparent border-none text-[#ff6b6b] px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-[10px] hover:bg-[#2a1a1a]"
+				class="w-full bg-transparent border-none text-red-400 px-4 py-3 text-left cursor-pointer text-sm font-medium transition-colors flex items-center gap-2.5 hover:bg-red-900/30"
 				onclick={logout}
 			>
 				🚪 Log Out
@@ -609,41 +609,41 @@ Special elements let you interact with browser APIs that aren't regular DOM elem
 <!-- Add class to body for global styling -->
 <svelte:body class:mobile={isMobile} class:scrolled={isScrolled} />
 
-<div class="bg-[#1a1a1a] min-h-screen text-[#e0e0e0]">
+<div class="bg-gray-900 min-h-screen text-gray-200">
 	<!-- Fixed header that changes when scrolled -->
 	<header
-		class="sticky top-0 bg-[#2a2a2a] border-b-2 border-[#3a3a3a] px-6 py-5 flex justify-between items-center z-[100] transition-all"
+		class="sticky top-0 bg-gray-800 border-b-2 border-gray-700 px-6 py-5 flex justify-between items-center z-50 transition-all"
 		class:!py-3={isScrolled}
-		class:bg-[rgba(42,42,42,0.95)]={isScrolled}
-		class:backdrop-blur-[10px]={isScrolled}
-		class:shadow-[0_4px_12px_rgba(0,0,0,0.3)]={isScrolled}
+		class:bg-gray-800/95={isScrolled}
+		class:backdrop-blur-sm={isScrolled}
+		class:shadow-lg={isScrolled}
 	>
-		<h1 class="m-0 text-[#4a9eff] text-2xl">My SaaS Dashboard</h1>
+		<h1 class="m-0 text-blue-400 text-2xl">My SaaS Dashboard</h1>
 		<div class="flex gap-4">
-			<span class="bg-[#1a1a1a] px-3 py-1.5 rounded-md text-[13px] font-semibold font-mono"
+			<span class="bg-gray-900 px-3 py-1.5 rounded-md text-sm font-semibold font-mono"
 				>📱 {windowWidth}px</span
 			>
-			<span class="bg-[#1a1a1a] px-3 py-1.5 rounded-md text-[13px] font-semibold font-mono"
+			<span class="bg-gray-900 px-3 py-1.5 rounded-md text-sm font-semibold font-mono"
 				>📏 {windowHeight}px</span
 			>
-			<span class="bg-[#1a1a1a] px-3 py-1.5 rounded-md text-[13px] font-semibold font-mono"
+			<span class="bg-gray-900 px-3 py-1.5 rounded-md text-sm font-semibold font-mono"
 				>📜 {Math.round(scrollY)}px</span
 			>
 		</div>
 	</header>
 
 	<!-- Page navigation -->
-	<nav class="bg-[#2a2a2a] px-6 py-4 flex gap-3 border-b border-[#3a3a3a]">
+	<nav class="bg-gray-800 px-6 py-4 flex gap-3 border-b border-gray-700">
 		{#each pages as page, i}
 			<button
-				class="bg-transparent border-2 border-[#3a3a3a] text-[#888] px-4 py-[10px] rounded-lg font-semibold cursor-pointer transition-all flex items-center gap-2 hover:border-[#4a9eff] hover:text-white"
-				class:bg-[#4a9eff]={currentPage.id === page.id}
-				class:border-[#4a9eff]={currentPage.id === page.id}
+				class="bg-transparent border-2 border-gray-700 text-gray-500 px-4 py-2.5 rounded-lg font-semibold cursor-pointer transition-all flex items-center gap-2 hover:border-blue-500 hover:text-white"
+				class:bg-blue-500={currentPage.id === page.id}
+				class:border-blue-500={currentPage.id === page.id}
 				class:text-black={currentPage.id === page.id}
 				onclick={() => (currentPage = page)}
 			>
 				{page.title}
-				<span class="text-[11px] opacity-60 bg-[rgba(0,0,0,0.3)] px-1.5 py-0.5 rounded"
+				<span class="text-xs opacity-60 bg-black/30 px-1.5 py-0.5 rounded"
 					>⌘{i + 1}</span
 				>
 			</button>
@@ -651,37 +651,37 @@ Special elements let you interact with browser APIs that aren't regular DOM elem
 	</nav>
 
 	<!-- Page content -->
-	<main class="py-10 px-6 max-w-[1200px] mx-auto">
-		<h2 class="m-0 mb-2 text-white text-[32px]">{currentPage.title}</h2>
-		<p class="m-0 mb-8 text-[#888] text-lg">{currentPage.description}</p>
+	<main class="py-10 px-6 max-w-6xl mx-auto">
+		<h2 class="m-0 mb-2 text-white text-3xl">{currentPage.title}</h2>
+		<p class="m-0 mb-8 text-gray-500 text-lg">{currentPage.description}</p>
 
 		<div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-5 mb-10">
-			<div class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-6">
-				<h3 class="m-0 mb-4 text-[#4a9eff] text-lg">Device Info</h3>
-				<p class="my-2 text-[#ccc] text-sm">Type: {isMobile ? '📱 Mobile' : '💻 Desktop'}</p>
-				<p class="my-2 text-[#ccc] text-sm">Width: {windowWidth}px</p>
-				<p class="my-2 text-[#ccc] text-sm">Height: {windowHeight}px</p>
+			<div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+				<h3 class="m-0 mb-4 text-blue-400 text-lg">Device Info</h3>
+				<p class="my-2 text-gray-300 text-sm">Type: {isMobile ? '📱 Mobile' : '💻 Desktop'}</p>
+				<p class="my-2 text-gray-300 text-sm">Width: {windowWidth}px</p>
+				<p class="my-2 text-gray-300 text-sm">Height: {windowHeight}px</p>
 			</div>
 
-			<div class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-6">
-				<h3 class="m-0 mb-4 text-[#4a9eff] text-lg">Scroll Position</h3>
-				<p class="my-2 text-[#ccc] text-sm">Y: {Math.round(scrollY)}px</p>
-				<p class="my-2 text-[#ccc] text-sm">Status: {isScrolled ? 'Scrolled' : 'Top of page'}</p>
+			<div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+				<h3 class="m-0 mb-4 text-blue-400 text-lg">Scroll Position</h3>
+				<p class="my-2 text-gray-300 text-sm">Y: {Math.round(scrollY)}px</p>
+				<p class="my-2 text-gray-300 text-sm">Status: {isScrolled ? 'Scrolled' : 'Top of page'}</p>
 			</div>
 
-			<div class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-6">
-				<h3 class="m-0 mb-4 text-[#4a9eff] text-lg">Keyboard Shortcuts</h3>
-				<p class="my-2 text-[#ccc] text-sm">⌘K - Quick search</p>
-				<p class="my-2 text-[#ccc] text-sm">⌘1-4 - Switch pages</p>
+			<div class="bg-gray-800 border border-gray-700 rounded-xl p-6">
+				<h3 class="m-0 mb-4 text-blue-400 text-lg">Keyboard Shortcuts</h3>
+				<p class="my-2 text-gray-300 text-sm">⌘K - Quick search</p>
+				<p class="my-2 text-gray-300 text-sm">⌘1-4 - Switch pages</p>
 			</div>
 		</div>
 
 		<!-- Add some content to enable scrolling -->
-		<div class="h-[1000px]"></div>
+		<div class="h-screen"></div>
 	</main>
 
-	<footer class="bg-[#2a2a2a] border-t border-[#3a3a3a] px-6 py-5 text-center">
-		<p class="m-0 text-[#888] text-sm">💡 Try keyboard shortcuts! Press ⌘K or ⌘1-4</p>
+	<footer class="bg-gray-800 border-t border-gray-700 px-6 py-5 text-center">
+		<p class="m-0 text-gray-500 text-sm">💡 Try keyboard shortcuts! Press ⌘K or ⌘1-4</p>
 	</footer>
 </div>
 
@@ -749,25 +749,25 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 
 {#if error}
 	<div
-		class="bg-[#2a1a1a] border-2 border-[#ff6b6b] rounded-xl p-10 text-center max-w-[600px] mx-auto my-10"
+		class="bg-red-900/30 border-2 border-red-500 rounded-xl p-10 text-center max-w-xl mx-auto my-10"
 	>
-		<div class="text-[64px] mb-4 animate-[shake_0.5s]">⚠️</div>
-		<h2 class="m-0 mb-4 text-[#ff6b6b] text-[28px]">Something went wrong</h2>
-		<p class="text-[#ccc] m-0 mb-3 text-base leading-[1.6]">{error.message}</p>
-		<p class="text-[#888] text-[13px] m-0 mb-6">
+		<div class="text-6xl mb-4 animate-shake">⚠️</div>
+		<h2 class="m-0 mb-4 text-red-400 text-3xl">Something went wrong</h2>
+		<p class="text-gray-300 m-0 mb-3 text-base leading-relaxed">{error.message}</p>
+		<p class="text-gray-500 text-sm m-0 mb-6">
 			Occurred at {error.timestamp.toLocaleTimeString()}
 		</p>
 		{#if error.stack}
-			<details class="bg-[#1a1a1a] border border-[#3a3a3a] rounded-lg p-4 text-left mb-6">
-				<summary class="text-[#4a9eff] cursor-pointer font-semibold mb-3">Technical Details</summary
+			<details class="bg-gray-900 border border-gray-700 rounded-lg p-4 text-left mb-6">
+				<summary class="text-blue-400 cursor-pointer font-semibold mb-3">Technical Details</summary
 				>
 				<pre
-					class="text-[#ff6b6b] text-xs overflow-x-auto mt-3 mb-0 leading-[1.4]">{error.stack}</pre>
+					class="text-red-400 text-xs overflow-x-auto mt-3 mb-0 leading-snug">{error.stack}</pre>
 			</details>
 		{/if}
 		<button
 			onclick={reset}
-			class="bg-[#4a9eff] text-black border-none px-8 py-[14px] rounded-lg text-base font-bold cursor-pointer transition-all hover:bg-[#6ab0ff] hover:-translate-y-0.5"
+			class="bg-blue-500 text-black border-none px-8 py-3.5 rounded-lg text-base font-bold cursor-pointer transition-all hover:bg-blue-400 hover:-translate-y-0.5"
 		>
 			Try Again
 		</button>
@@ -877,12 +877,12 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 	}
 </script>
 
-<div class="bg-[#1a1a1a] min-h-screen py-10 px-5 text-[#e0e0e0]">
-	<h1 class="text-center text-[#4a9eff] m-0 mb-8">User Dashboard</h1>
+<div class="bg-gray-900 min-h-screen py-10 px-5 text-gray-200">
+	<h1 class="text-center text-blue-400 m-0 mb-8">User Dashboard</h1>
 
 	<button
 		onclick={loadData}
-		class="block mx-auto mb-8 bg-[#4ade80] text-black border-none px-8 py-3 rounded-lg font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+		class="block mx-auto mb-8 bg-green-500 text-black border-none px-8 py-3 rounded-lg font-semibold cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
 		disabled={loading}
 	>
 		{loading ? 'Loading...' : 'Load User Data'}
@@ -890,7 +890,7 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 
 	<ErrorBoundary>
 		{#if userData}
-			<div class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-6 max-w-[400px] mx-auto">
+			<div class="bg-gray-800 border border-gray-700 rounded-xl p-6 max-w-md mx-auto">
 				<h2>{userData.name}</h2>
 				<p>Email: {userData.email}</p>
 				<p>Posts: {userData.posts}</p>
@@ -955,20 +955,20 @@ Bind to an element's `clientWidth` and `clientHeight` to react to size changes. 
 </script>
 
 <div
-	class="bg-[#1a1a1a] min-h-screen py-6 px-5 text-[#e0e0e0]"
+	class="bg-gray-900 min-h-screen py-6 px-5 text-gray-200"
 	bind:clientWidth={containerWidth}
 	bind:clientHeight={containerHeight}
 >
 	<div class="mb-6">
-		<h2 class="m-0 mb-3 text-[#4a9eff] text-[28px]">Responsive Product Grid</h2>
+		<h2 class="m-0 mb-3 text-blue-400 text-3xl">Responsive Product Grid</h2>
 		<div class="flex gap-4 flex-wrap">
-			<span class="bg-[#2a2a2a] px-4 py-2 rounded-md text-sm font-semibold border border-[#3a3a3a]"
+			<span class="bg-gray-800 px-4 py-2 rounded-md text-sm font-semibold border border-gray-700"
 				>Width: {containerWidth}px</span
 			>
-			<span class="bg-[#2a2a2a] px-4 py-2 rounded-md text-sm font-semibold border border-[#3a3a3a]"
+			<span class="bg-gray-800 px-4 py-2 rounded-md text-sm font-semibold border border-gray-700"
 				>Height: {containerHeight}px</span
 			>
-			<span class="bg-[#2a2a2a] px-4 py-2 rounded-md text-sm font-semibold border border-[#3a3a3a]"
+			<span class="bg-gray-800 px-4 py-2 rounded-md text-sm font-semibold border border-gray-700"
 				>Columns: {columns}</span
 			>
 		</div>
@@ -980,23 +980,23 @@ Bind to an element's `clientWidth` and `clientHeight` to react to size changes. 
 	>
 		{#each products as product}
 			<div
-				class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-5 text-center transition-all hover:border-[#4a9eff] hover:-translate-y-1"
+				class="bg-gray-800 border border-gray-700 rounded-xl p-5 text-center transition-all hover:border-blue-500 hover:-translate-y-1"
 			>
 				<div class="text-5xl mb-3">{product.image}</div>
 				<h3 class="m-0 mb-2 text-white">{product.name}</h3>
-				<p class="m-0 text-[#4ade80] text-xl font-bold">${product.price}</p>
+				<p class="m-0 text-green-400 text-xl font-bold">${product.price}</p>
 			</div>
 		{/each}
 	</div>
 
 	<div class="mb-4">
-		<h3 class="text-[#4a9eff] mb-4">Chart Area</h3>
+		<h3 class="text-blue-400 mb-4">Chart Area</h3>
 		<div
-			class="bg-[#2a2a2a] border-2 border-dashed border-[#3a3a3a] rounded-xl mx-auto transition-all"
+			class="bg-gray-800 border-2 border-dashed border-gray-700 rounded-xl mx-auto transition-all"
 			style="width: {chartSize.width}px; height: {chartSize.height}px;"
 		>
 			<div
-				class="w-full h-full flex flex-col items-center justify-center text-[#888] text-lg text-center"
+				class="w-full h-full flex flex-col items-center justify-center text-gray-500 text-lg text-center"
 			>
 				📊 Chart would render here
 				<br />
@@ -1061,7 +1061,7 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 </script>
 
 <div
-	class="bg-[#2a2a2a] rounded-xl overflow-hidden border border-[#3a3a3a] max-w-[900px] mx-auto my-10"
+	class="bg-gray-800 rounded-xl overflow-hidden border border-gray-700 max-w-4xl mx-auto my-10"
 >
 	<div class="relative bg-black">
 		<video
@@ -1076,11 +1076,11 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 
 		<!-- Overlay controls (appear on hover) -->
 		<div
-			class="absolute inset-0 flex items-center justify-center bg-[rgba(0,0,0,0.3)] opacity-0 transition-opacity cursor-pointer hover:opacity-100"
+			class="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 transition-opacity cursor-pointer hover:opacity-100"
 		>
 			<button
 				onclick={togglePlay}
-				class="bg-[rgba(74,158,255,0.9)] border-none w-20 h-20 rounded-full text-[32px] cursor-pointer transition-all hover:bg-[#4a9eff] hover:scale-110"
+				class="bg-blue-500/90 border-none w-20 h-20 rounded-full text-3xl cursor-pointer transition-all hover:bg-blue-500 hover:scale-110"
 			>
 				{paused ? '▶️' : '⏸️'}
 			</button>
@@ -1088,7 +1088,7 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 	</div>
 
 	<!-- Control bar -->
-	<div class="bg-[#1a1a1a] px-5 py-4">
+	<div class="bg-gray-900 px-5 py-4">
 		<!-- Progress bar -->
 		<div class="relative mb-4">
 			<input
@@ -1098,8 +1098,8 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 				bind:value={currentTime}
 				class="absolute -top-2 left-0 w-full h-5 opacity-0 cursor-pointer"
 			/>
-			<div class="h-1.5 bg-[#3a3a3a] rounded-[3px] overflow-hidden">
-				<div class="h-full bg-[#4a9eff] transition-[width_0.1s]" style="width: {progress}%"></div>
+			<div class="h-1.5 bg-gray-700 rounded overflow-hidden">
+				<div class="h-full bg-blue-500 transition-all" style="width: {progress}%"></div>
 			</div>
 		</div>
 
@@ -1109,23 +1109,23 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 			<div class="flex items-center gap-3">
 				<button
 					onclick={togglePlay}
-					class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-[#4a9eff] hover:bg-[#3a3a3a]"
+					class="bg-gray-800 border-2 border-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-blue-500 hover:bg-gray-700"
 				>
 					{paused ? '▶️' : '⏸️'}
 				</button>
 				<button
 					onclick={() => skip(-10)}
-					class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-[#4a9eff] hover:bg-[#3a3a3a]"
+					class="bg-gray-800 border-2 border-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-blue-500 hover:bg-gray-700"
 				>
 					⏪ 10s
 				</button>
 				<button
 					onclick={() => skip(10)}
-					class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-[#4a9eff] hover:bg-[#3a3a3a]"
+					class="bg-gray-800 border-2 border-gray-700 text-white px-4 py-2 rounded-md text-sm font-semibold cursor-pointer transition-all hover:border-blue-500 hover:bg-gray-700"
 				>
 					10s ⏩
 				</button>
-				<span class="text-[#ccc] text-sm font-semibold font-mono min-w-[110px]">
+				<span class="text-gray-300 text-sm font-semibold font-mono min-w-28">
 					{formatTime(currentTime)} / {formatTime(duration)}
 				</span>
 			</div>
@@ -1135,7 +1135,7 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 				<!-- Speed control -->
 				<select
 					bind:value={playbackRate}
-					class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-white px-3 py-2 rounded-md text-sm cursor-pointer"
+					class="bg-gray-800 border-2 border-gray-700 text-white px-3 py-2 rounded-md text-sm cursor-pointer"
 				>
 					<option value={0.5}>0.5×</option>
 					<option value={0.75}>0.75×</option>
@@ -1156,9 +1156,9 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 						max="1"
 						step="0.01"
 						bind:value={volume}
-						class="w-[100px] accent-[#4a9eff]"
+						class="w-24 accent-blue-500"
 					/>
-					<span class="text-[#888] text-[13px] font-semibold min-w-[40px]"
+					<span class="text-gray-500 text-sm font-semibold min-w-10"
 						>{Math.round(volume * 100)}%</span
 					>
 				</div>
@@ -1166,7 +1166,7 @@ Bind to video/audio properties like `currentTime`, `duration`, `paused`, `volume
 		</div>
 
 		<!-- Time remaining indicator -->
-		<div class="text-center text-[#888] text-[13px]">
+		<div class="text-center text-gray-500 text-sm">
 			⏱️ {formatTime(timeRemaining)} remaining
 		</div>
 	</div>
@@ -1229,16 +1229,16 @@ Code in `<script context="module">` runs **once per component file**, not per in
 	});
 </script>
 
-<div class="bg-[#2a2a2a] border border-[#3a3a3a] rounded-xl p-6 mb-4">
-	<h3 class="m-0 mb-4 text-[#4a9eff] text-xl">Instance: {instanceId}</h3>
+<div class="bg-gray-800 border border-gray-700 rounded-xl p-6 mb-4">
+	<h3 class="m-0 mb-4 text-blue-400 text-xl">Instance: {instanceId}</h3>
 	<div class="flex flex-col gap-3">
-		<div class="bg-[#1a1a1a] p-3 rounded-md flex justify-between items-center">
-			<span class="text-[#888] text-sm font-semibold">Total Instances:</span>
-			<span class="text-[#4ade80] text-sm font-bold">{totalInstances}</span>
+		<div class="bg-gray-900 p-3 rounded-md flex justify-between items-center">
+			<span class="text-gray-500 text-sm font-semibold">Total Instances:</span>
+			<span class="text-green-400 text-sm font-bold">{totalInstances}</span>
 		</div>
-		<div class="bg-[#1a1a1a] p-3 rounded-md flex justify-between items-center">
-			<span class="text-[#888] text-sm font-semibold">All Instances:</span>
-			<span class="text-[#4ade80] text-sm font-bold">{instanceRegistry.join(', ')}</span>
+		<div class="bg-gray-900 p-3 rounded-md flex justify-between items-center">
+			<span class="text-gray-500 text-sm font-semibold">All Instances:</span>
+			<span class="text-green-400 text-sm font-bold">{instanceRegistry.join(', ')}</span>
 		</div>
 	</div>
 </div>
@@ -1299,9 +1299,9 @@ You're building a multi-select filter where all filter chips need to share selec
 </script>
 
 <button
-	class="bg-[#2a2a2a] border-2 border-[#3a3a3a] text-[#ccc] px-4 py-[10px] rounded-[20px] text-sm font-semibold cursor-pointer transition-all flex items-center gap-2 hover:border-[#4a9eff] hover:bg-[#3a3a3a]"
-	class:bg-[#4a9eff]={isSelected}
-	class:border-[#4a9eff]={isSelected}
+	class="bg-gray-800 border-2 border-gray-700 text-gray-400 px-4 py-2.5 rounded-full text-sm font-semibold cursor-pointer transition-all flex items-center gap-2 hover:border-blue-400 hover:bg-gray-700"
+	class:bg-blue-400={isSelected}
+	class:border-blue-400={isSelected}
 	class:text-black={isSelected}
 	onclick={toggle}
 >
@@ -1324,8 +1324,8 @@ You're building a multi-select filter where all filter chips need to share selec
 	const selectedCount = $derived(getSelectedFilters().length);
 </script>
 
-<div class="bg-[#1a1a1a] py-8 px-8 rounded-xl max-w-[700px] mx-auto my-10">
-	<h2 class="m-0 mb-6 text-[#4a9eff]">Filter Products</h2>
+<div class="bg-gray-900 py-8 px-8 rounded-xl max-w-2xl mx-auto my-10">
+	<h2 class="m-0 mb-6 text-blue-400">Filter Products</h2>
 
 	<div class="flex flex-wrap gap-3 mb-6">
 		<FilterChip id="electronics" label="Electronics" icon="💻" />
@@ -1336,13 +1336,13 @@ You're building a multi-select filter where all filter chips need to share selec
 		<FilterChip id="toys" label="Toys" icon="🎮" />
 	</div>
 
-	<div class="flex justify-between items-center pt-6 border-t border-[#3a3a3a]">
-		<div class="text-[#888] text-sm font-semibold">
+	<div class="flex justify-between items-center pt-6 border-t border-gray-700">
+		<div class="text-gray-500 text-sm font-semibold">
 			{selectedCount} filter{selectedCount === 1 ? '' : 's'} selected
 		</div>
 		<button
 			onclick={clearAllFilters}
-			class="bg-[#ff6b6b] text-white border-none px-5 py-[10px] rounded-lg font-semibold cursor-pointer"
+			class="bg-red-400 text-white border-none px-5 py-2.5 rounded-lg font-semibold cursor-pointer"
 		>
 			Clear All
 		</button>
@@ -1417,18 +1417,18 @@ You're building a course with multiple video lessons. When one plays, pause all 
 </script>
 
 <div
-	class="bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded-xl overflow-hidden transition-all"
-	class:border-[#4a9eff]={isCurrentlyPlaying}
-	class:shadow-[0_4px_16px_rgba(74,158,255,0.3)]={isCurrentlyPlaying}
+	class="bg-gray-800 border-2 border-gray-700 rounded-xl overflow-hidden transition-all"
+	class:border-blue-400={isCurrentlyPlaying}
+	class:shadow-lg={isCurrentlyPlaying}
 >
-	<div class="p-5 flex justify-between items-center border-b border-[#3a3a3a]">
+	<div class="p-5 flex justify-between items-center border-b border-gray-700">
 		<div>
 			<h3 class="m-0 mb-1 text-white text-lg">{title}</h3>
-			<span class="text-[#888] text-[13px]">⏱️ {duration}</span>
+			<span class="text-gray-500 text-sm">⏱️ {duration}</span>
 		</div>
 		{#if isCurrentlyPlaying}
 			<span
-				class="bg-[#4a9eff] text-black px-3 py-1.5 rounded-md text-xs font-bold animate-[pulse_2s_infinite]"
+				class="bg-blue-400 text-black px-3 py-1.5 rounded-md text-xs font-bold animate-pulse"
 				>▶️ Playing</span
 			>
 		{/if}
@@ -1445,16 +1445,16 @@ You're building a course with multiple video lessons. When one plays, pause all 
 	<div class="px-5 py-4 flex items-center gap-3">
 		<button
 			onclick={() => (paused = !paused)}
-			class="bg-[#4a9eff] text-black border-none px-5 py-[10px] rounded-md font-bold cursor-pointer transition-all whitespace-nowrap hover:bg-[#6ab0ff] hover:scale-105"
+			class="bg-blue-400 text-black border-none px-5 py-2.5 rounded-md font-bold cursor-pointer transition-all whitespace-nowrap hover:bg-blue-300 hover:scale-105"
 		>
 			{paused ? '▶️ Play' : '⏸️ Pause'}
 		</button>
 
-		<div class="flex-1 h-1.5 bg-[#3a3a3a] rounded-[3px] overflow-hidden">
-			<div class="h-full bg-[#4a9eff] transition-[width_0.1s]" style="width: {progress}%"></div>
+		<div class="flex-1 h-1.5 bg-gray-700 rounded-sm overflow-hidden">
+			<div class="h-full bg-blue-400 transition-[width_0.1s]" style="width: {progress}%"></div>
 		</div>
 
-		<span class="text-[#888] text-[13px] font-semibold font-mono min-w-[100px] text-right">
+		<span class="text-gray-500 text-sm font-semibold font-mono min-w-24 text-right">
 			{formatTime(currentTime)} / {formatTime(videoDuration)}
 		</span>
 	</div>
@@ -1480,18 +1480,18 @@ You're building a course with multiple video lessons. When one plays, pause all 
 	import VideoLesson, { pauseAll } from './VideoLesson.svelte';
 </script>
 
-<div class="bg-[#1a1a1a] min-h-screen py-10 px-5">
-	<div class="max-w-[900px] mx-auto mb-8 flex justify-between items-center">
-		<h1 class="m-0 text-[#4a9eff] text-[32px]">📚 Svelte 5 Mastery Course</h1>
+<div class="bg-gray-900 min-h-screen py-10 px-5">
+	<div class="max-w-4xl mx-auto mb-8 flex justify-between items-center">
+		<h1 class="m-0 text-blue-400 text-3xl">📚 Svelte 5 Mastery Course</h1>
 		<button
 			onclick={pauseAll}
-			class="bg-[#ff6b6b] text-white border-none px-6 py-3 rounded-lg font-bold cursor-pointer"
+			class="bg-red-400 text-white border-none px-6 py-3 rounded-lg font-bold cursor-pointer"
 		>
 			⏸️ Pause All Videos
 		</button>
 	</div>
 
-	<div class="max-w-[900px] mx-auto flex flex-col gap-6">
+	<div class="max-w-4xl mx-auto flex flex-col gap-6">
 		<VideoLesson
 			id="lesson-1"
 			title="Lesson 1: Introduction to Runes"
@@ -1673,6 +1673,634 @@ test("clickOutside triggers callback", async () => {
   expect(callback).toHaveBeenCalled();
 });
 ```
+
+---
+
+## 🚀 End-of-Section Project: Interactive Dashboard with Rich Media
+
+### Project Overview
+
+Build an **interactive admin dashboard** that demonstrates actions, special elements, media bindings, and module-level state. This project combines all Section 7 concepts into a practical application.
+
+**What You'll Build:**
+
+- **Custom actions**: `clickOutside`, `tooltip`, `lazyLoad`, `shortcut`
+- **Media bindings**: Video player with progress tracking
+- **Dimension bindings**: Responsive layout detection
+- **Module-level state**: Notification system across components
+- **Special elements**: `<svelte:window>`, `<svelte:body>`, `<svelte:document>`
+
+### 📁 Files to Create
+
+**1. Click Outside Action** - `src/lib/actions/clickOutside.ts`
+
+```typescript
+export function clickOutside(
+  node: HTMLElement,
+  callback: () => void
+): { destroy: () => void } {
+  function handleClick(event: MouseEvent) {
+    if (!node.contains(event.target as Node)) {
+      callback();
+    }
+  }
+
+  document.addEventListener("click", handleClick, true);
+
+  return {
+    destroy() {
+      document.removeEventListener("click", handleClick, true);
+    },
+  };
+}
+```
+
+**2. Tooltip Action** - `src/lib/actions/tooltip.ts`
+
+```typescript
+interface TooltipOptions {
+  text: string;
+  position?: "top" | "bottom" | "left" | "right";
+}
+
+export function tooltip(
+  node: HTMLElement,
+  options: TooltipOptions
+): { update: (opts: TooltipOptions) => void; destroy: () => void } {
+  let tooltipEl: HTMLDivElement | null = null;
+  let currentOptions = options;
+
+  function createTooltip() {
+    tooltipEl = document.createElement("div");
+    tooltipEl.className = `
+			fixed z-50 px-3 py-2 text-sm text-white bg-gray-900 rounded-lg shadow-lg
+			pointer-events-none transition-opacity duration-200
+		`;
+    tooltipEl.textContent = currentOptions.text;
+    document.body.appendChild(tooltipEl);
+    positionTooltip();
+  }
+
+  function positionTooltip() {
+    if (!tooltipEl) return;
+    const rect = node.getBoundingClientRect();
+    const pos = currentOptions.position || "top";
+
+    const positions = {
+      top: { left: rect.left + rect.width / 2, top: rect.top - 8 },
+      bottom: { left: rect.left + rect.width / 2, top: rect.bottom + 8 },
+      left: { left: rect.left - 8, top: rect.top + rect.height / 2 },
+      right: { left: rect.right + 8, top: rect.top + rect.height / 2 },
+    };
+
+    const { left, top } = positions[pos];
+    tooltipEl.style.left = `${left}px`;
+    tooltipEl.style.top = `${top}px`;
+    tooltipEl.style.transform =
+      pos === "top" || pos === "bottom"
+        ? "translateX(-50%)" + (pos === "top" ? " translateY(-100%)" : "")
+        : "translateY(-50%)" + (pos === "left" ? " translateX(-100%)" : "");
+  }
+
+  function removeTooltip() {
+    tooltipEl?.remove();
+    tooltipEl = null;
+  }
+
+  node.addEventListener("mouseenter", createTooltip);
+  node.addEventListener("mouseleave", removeTooltip);
+
+  return {
+    update(newOptions: TooltipOptions) {
+      currentOptions = newOptions;
+      if (tooltipEl) {
+        tooltipEl.textContent = currentOptions.text;
+        positionTooltip();
+      }
+    },
+    destroy() {
+      removeTooltip();
+      node.removeEventListener("mouseenter", createTooltip);
+      node.removeEventListener("mouseleave", removeTooltip);
+    },
+  };
+}
+```
+
+**3. Keyboard Shortcut Action** - `src/lib/actions/shortcut.ts`
+
+```typescript
+interface ShortcutOptions {
+  key: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+  callback: () => void;
+}
+
+export function shortcut(
+  node: HTMLElement,
+  options: ShortcutOptions
+): { update: (opts: ShortcutOptions) => void; destroy: () => void } {
+  let currentOptions = options;
+
+  function handleKeydown(event: KeyboardEvent) {
+    const matchesKey =
+      event.key.toLowerCase() === currentOptions.key.toLowerCase();
+    const matchesCtrl = !currentOptions.ctrl || event.ctrlKey || event.metaKey;
+    const matchesShift = !currentOptions.shift || event.shiftKey;
+    const matchesAlt = !currentOptions.alt || event.altKey;
+
+    if (matchesKey && matchesCtrl && matchesShift && matchesAlt) {
+      event.preventDefault();
+      currentOptions.callback();
+    }
+  }
+
+  window.addEventListener("keydown", handleKeydown);
+
+  return {
+    update(newOptions: ShortcutOptions) {
+      currentOptions = newOptions;
+    },
+    destroy() {
+      window.removeEventListener("keydown", handleKeydown);
+    },
+  };
+}
+```
+
+**4. Notification System** - `src/lib/components/Notifications.svelte`
+
+```svelte
+<script lang="ts" module>
+	interface Notification {
+		id: number;
+		type: 'success' | 'error' | 'warning' | 'info';
+		message: string;
+	}
+
+	let notifications = $state<Notification[]>([]);
+	let nextId = 0;
+
+	export function notify(type: Notification['type'], message: string, duration = 4000) {
+		const id = nextId++;
+		notifications.push({ id, type, message });
+
+		setTimeout(() => {
+			notifications = notifications.filter((n) => n.id !== id);
+		}, duration);
+	}
+
+	export function clearAll() {
+		notifications = [];
+	}
+</script>
+
+<script lang="ts">
+	const icons = {
+		success: '✅',
+		error: '❌',
+		warning: '⚠️',
+		info: 'ℹ️'
+	};
+
+	const colors = {
+		success: 'bg-green-600 border-green-400',
+		error: 'bg-red-600 border-red-400',
+		warning: 'bg-yellow-600 border-yellow-400',
+		info: 'bg-blue-600 border-blue-400'
+	};
+</script>
+
+<div class="fixed top-4 right-4 z-50 flex flex-col gap-3 max-w-sm">
+	{#each notifications as notification (notification.id)}
+		<div
+			class="px-4 py-3 rounded-lg border-l-4 shadow-lg text-white flex items-center gap-3 animate-in slide-in-from-right {colors[
+				notification.type
+			]}"
+		>
+			<span class="text-xl">{icons[notification.type]}</span>
+			<span class="flex-1">{notification.message}</span>
+			<button
+				class="text-white/70 hover:text-white"
+				onclick={() => (notifications = notifications.filter((n) => n.id !== notification.id))}
+			>
+				✕
+			</button>
+		</div>
+	{/each}
+</div>
+
+<style>
+	@keyframes slide-in-from-right {
+		from {
+			transform: translateX(100%);
+			opacity: 0;
+		}
+		to {
+			transform: translateX(0);
+			opacity: 1;
+		}
+	}
+
+	.animate-in {
+		animation: slide-in-from-right 0.3s ease-out;
+	}
+</style>
+```
+
+**5. Video Player Component** - `src/lib/components/VideoPlayer.svelte`
+
+```svelte
+<script lang="ts">
+	import { tooltip } from '$lib/actions/tooltip';
+
+	interface Props {
+		src: string;
+		title: string;
+	}
+
+	let { src, title }: Props = $props();
+
+	let videoEl: HTMLVideoElement;
+	let currentTime = $state(0);
+	let duration = $state(0);
+	let paused = $state(true);
+	let volume = $state(1);
+	let muted = $state(false);
+	let playbackRate = $state(1);
+
+	const progress = $derived(duration > 0 ? (currentTime / duration) * 100 : 0);
+
+	function formatTime(seconds: number): string {
+		const mins = Math.floor(seconds / 60);
+		const secs = Math.floor(seconds % 60);
+		return `${mins}:${secs.toString().padStart(2, '0')}`;
+	}
+
+	function seek(e: MouseEvent) {
+		const rect = (e.target as HTMLElement).getBoundingClientRect();
+		const percent = (e.clientX - rect.left) / rect.width;
+		currentTime = percent * duration;
+	}
+
+	function togglePlay() {
+		paused = !paused;
+	}
+
+	function cycleSpeed() {
+		const speeds = [0.5, 1, 1.25, 1.5, 2];
+		const currentIndex = speeds.indexOf(playbackRate);
+		playbackRate = speeds[(currentIndex + 1) % speeds.length];
+	}
+</script>
+
+<div class="bg-gray-900 rounded-xl overflow-hidden border border-gray-700">
+	<div class="p-4 border-b border-gray-700 flex justify-between items-center">
+		<h3 class="text-white font-semibold">{title}</h3>
+		{#if !paused}
+			<span class="bg-green-500 text-black px-2 py-1 rounded text-xs font-bold animate-pulse">
+				▶ Playing
+			</span>
+		{/if}
+	</div>
+
+	<video
+		bind:this={videoEl}
+		bind:currentTime
+		bind:duration
+		bind:paused
+		bind:volume
+		bind:muted
+		bind:playbackRate
+		{src}
+		class="w-full"
+	></video>
+
+	<div class="p-4 space-y-3">
+		<!-- Progress bar -->
+		<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+		<div
+			class="h-2 bg-gray-700 rounded-full cursor-pointer overflow-hidden"
+			onclick={seek}
+		>
+			<div class="h-full bg-blue-500 transition-all" style:width="{progress}%"></div>
+		</div>
+
+		<div class="flex items-center justify-between">
+			<div class="flex items-center gap-2">
+				<button
+					use:tooltip={{ text: paused ? 'Play (Space)' : 'Pause (Space)', position: 'top' }}
+					class="w-10 h-10 bg-blue-500 hover:bg-blue-400 text-white rounded-lg font-bold transition-colors"
+					onclick={togglePlay}
+				>
+					{paused ? '▶' : '⏸'}
+				</button>
+
+				<button
+					use:tooltip={{ text: muted ? 'Unmute' : 'Mute', position: 'top' }}
+					class="w-10 h-10 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition-colors"
+					onclick={() => (muted = !muted)}
+				>
+					{muted ? '🔇' : '🔊'}
+				</button>
+
+				<input
+					type="range"
+					min="0"
+					max="1"
+					step="0.1"
+					bind:value={volume}
+					class="w-20 accent-blue-500"
+				/>
+			</div>
+
+			<span class="text-gray-400 font-mono text-sm">
+				{formatTime(currentTime)} / {formatTime(duration)}
+			</span>
+
+			<button
+				use:tooltip={{ text: `Speed: ${playbackRate}x`, position: 'top' }}
+				class="px-3 py-1 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm transition-colors"
+				onclick={cycleSpeed}
+			>
+				{playbackRate}x
+			</button>
+		</div>
+	</div>
+</div>
+```
+
+**6. Dashboard Sidebar** - `src/lib/components/Sidebar.svelte`
+
+```svelte
+<script lang="ts">
+	import { clickOutside } from '$lib/actions/clickOutside';
+	import { shortcut } from '$lib/actions/shortcut';
+
+	interface Props {
+		open: boolean;
+		onclose: () => void;
+	}
+
+	let { open, onclose }: Props = $props();
+
+	const menuItems = [
+		{ icon: '🏠', label: 'Dashboard', href: '/' },
+		{ icon: '📊', label: 'Analytics', href: '/analytics' },
+		{ icon: '👥', label: 'Users', href: '/users' },
+		{ icon: '📁', label: 'Files', href: '/files' },
+		{ icon: '⚙️', label: 'Settings', href: '/settings' }
+	];
+</script>
+
+{#if open}
+	<!-- Backdrop -->
+	<div class="fixed inset-0 bg-black/50 z-40 lg:hidden" onclick={onclose}></div>
+
+	<!-- Sidebar -->
+	<aside
+		use:clickOutside={onclose}
+		use:shortcut={{ key: 'Escape', callback: onclose }}
+		class="fixed left-0 top-0 h-full w-64 bg-gray-900 border-r border-gray-700 z-50 p-4"
+	>
+		<div class="flex justify-between items-center mb-8">
+			<h2 class="text-xl font-bold text-white">📊 Dashboard</h2>
+			<button
+				class="lg:hidden text-gray-400 hover:text-white"
+				onclick={onclose}
+			>
+				✕
+			</button>
+		</div>
+
+		<nav class="space-y-2">
+			{#each menuItems as item}
+				<a
+					href={item.href}
+					class="flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+				>
+					<span class="text-xl">{item.icon}</span>
+					<span>{item.label}</span>
+				</a>
+			{/each}
+		</nav>
+
+		<div class="absolute bottom-4 left-4 right-4">
+			<div class="text-xs text-gray-500">
+				Press <kbd class="px-1 py-0.5 bg-gray-700 rounded">Esc</kbd> to close
+			</div>
+		</div>
+	</aside>
+{/if}
+```
+
+**7. Main Dashboard Page** - `src/routes/dashboard/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import { shortcut } from '$lib/actions/shortcut';
+	import { tooltip } from '$lib/actions/tooltip';
+	import Notifications, { notify } from '$lib/components/Notifications.svelte';
+	import VideoPlayer from '$lib/components/VideoPlayer.svelte';
+	import Sidebar from '$lib/components/Sidebar.svelte';
+
+	// Dimension bindings for responsive layout
+	let innerWidth = $state(0);
+	let innerHeight = $state(0);
+
+	const isMobile = $derived(innerWidth < 768);
+	const isTablet = $derived(innerWidth >= 768 && innerWidth < 1024);
+
+	// Sidebar state
+	let sidebarOpen = $state(false);
+
+	// Online status
+	let online = $state(true);
+
+	// Visibility tracking
+	let hidden = $state(false);
+
+	$effect(() => {
+		if (!hidden) {
+			console.log('Tab is visible - resuming updates');
+		} else {
+			console.log('Tab is hidden - pausing updates');
+		}
+	});
+
+	// Keyboard shortcuts
+	function handleShortcuts(node: HTMLElement) {
+		return shortcut(node, {
+			key: 'k',
+			ctrl: true,
+			callback: () => notify('info', 'Search opened! (Ctrl+K)')
+		});
+	}
+
+	// Stats for dashboard
+	const stats = [
+		{ label: 'Total Users', value: '12,453', change: '+12%', icon: '👥' },
+		{ label: 'Revenue', value: '$84,230', change: '+8%', icon: '💰' },
+		{ label: 'Active Sessions', value: '1,429', change: '+23%', icon: '📊' },
+		{ label: 'Conversion Rate', value: '3.2%', change: '+2%', icon: '📈' }
+	];
+</script>
+
+<svelte:window bind:innerWidth bind:innerHeight bind:online />
+<svelte:document bind:hidden />
+
+<div use:handleShortcuts class="min-h-screen bg-gray-950">
+	<!-- Notifications container -->
+	<Notifications />
+
+	<!-- Sidebar -->
+	<Sidebar open={sidebarOpen} onclose={() => (sidebarOpen = false)} />
+
+	<!-- Main content -->
+	<div class="p-6 lg:pl-72">
+		<!-- Header -->
+		<header class="flex items-center justify-between mb-8">
+			<div class="flex items-center gap-4">
+				<button
+					class="lg:hidden p-2 bg-gray-800 rounded-lg text-white"
+					onclick={() => (sidebarOpen = true)}
+				>
+					☰
+				</button>
+				<h1 class="text-2xl font-bold text-white">Dashboard</h1>
+			</div>
+
+			<div class="flex items-center gap-4">
+				<!-- Online indicator -->
+				<div
+					use:tooltip={{ text: online ? 'Connected' : 'Offline', position: 'bottom' }}
+					class="flex items-center gap-2 px-3 py-1 rounded-full text-sm {online
+						? 'bg-green-900 text-green-400'
+						: 'bg-red-900 text-red-400'}"
+				>
+					<span class="w-2 h-2 rounded-full {online ? 'bg-green-400' : 'bg-red-400'}"></span>
+					{online ? 'Online' : 'Offline'}
+				</div>
+
+				<!-- Screen size indicator -->
+				<div class="text-gray-500 text-sm hidden md:block">
+					{innerWidth}×{innerHeight}
+					{#if isMobile}(Mobile){:else if isTablet}(Tablet){:else}(Desktop){/if}
+				</div>
+
+				<button
+					use:tooltip={{ text: 'Notifications', position: 'bottom' }}
+					class="p-2 bg-gray-800 rounded-lg text-white hover:bg-gray-700"
+					onclick={() => notify('info', 'You have 3 new notifications')}
+				>
+					🔔
+				</button>
+			</div>
+		</header>
+
+		<!-- Stats Grid -->
+		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+			{#each stats as stat}
+				<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+					<div class="flex items-center justify-between mb-4">
+						<span class="text-3xl">{stat.icon}</span>
+						<span class="text-green-400 text-sm font-semibold">{stat.change}</span>
+					</div>
+					<div class="text-2xl font-bold text-white mb-1">{stat.value}</div>
+					<div class="text-gray-500 text-sm">{stat.label}</div>
+				</div>
+			{/each}
+		</div>
+
+		<!-- Video Section -->
+		<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+			<VideoPlayer
+				src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+				title="Training Video: Getting Started"
+			/>
+
+			<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+				<h2 class="text-xl font-bold text-white mb-4">Quick Actions</h2>
+				<div class="grid grid-cols-2 gap-4">
+					<button
+						use:tooltip={{ text: 'Create new user', position: 'top' }}
+						class="p-4 bg-blue-600 hover:bg-blue-500 rounded-lg text-white transition-colors"
+						onclick={() => notify('success', 'User created successfully!')}
+					>
+						➕ Add User
+					</button>
+					<button
+						use:tooltip={{ text: 'Generate report', position: 'top' }}
+						class="p-4 bg-purple-600 hover:bg-purple-500 rounded-lg text-white transition-colors"
+						onclick={() => notify('info', 'Report generation started...')}
+					>
+						📄 Report
+					</button>
+					<button
+						use:tooltip={{ text: 'Export all data', position: 'bottom' }}
+						class="p-4 bg-green-600 hover:bg-green-500 rounded-lg text-white transition-colors"
+						onclick={() => notify('success', 'Export completed!')}
+					>
+						📤 Export
+					</button>
+					<button
+						use:tooltip={{ text: 'Open settings', position: 'bottom' }}
+						class="p-4 bg-gray-700 hover:bg-gray-600 rounded-lg text-white transition-colors"
+						onclick={() => notify('warning', 'Settings panel coming soon')}
+					>
+						⚙️ Settings
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Keyboard shortcuts help -->
+		<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+			<h2 class="text-xl font-bold text-white mb-4">⌨️ Keyboard Shortcuts</h2>
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+				<div class="flex items-center gap-2 text-gray-400">
+					<kbd class="px-2 py-1 bg-gray-700 rounded">Ctrl+K</kbd>
+					<span>Search</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-400">
+					<kbd class="px-2 py-1 bg-gray-700 rounded">Esc</kbd>
+					<span>Close sidebar</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-400">
+					<kbd class="px-2 py-1 bg-gray-700 rounded">Space</kbd>
+					<span>Play/Pause</span>
+				</div>
+				<div class="flex items-center gap-2 text-gray-400">
+					<kbd class="px-2 py-1 bg-gray-700 rounded">?</kbd>
+					<span>Help</span>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+```
+
+### 🎯 Project Checklist
+
+- [ ] `clickOutside` action closes sidebar when clicking outside
+- [ ] `tooltip` action shows helpful hints on hover
+- [ ] `shortcut` action handles Ctrl+K and Escape key
+- [ ] Video player uses all media bindings (currentTime, duration, paused, volume, muted, playbackRate)
+- [ ] Dimension bindings track window size for responsive layout
+- [ ] `<svelte:window>` binds `innerWidth`, `innerHeight`, and `online`
+- [ ] `<svelte:document>` tracks tab visibility with `hidden`
+- [ ] Module-level notification system works across components
+- [ ] Sidebar has proper cleanup on destroy
+
+### 💡 Extension Ideas
+
+1. **Add `longpress` action** for mobile touch interactions
+2. **Implement `lazyLoad` action** for images below the fold
+3. **Add `copyToClipboard` action** with feedback notification
+4. **Track scroll position** with `<svelte:window bind:scrollY>`
+5. **Add fullscreen toggle** using `<svelte:body>` class binding
 
 ---
 

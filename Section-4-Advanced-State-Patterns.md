@@ -72,76 +72,78 @@ A real-time currency converter that fetches exchange rates from an API and updat
 ```typescript
 // lib/services/currencyAPI.ts
 export interface ExchangeRates {
-	base: string;
-	rates: Record<string, number>;
-	timestamp: number;
+  base: string;
+  rates: Record<string, number>;
+  timestamp: number;
 }
 
 export interface Currency {
-	code: string;
-	name: string;
-	symbol: string;
+  code: string;
+  name: string;
+  symbol: string;
 }
 
 export const popularCurrencies: Currency[] = [
-	{ code: 'USD', name: 'US Dollar', symbol: '$' },
-	{ code: 'EUR', name: 'Euro', symbol: '€' },
-	{ code: 'GBP', name: 'British Pound', symbol: '£' },
-	{ code: 'JPY', name: 'Japanese Yen', symbol: '¥' },
-	{ code: 'AUD', name: 'Australian Dollar', symbol: 'A$' },
-	{ code: 'CAD', name: 'Canadian Dollar', symbol: 'C$' },
-	{ code: 'CHF', name: 'Swiss Franc', symbol: 'CHF' },
-	{ code: 'CNY', name: 'Chinese Yuan', symbol: '¥' },
-	{ code: 'INR', name: 'Indian Rupee', symbol: '₹' },
-	{ code: 'MXN', name: 'Mexican Peso', symbol: 'Mex$' }
+  { code: "USD", name: "US Dollar", symbol: "$" },
+  { code: "EUR", name: "Euro", symbol: "€" },
+  { code: "GBP", name: "British Pound", symbol: "£" },
+  { code: "JPY", name: "Japanese Yen", symbol: "¥" },
+  { code: "AUD", name: "Australian Dollar", symbol: "A$" },
+  { code: "CAD", name: "Canadian Dollar", symbol: "C$" },
+  { code: "CHF", name: "Swiss Franc", symbol: "CHF" },
+  { code: "CNY", name: "Chinese Yuan", symbol: "¥" },
+  { code: "INR", name: "Indian Rupee", symbol: "₹" },
+  { code: "MXN", name: "Mexican Peso", symbol: "Mex$" },
 ];
 
 class CurrencyService {
-	private cache: Map<string, ExchangeRates> = new Map();
-	private cacheExpiry = 5 * 60 * 1000; // 5 minutes
+  private cache: Map<string, ExchangeRates> = new Map();
+  private cacheExpiry = 5 * 60 * 1000; // 5 minutes
 
-	async fetchRates(base: string): Promise<ExchangeRates> {
-		// Check cache first
-		const cached = this.cache.get(base);
-		if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
-			console.log('📦 Using cached rates for', base);
-			return cached;
-		}
+  async fetchRates(base: string): Promise<ExchangeRates> {
+    // Check cache first
+    const cached = this.cache.get(base);
+    if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
+      console.log("📦 Using cached rates for", base);
+      return cached;
+    }
 
-		console.log('🌐 Fetching rates for', base);
+    console.log("🌐 Fetching rates for", base);
 
-		// Using exchangerate-api.com (free tier)
-		const response = await fetch(`https://api.exchangerate-api.com/v4/latest/${base}`);
+    // Using exchangerate-api.com (free tier)
+    const response = await fetch(
+      `https://api.exchangerate-api.com/v4/latest/${base}`
+    );
 
-		if (!response.ok) {
-			throw new Error(`Failed to fetch rates: ${response.statusText}`);
-		}
+    if (!response.ok) {
+      throw new Error(`Failed to fetch rates: ${response.statusText}`);
+    }
 
-		const data = await response.json();
-		const rates: ExchangeRates = {
-			base: data.base,
-			rates: data.rates,
-			timestamp: Date.now()
-		};
+    const data = await response.json();
+    const rates: ExchangeRates = {
+      base: data.base,
+      rates: data.rates,
+      timestamp: Date.now(),
+    };
 
-		// Cache the result
-		this.cache.set(base, rates);
+    // Cache the result
+    this.cache.set(base, rates);
 
-		return rates;
-	}
+    return rates;
+  }
 
-	async convert(amount: number, from: string, to: string): Promise<number> {
-		if (from === to) return amount;
+  async convert(amount: number, from: string, to: string): Promise<number> {
+    if (from === to) return amount;
 
-		const rates = await this.fetchRates(from);
-		const rate = rates.rates[to];
+    const rates = await this.fetchRates(from);
+    const rate = rates.rates[to];
 
-		if (!rate) {
-			throw new Error(`Exchange rate not found for ${to}`);
-		}
+    if (!rate) {
+      throw new Error(`Exchange rate not found for ${to}`);
+    }
 
-		return amount * rate;
-	}
+    return amount * rate;
+  }
 }
 
 export const currencyService = new CurrencyService();
@@ -459,7 +461,7 @@ Create:
 						<span>${(basePrice * taxRate).toFixed(2)}</span>
 					</div>
 					<div
-						class="flex justify-between py-2 mt-2 pt-4 border-t-2 border-[#3a3a3a] text-xl font-extrabold text-[#4a9eff]"
+						class="flex justify-between py-2 mt-2 pt-4 border-t-2 border-gray-700 text-xl font-extrabold text-blue-400"
 					>
 						<span>Total:</span>
 						<span>${totalPrice.value.toFixed(2)}</span>
@@ -570,7 +572,7 @@ Handle promises in templates with loading, success, and error states.
 				<div class="flex items-center justify-center gap-3 py-8 text-gray-500 italic">Loading user...</div>
 			{:then user}
 				<div class="text-center">
-					<div class="text-[64px] mb-4">{user.avatar}</div>
+					<div class="text-6xl mb-4">{user.avatar}</div>
 					<h3 class="m-0 mb-2 text-white">{user.name}</h3>
 					<p class="text-gray-500 my-2">{user.email}</p>
 				</div>
@@ -582,7 +584,7 @@ Handle promises in templates with loading, success, and error states.
 			<h2 class="m-0 mb-5 text-white text-lg">Pattern 3: All States</h2>
 			{#await userPromise}
 				<div class="flex items-center justify-center gap-3 py-8 text-gray-500 italic">
-					<div class="w-6 h-6 border-[3px] border-gray-700 border-t-blue-400 rounded-full animate-[spin_1s_linear_infinite]"></div>
+					<div class="w-6 h-6 border-4 border-gray-700 border-t-blue-400 rounded-full animate-spin"></div>
 					Loading user profile...
 				</div>
 			{:then user}
@@ -593,7 +595,7 @@ Handle promises in templates with loading, success, and error states.
 					<p class="text-gray-300 mt-4 mb-0 leading-relaxed">{user.bio}</p>
 				</div>
 			{:catch error}
-				<div class="bg-[rgba(255,107,107,0.1)] border-2 border-[#ff6b6b] text-[#ff6b6b] p-4 rounded-lg font-semibold">
+				<div class="bg-red-400/10 border-2 border-red-400 text-red-400 p-4 rounded-lg font-semibold">
 					⚠️ {error.message}
 				</div>
 			{/await}
@@ -613,7 +615,7 @@ Handle promises in templates with loading, success, and error states.
 							<small class="text-gray-500 text-xs">{user.email}</small>
 						</div>
 					{:catch}
-						<div class="bg-[rgba(255,107,107,0.1)] border-2 border-red-400 text-red-400 p-2 rounded-lg font-semibold text-sm">Failed</div>
+						<div class="bg-red-400/10 border-2 border-red-400 text-red-400 p-2 rounded-lg font-semibold text-sm">Failed</div>
 					{/await}
 				</div>
 
@@ -626,7 +628,7 @@ Handle promises in templates with loading, success, and error states.
 							📝 {posts.length} posts
 						</div>
 					{:catch}
-						<div class="bg-[rgba(255,107,107,0.1)] border-2 border-red-400 text-red-400 p-2 rounded-lg font-semibold text-sm">Failed</div>
+						<div class="bg-red-400/10 border-2 border-red-400 text-red-400 p-2 rounded-lg font-semibold text-sm">Failed</div>
 					{/await}
 				</div>
 			</div>
@@ -637,7 +639,7 @@ Handle promises in templates with loading, success, and error states.
 			<h2 class="m-0 mb-5 text-white text-lg">User Posts</h2>
 			{#await postsPromise}
 				<div class="flex items-center justify-center gap-3 py-8 text-gray-500 italic">
-					<div class="w-6 h-6 border-[3px] border-gray-700 border-t-blue-400 rounded-full animate-[spin_1s_linear_infinite]"></div>
+					<div class="w-6 h-6 border-4 border-gray-700 border-t-blue-400 rounded-full animate-spin"></div>
 					Loading posts...
 				</div>
 			{:then posts}
@@ -651,7 +653,7 @@ Handle promises in templates with loading, success, and error states.
 					{/each}
 				</div>
 			{:catch error}
-				<div class="bg-[rgba(255,107,107,0.1)] border-2 border-red-400 text-red-400 p-4 rounded-lg font-semibold">
+				<div class="bg-red-400/10 border-2 border-red-400 text-red-400 p-4 rounded-lg font-semibold">
 					⚠️ {error.message}
 					<button onclick={reload} class="mt-3 bg-red-400 text-white border-none py-2 px-4 rounded-md cursor-pointer">Try Again</button>
 				</div>
@@ -1656,94 +1658,94 @@ Best practices for organizing API calls, error handling, loading states, and cac
 // src/lib/services/api.ts
 
 export interface ApiResponse<T> {
-	data?: T;
-	error?: string;
-	loading: boolean;
+  data?: T;
+  error?: string;
+  loading: boolean;
 }
 
 export interface User {
-	id: number;
-	name: string;
-	email: string;
-	username: string;
+  id: number;
+  name: string;
+  email: string;
+  username: string;
 }
 
 export interface Post {
-	id: number;
-	title: string;
-	body: string;
-	userId: number;
+  id: number;
+  title: string;
+  body: string;
+  userId: number;
 }
 
 // Best Practice: Separate service layer from components
 export class ApiService {
-	private baseUrl: string;
-	private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
-	private cacheExpiry = 60000; // 1 minute
+  private baseUrl: string;
+  private cache: Map<string, { data: unknown; timestamp: number }> = new Map();
+  private cacheExpiry = 60000; // 1 minute
 
-	constructor(baseUrl: string) {
-		this.baseUrl = baseUrl;
-	}
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
 
-	private getCacheKey(endpoint: string): string {
-		return `${this.baseUrl}${endpoint}`;
-	}
+  private getCacheKey(endpoint: string): string {
+    return `${this.baseUrl}${endpoint}`;
+  }
 
-	private isCacheValid(timestamp: number): boolean {
-		return Date.now() - timestamp < this.cacheExpiry;
-	}
+  private isCacheValid(timestamp: number): boolean {
+    return Date.now() - timestamp < this.cacheExpiry;
+  }
 
-	async fetch<T>(endpoint: string, useCache = true): Promise<T> {
-		const cacheKey = this.getCacheKey(endpoint);
+  async fetch<T>(endpoint: string, useCache = true): Promise<T> {
+    const cacheKey = this.getCacheKey(endpoint);
 
-		// Check cache
-		if (useCache) {
-			const cached = this.cache.get(cacheKey);
-			if (cached && this.isCacheValid(cached.timestamp)) {
-				return cached.data as T;
-			}
-		}
+    // Check cache
+    if (useCache) {
+      const cached = this.cache.get(cacheKey);
+      if (cached && this.isCacheValid(cached.timestamp)) {
+        return cached.data as T;
+      }
+    }
 
-		// Fetch from API
-		const response = await fetch(`${this.baseUrl}${endpoint}`);
+    // Fetch from API
+    const response = await fetch(`${this.baseUrl}${endpoint}`);
 
-		if (!response.ok) {
-			throw new Error(`HTTP error! status: ${response.status}`);
-		}
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
 
-		const data = await response.json();
+    const data = await response.json();
 
-		// Update cache
-		if (useCache) {
-			this.cache.set(cacheKey, {
-				data,
-				timestamp: Date.now()
-			});
-		}
+    // Update cache
+    if (useCache) {
+      this.cache.set(cacheKey, {
+        data,
+        timestamp: Date.now(),
+      });
+    }
 
-		return data as T;
-	}
+    return data as T;
+  }
 
-	async getUsers(): Promise<User[]> {
-		return this.fetch<User[]>('/users');
-	}
+  async getUsers(): Promise<User[]> {
+    return this.fetch<User[]>("/users");
+  }
 
-	async getUser(id: number): Promise<User> {
-		return this.fetch<User>(`/users/${id}`);
-	}
+  async getUser(id: number): Promise<User> {
+    return this.fetch<User>(`/users/${id}`);
+  }
 
-	async getPosts(userId?: number): Promise<Post[]> {
-		const endpoint = userId ? `/posts?userId=${userId}` : '/posts';
-		return this.fetch<Post[]>(endpoint);
-	}
+  async getPosts(userId?: number): Promise<Post[]> {
+    const endpoint = userId ? `/posts?userId=${userId}` : "/posts";
+    return this.fetch<Post[]>(endpoint);
+  }
 
-	clearCache() {
-		this.cache.clear();
-	}
+  clearCache() {
+    this.cache.clear();
+  }
 }
 
 // Singleton instance
-export const api = new ApiService('https://jsonplaceholder.typicode.com');
+export const api = new ApiService("https://jsonplaceholder.typicode.com");
 ```
 
 **Demo Page:**
@@ -1941,6 +1943,431 @@ export const api = new ApiService('https://jsonplaceholder.typicode.com');
 - **Error handling**: Try-catch blocks with user-friendly messages
 - **TypeScript**: Full type safety for API responses
 - **Reusable**: Service can be used across all components
+
+---
+
+## 10. 🚀 End-of-Section Project: E-Commerce Shopping Cart
+
+### Project Overview
+
+Build a **complete e-commerce shopping cart** that demonstrates all advanced state patterns. This real-world project combines reactive classes, derived state, API integration, and writable derived patterns.
+
+**What You'll Build:**
+
+- A **ProductService** class with caching for API calls
+- A **CartManager** reactive class for cart state
+- **Writable derived** for quantity controls
+- **{#await}** blocks for async product loading
+- A complete shopping experience
+
+### 📁 Files to Create
+
+**1. Product Service** - `src/lib/services/products.svelte.ts`
+
+```typescript
+interface Product {
+  id: number;
+  name: string;
+  price: number;
+  image: string;
+  category: string;
+  inStock: boolean;
+}
+
+interface ApiResponse<T> {
+  data: T | null;
+  loading: boolean;
+  error: string | null;
+}
+
+class ProductService {
+  private cache = new Map<string, { data: Product[]; timestamp: number }>();
+  private CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+  products = $state<ApiResponse<Product[]>>({
+    data: null,
+    loading: false,
+    error: null,
+  });
+
+  async fetchProducts(category?: string): Promise<void> {
+    const cacheKey = category || "all";
+    const cached = this.cache.get(cacheKey);
+
+    if (cached && Date.now() - cached.timestamp < this.CACHE_DURATION) {
+      this.products = { data: cached.data, loading: false, error: null };
+      return;
+    }
+
+    this.products = { data: null, loading: true, error: null };
+
+    try {
+      // Simulated API call
+      await new Promise((r) => setTimeout(r, 800));
+
+      const mockProducts: Product[] = [
+        {
+          id: 1,
+          name: "Wireless Headphones",
+          price: 99.99,
+          image: "🎧",
+          category: "electronics",
+          inStock: true,
+        },
+        {
+          id: 2,
+          name: "Running Shoes",
+          price: 129.99,
+          image: "👟",
+          category: "sports",
+          inStock: true,
+        },
+        {
+          id: 3,
+          name: "Coffee Maker",
+          price: 79.99,
+          image: "☕",
+          category: "home",
+          inStock: false,
+        },
+        {
+          id: 4,
+          name: "Backpack",
+          price: 59.99,
+          image: "🎒",
+          category: "accessories",
+          inStock: true,
+        },
+        {
+          id: 5,
+          name: "Smart Watch",
+          price: 249.99,
+          image: "⌚",
+          category: "electronics",
+          inStock: true,
+        },
+        {
+          id: 6,
+          name: "Yoga Mat",
+          price: 29.99,
+          image: "🧘",
+          category: "sports",
+          inStock: true,
+        },
+      ];
+
+      const filtered = category
+        ? mockProducts.filter((p) => p.category === category)
+        : mockProducts;
+
+      this.cache.set(cacheKey, { data: filtered, timestamp: Date.now() });
+      this.products = { data: filtered, loading: false, error: null };
+    } catch (e) {
+      this.products = {
+        data: null,
+        loading: false,
+        error: "Failed to load products",
+      };
+    }
+  }
+
+  clearCache() {
+    this.cache.clear();
+  }
+}
+
+export const productService = new ProductService();
+```
+
+**2. Cart Manager** - `src/lib/stores/cart.svelte.ts`
+
+```typescript
+interface CartItem {
+  productId: number;
+  name: string;
+  price: number;
+  image: string;
+  quantity: number;
+}
+
+class CartManager {
+  items = $state<CartItem[]>([]);
+
+  // Derived values
+  totalItems = $derived(
+    this.items.reduce((sum, item) => sum + item.quantity, 0)
+  );
+
+  subtotal = $derived(
+    this.items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  );
+
+  tax = $derived(this.subtotal * 0.08); // 8% tax
+
+  total = $derived(this.subtotal + this.tax);
+
+  // Writable derived for individual item quantities
+  getQuantityControl(productId: number) {
+    return {
+      get value() {
+        const item = cartManager.items.find((i) => i.productId === productId);
+        return item?.quantity || 0;
+      },
+      set value(newQuantity: number) {
+        if (newQuantity <= 0) {
+          cartManager.removeItem(productId);
+        } else {
+          const item = cartManager.items.find((i) => i.productId === productId);
+          if (item) {
+            item.quantity = newQuantity;
+          }
+        }
+      },
+    };
+  }
+
+  addItem(product: { id: number; name: string; price: number; image: string }) {
+    const existing = this.items.find((i) => i.productId === product.id);
+    if (existing) {
+      existing.quantity++;
+    } else {
+      this.items.push({
+        productId: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        quantity: 1,
+      });
+    }
+  }
+
+  removeItem(productId: number) {
+    this.items = this.items.filter((i) => i.productId !== productId);
+  }
+
+  updateQuantity(productId: number, quantity: number) {
+    const item = this.items.find((i) => i.productId === productId);
+    if (item) {
+      if (quantity <= 0) {
+        this.removeItem(productId);
+      } else {
+        item.quantity = quantity;
+      }
+    }
+  }
+
+  clearCart() {
+    this.items = [];
+  }
+
+  isInCart(productId: number): boolean {
+    return this.items.some((i) => i.productId === productId);
+  }
+}
+
+export const cartManager = new CartManager();
+```
+
+**3. Shopping Page** - `src/routes/shop/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import { productService } from '$lib/services/products.svelte';
+	import { cartManager } from '$lib/stores/cart.svelte';
+
+	let selectedCategory = $state<string | undefined>(undefined);
+	let showCart = $state(false);
+
+	const categories = ['all', 'electronics', 'sports', 'home', 'accessories'];
+
+	onMount(() => {
+		productService.fetchProducts();
+	});
+
+	function selectCategory(cat: string) {
+		selectedCategory = cat === 'all' ? undefined : cat;
+		productService.fetchProducts(selectedCategory);
+	}
+</script>
+
+<div class="bg-gray-900 min-h-screen text-gray-200">
+	<!-- Header -->
+	<header class="bg-gray-800 border-b border-gray-700 p-4 sticky top-0 z-40">
+		<div class="max-w-6xl mx-auto flex justify-between items-center">
+			<h1 class="text-2xl font-bold text-blue-400">🛍️ Svelte Shop</h1>
+			<button
+				onclick={() => (showCart = !showCart)}
+				class="relative bg-blue-500 hover:bg-blue-400 text-white px-4 py-2 rounded-lg font-semibold transition-colors"
+			>
+				Cart
+				{#if cartManager.totalItems > 0}
+					<span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-6 h-6 rounded-full flex items-center justify-center">
+						{cartManager.totalItems}
+					</span>
+				{/if}
+			</button>
+		</div>
+	</header>
+
+	<div class="max-w-6xl mx-auto p-6">
+		<!-- Category Filter -->
+		<div class="flex gap-2 mb-8 flex-wrap">
+			{#each categories as cat}
+				<button
+					onclick={() => selectCategory(cat)}
+					class="px-4 py-2 rounded-lg font-semibold transition-all capitalize"
+					class:bg-blue-500={selectedCategory === (cat === 'all' ? undefined : cat) || (cat === 'all' && !selectedCategory)}
+					class:text-white={selectedCategory === (cat === 'all' ? undefined : cat) || (cat === 'all' && !selectedCategory)}
+					class:bg-gray-700={!(selectedCategory === (cat === 'all' ? undefined : cat) || (cat === 'all' && !selectedCategory))}
+					class:text-gray-300={!(selectedCategory === (cat === 'all' ? undefined : cat) || (cat === 'all' && !selectedCategory))}
+				>
+					{cat}
+				</button>
+			{/each}
+		</div>
+
+		<!-- Products Grid -->
+		{#if productService.products.loading}
+			<div class="flex justify-center py-20">
+				<div class="w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+			</div>
+		{:else if productService.products.error}
+			<div class="bg-red-500/10 border border-red-500 rounded-lg p-6 text-center">
+				<p class="text-red-400">{productService.products.error}</p>
+				<button
+					onclick={() => productService.fetchProducts(selectedCategory)}
+					class="mt-4 bg-red-500 hover:bg-red-400 text-white px-4 py-2 rounded-lg"
+				>
+					Retry
+				</button>
+			</div>
+		{:else if productService.products.data}
+			<div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+				{#each productService.products.data as product (product.id)}
+					<div class="bg-gray-800 rounded-xl p-6 border border-gray-700 hover:border-blue-500 transition-colors">
+						<div class="text-6xl mb-4 text-center">{product.image}</div>
+						<h3 class="text-lg font-bold text-white mb-2">{product.name}</h3>
+						<p class="text-2xl font-bold text-blue-400 mb-4">${product.price.toFixed(2)}</p>
+
+						{#if !product.inStock}
+							<span class="text-red-400 font-semibold">Out of Stock</span>
+						{:else if cartManager.isInCart(product.id)}
+							<div class="flex items-center gap-3">
+								<button
+									onclick={() => cartManager.updateQuantity(product.id, cartManager.getQuantityControl(product.id).value - 1)}
+									class="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg text-xl"
+								>
+									-
+								</button>
+								<span class="text-lg font-bold w-8 text-center">
+									{cartManager.getQuantityControl(product.id).value}
+								</span>
+								<button
+									onclick={() => cartManager.updateQuantity(product.id, cartManager.getQuantityControl(product.id).value + 1)}
+									class="w-10 h-10 bg-gray-700 hover:bg-gray-600 rounded-lg text-xl"
+								>
+									+
+								</button>
+							</div>
+						{:else}
+							<button
+								onclick={() => cartManager.addItem(product)}
+								class="w-full bg-blue-500 hover:bg-blue-400 text-white py-3 rounded-lg font-semibold transition-colors"
+							>
+								Add to Cart
+							</button>
+						{/if}
+					</div>
+				{/each}
+			</div>
+		{/if}
+	</div>
+
+	<!-- Cart Sidebar -->
+	{#if showCart}
+		<div class="fixed inset-0 bg-black/50 z-50" onclick={() => (showCart = false)}>
+			<div
+				class="absolute right-0 top-0 h-full w-full max-w-md bg-gray-800 p-6 overflow-y-auto"
+				onclick={(e) => e.stopPropagation()}
+			>
+				<div class="flex justify-between items-center mb-6">
+					<h2 class="text-2xl font-bold text-white">Your Cart</h2>
+					<button onclick={() => (showCart = false)} class="text-gray-400 hover:text-white text-2xl">✕</button>
+				</div>
+
+				{#if cartManager.items.length === 0}
+					<p class="text-gray-400 text-center py-10">Your cart is empty</p>
+				{:else}
+					<div class="flex flex-col gap-4 mb-6">
+						{#each cartManager.items as item (item.productId)}
+							<div class="bg-gray-700 rounded-lg p-4 flex gap-4">
+								<div class="text-4xl">{item.image}</div>
+								<div class="flex-1">
+									<h4 class="font-semibold text-white">{item.name}</h4>
+									<p class="text-blue-400">${item.price.toFixed(2)}</p>
+									<div class="flex items-center gap-2 mt-2">
+										<button
+											onclick={() => cartManager.updateQuantity(item.productId, item.quantity - 1)}
+											class="w-8 h-8 bg-gray-600 hover:bg-gray-500 rounded text-sm"
+										>
+											-
+										</button>
+										<span class="w-8 text-center">{item.quantity}</span>
+										<button
+											onclick={() => cartManager.updateQuantity(item.productId, item.quantity + 1)}
+											class="w-8 h-8 bg-gray-600 hover:bg-gray-500 rounded text-sm"
+										>
+											+
+										</button>
+									</div>
+								</div>
+								<button
+									onclick={() => cartManager.removeItem(item.productId)}
+									class="text-red-400 hover:text-red-300"
+								>
+									🗑️
+								</button>
+							</div>
+						{/each}
+					</div>
+
+					<div class="border-t border-gray-700 pt-4 space-y-2">
+						<div class="flex justify-between text-gray-400">
+							<span>Subtotal</span>
+							<span>${cartManager.subtotal.toFixed(2)}</span>
+						</div>
+						<div class="flex justify-between text-gray-400">
+							<span>Tax (8%)</span>
+							<span>${cartManager.tax.toFixed(2)}</span>
+						</div>
+						<div class="flex justify-between text-xl font-bold text-white pt-2 border-t border-gray-700">
+							<span>Total</span>
+							<span>${cartManager.total.toFixed(2)}</span>
+						</div>
+					</div>
+
+					<button class="w-full bg-green-500 hover:bg-green-400 text-white py-4 rounded-lg font-bold mt-6 transition-colors">
+						Checkout (${cartManager.total.toFixed(2)})
+					</button>
+				{/if}
+			</div>
+		</div>
+	{/if}
+</div>
+```
+
+### What This Project Demonstrates
+
+| Concept                 | Implementation                           |
+| ----------------------- | ---------------------------------------- |
+| **Reactive Classes**    | CartManager, ProductService              |
+| **$derived**            | totalItems, subtotal, tax, total         |
+| **Writable Derived**    | getQuantityControl() for quantity inputs |
+| **API Caching**         | ProductService with timestamp cache      |
+| **Loading States**      | products.loading, products.error         |
+| **Class Methods**       | addItem, removeItem, updateQuantity      |
+| **Built-in Reactivity** | Map for caching, array mutations         |
 
 ---
 

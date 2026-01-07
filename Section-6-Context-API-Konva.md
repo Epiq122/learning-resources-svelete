@@ -326,10 +326,10 @@ Context creates **tree-scoped state** - only available to children of the compon
 
 <div
 	class="min-h-screen p-5 transition-all duration-300 ease-in-out"
-	class:bg-[#1a1a1a]={theme !== 'light'}
-	class:text-[#e0e0e0]={theme !== 'light'}
-	class:bg-[#f0f0f0]={theme === 'light'}
-	class:text-[#1a1a1a]={theme === 'light'}
+	class:bg-gray-900={theme !== 'light'}
+	class:text-gray-200={theme !== 'light'}
+	class:bg-gray-100={theme === 'light'}
+	class:text-gray-900={theme === 'light'}
 >
 	{@render children()}
 </div>
@@ -396,16 +396,16 @@ If a component uses `getContext()` but no parent set that context, it returns `u
 </script>
 
 {#if hasUser}
-	<div class="bg-[#1a2a1a] text-green-400 p-5 rounded-lg border-2 border-green-400">
+	<div class="bg-green-900/30 text-green-400 p-5 rounded-lg border-2 border-green-400">
 		<h2 class="m-0 mb-3 text-lg">✅ Context Found</h2>
 		<p class="m-0 mb-2">Welcome {user.name}!</p>
 		<span class="bg-green-400 text-black px-3 py-1 rounded text-xs font-semibold">{user.role}</span>
 	</div>
 {:else}
-	<div class="bg-[#2a1a1a] text-red-400 p-5 rounded-lg border-2 border-red-400">
+	<div class="bg-red-900/30 text-red-400 p-5 rounded-lg border-2 border-red-400">
 		<h2 class="m-0 mb-3 text-lg">⚠️ No Context Found</h2>
 		<p class="m-0 mb-2">This component must be used inside a context provider</p>
-		<code class="block bg-[rgba(0,0,0,0.3)] p-2 rounded mt-3 font-mono"
+		<code class="block bg-black/30 p-2 rounded mt-3 font-mono"
 			>&lt;BasicContext&gt;...&lt;/BasicContext&gt;</code
 		>
 	</div>
@@ -507,7 +507,7 @@ export function getModalContext(): ModalContext {
 	let { children }: { children: Snippet } = $props();
 </script>
 
-<div class="bg-[#1a1a1a] min-h-screen p-5">
+<div class="bg-gray-900 min-h-screen p-5">
 	<!-- App content -->
 	{@render children()}
 </div>
@@ -515,15 +515,15 @@ export function getModalContext(): ModalContext {
 <!-- Modal overlay (shown when modal is open) -->
 {#if modal.isOpen}
 	<div
-		class="fixed inset-0 bg-[rgba(0,0,0,0.8)] flex items-center justify-center z-[1000] backdrop-blur-[4px]"
+		class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 backdrop-blur-sm"
 		onclick={modal.close}
 	>
 		<div
-			class="bg-[#2a2a2a] p-8 rounded-xl border border-[#3a3a3a] max-w-[600px] w-[90%] relative shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-[slideIn_0.3s_ease]"
+			class="bg-gray-800 p-8 rounded-xl border border-gray-700 max-w-xl w-11/12 relative shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
 			<button
-				class="absolute top-4 right-4 bg-transparent border-none text-[#888] text-2xl cursor-pointer px-2 py-1 leading-none transition-colors hover:text-white"
+				class="absolute top-4 right-4 bg-transparent border-none text-gray-500 text-2xl cursor-pointer px-2 py-1 leading-none transition-colors hover:text-white"
 				onclick={modal.close}>✕</button
 			>
 			{#if modal.content}
@@ -569,19 +569,19 @@ export function getModalContext(): ModalContext {
 	const modal = getModalContext();
 </script>
 
-<div class="bg-[#2a2a2a] p-5 rounded-lg border border-[#3a3a3a] transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-[#4a9eff]">
+<div class="bg-gray-800 p-5 rounded-lg border border-gray-700 transition-[transform,border-color] duration-200 hover:-translate-y-1 hover:border-blue-500">
 	<h3 class="m-0 mb-2 text-white text-lg">{product.name}</h3>
-	<p class="text-[#4ade80] text-xl font-semibold m-0 mb-4">${product.price.toFixed(2)}</p>
+	<p class="text-green-400 text-xl font-semibold m-0 mb-4">${product.price.toFixed(2)}</p>
 	<button
 		onclick={() => modal.open(() => (
 			<div class="text-white">
-				<h2 class="m-0 mb-4 text-[#4a9eff]">{product.name}</h2>
-				<p class="text-[#ccc] leading-relaxed mb-5">{product.description}</p>
-				<p class="text-[#4ade80] text-[28px] font-bold m-0 mb-5">${product.price.toFixed(2)}</p>
-				<button class="bg-[#4ade80] text-black border-none py-[14px] px-7 rounded-lg font-semibold text-base cursor-pointer w-full">Add to Cart</button>
+				<h2 class="m-0 mb-4 text-blue-400">{product.name}</h2>
+				<p class="text-gray-300 leading-relaxed mb-5">{product.description}</p>
+				<p class="text-green-400 text-3xl font-bold m-0 mb-5">${product.price.toFixed(2)}</p>
+				<button class="bg-green-500 text-black border-none py-3.5 px-7 rounded-lg font-semibold text-base cursor-pointer w-full">Add to Cart</button>
 			</div>
 		))}
-		class="bg-[#4a9eff] text-black border-none py-[10px] px-5 rounded-md cursor-pointer font-semibold w-full transition-colors hover:bg-[#6ab0ff]"
+		class="bg-blue-500 text-black border-none py-2.5 px-5 rounded-md cursor-pointer font-semibold w-full transition-colors hover:bg-blue-400"
 	>
 		View Details
 	</button>
@@ -734,7 +734,7 @@ export function getLayerContext(): Konva.Layer {
 <!-- Container div where Konva will attach its canvas -->
 <div
 	bind:this={container}
-	class="bg-[#1a1a1a] border-2 border-[#3a3a3a] rounded-lg overflow-hidden shadow-[0_4px_12px_rgba(0,0,0,0.5)]"
+	class="bg-gray-900 border-2 border-gray-700 rounded-lg overflow-hidden shadow-lg"
 	style="width: {width}px; height: {height}px;"
 >
 	<!-- Only render children after stage is created -->
@@ -1239,7 +1239,7 @@ export function getLayerContext(): Konva.Layer {
 
 <button
 	onclick={animateRect}
-	class="bg-[#4a9eff] text-black border-none py-3 px-6 rounded-lg font-semibold cursor-pointer mb-4"
+	class="bg-blue-500 text-black border-none py-3 px-6 rounded-lg font-semibold cursor-pointer mb-4"
 	>Animate</button
 >
 
@@ -1305,19 +1305,19 @@ export function getLayerContext(): Konva.Layer {
 	}
 </script>
 
-<div class="bg-[#1a1a1a] min-h-screen p-10 text-[#e0e0e0]">
+<div class="bg-gray-900 min-h-screen p-10 text-gray-200">
 	<div class="mb-6">
-		<h1 class="m-0 mb-4 text-[#4a9eff] text-[32px]">Interactive Konva Drawing</h1>
+		<h1 class="m-0 mb-4 text-blue-400 text-3xl">Interactive Konva Drawing</h1>
 		<div class="flex gap-3 mb-4">
 			<button
 				onclick={addRectangle}
-				class="bg-[#4ade80] text-black border-none py-3 px-6 rounded-lg font-semibold text-base cursor-pointer transition-all hover:bg-[#5ef090] hover:-translate-y-0.5"
+				class="bg-green-500 text-black border-none py-3 px-6 rounded-lg font-semibold text-base cursor-pointer transition-all hover:bg-green-400 hover:-translate-y-0.5"
 			>
 				➕ Add Rectangle
 			</button>
 			<button
 				onclick={deleteSelected}
-				class="bg-[#ff6b6b] text-white border-none py-3 px-6 rounded-lg font-semibold text-base cursor-pointer transition-all hover:bg-[#ff8787] hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-[#ff6b6b]"
+				class="bg-red-500 text-white border-none py-3 px-6 rounded-lg font-semibold text-base cursor-pointer transition-all hover:bg-red-400 hover:-translate-y-0.5 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0 disabled:hover:bg-red-500"
 				disabled={selectedId === null}
 			>
 				🗑️ Delete Selected
@@ -1327,14 +1327,14 @@ export function getLayerContext(): Konva.Layer {
 		{#if selectedId !== null}
 			{@const selected = rectangles.find((r) => r.id === selectedId)}
 			{#if selected}
-				<div class="bg-[#2a2a2a] p-4 rounded-lg border border-[#3a3a3a]">
-					<p class="my-1 text-[#ccc]">
-						<strong class="text-[#4a9eff]">Selected:</strong> Rectangle #{selectedId}
+				<div class="bg-gray-800 p-4 rounded-lg border border-gray-700">
+					<p class="my-1 text-gray-300">
+						<strong class="text-blue-400">Selected:</strong> Rectangle #{selectedId}
 					</p>
-					<p class="my-1 text-[#ccc]">
+					<p class="my-1 text-gray-300">
 						Position: ({Math.round(selected.x)}, {Math.round(selected.y)})
 					</p>
-					<p class="my-1 text-[#ccc]">Size: {selected.width} × {selected.height}</p>
+					<p class="my-1 text-gray-300">Size: {selected.width} × {selected.height}</p>
 				</div>
 			{/if}
 		{/if}
@@ -1370,6 +1370,519 @@ export function getLayerContext(): Konva.Layer {
 ✅ Use `$effect()` to sync Svelte props with Konva properties
 ✅ Use `$bindable()` for two-way binding
 ✅ Export component internals when parent needs direct access
+
+---
+
+## 🚀 End-of-Section Project: Collaborative Whiteboard
+
+### Project Overview
+
+Build a **collaborative whiteboard application** that demonstrates Context API patterns and Konva integration. This project combines theme context, tool context, canvas rendering, and two-way binding.
+
+**What You'll Build:**
+
+- A **ThemeContext** for dark/light mode across all components
+- A **ToolContext** for sharing selected drawing tool state
+- A **Konva canvas** with draggable shapes
+- **Property panel** with two-way binding to shape properties
+- **Toolbar** using context for tool selection
+
+### 📁 Files to Create
+
+**1. Theme Context** - `src/lib/contexts/theme.svelte.ts`
+
+```typescript
+import { getContext, setContext } from "svelte";
+
+interface ThemeContext {
+  readonly current: "light" | "dark";
+  readonly colors: {
+    background: string;
+    surface: string;
+    text: string;
+    primary: string;
+    border: string;
+  };
+  toggle: () => void;
+}
+
+const THEME_KEY = Symbol("theme");
+
+export function createThemeContext(): ThemeContext {
+  let theme = $state<"light" | "dark">("dark");
+
+  const colors = $derived({
+    background: theme === "dark" ? "#1a1a2e" : "#f8fafc",
+    surface: theme === "dark" ? "#16213e" : "#ffffff",
+    text: theme === "dark" ? "#eee" : "#1e293b",
+    primary: "#4a9eff",
+    border: theme === "dark" ? "#334155" : "#e2e8f0",
+  });
+
+  const context: ThemeContext = {
+    get current() {
+      return theme;
+    },
+    get colors() {
+      return colors;
+    },
+    toggle() {
+      theme = theme === "dark" ? "light" : "dark";
+    },
+  };
+
+  setContext(THEME_KEY, context);
+  return context;
+}
+
+export function getThemeContext(): ThemeContext {
+  const context = getContext<ThemeContext>(THEME_KEY);
+  if (!context) {
+    throw new Error("ThemeContext not found. Wrap component in ThemeProvider.");
+  }
+  return context;
+}
+```
+
+**2. Tool Context** - `src/lib/contexts/tools.svelte.ts`
+
+```typescript
+import { getContext, setContext } from "svelte";
+
+type Tool = "select" | "rectangle" | "circle" | "line";
+
+interface ToolContext {
+  readonly selected: Tool;
+  readonly strokeColor: string;
+  readonly fillColor: string;
+  readonly strokeWidth: number;
+  selectTool: (tool: Tool) => void;
+  setStrokeColor: (color: string) => void;
+  setFillColor: (color: string) => void;
+  setStrokeWidth: (width: number) => void;
+}
+
+const TOOL_KEY = Symbol("tool");
+
+export function createToolContext(): ToolContext {
+  let selected = $state<Tool>("select");
+  let strokeColor = $state("#4a9eff");
+  let fillColor = $state("#2a4a6a");
+  let strokeWidth = $state(2);
+
+  const context: ToolContext = {
+    get selected() {
+      return selected;
+    },
+    get strokeColor() {
+      return strokeColor;
+    },
+    get fillColor() {
+      return fillColor;
+    },
+    get strokeWidth() {
+      return strokeWidth;
+    },
+    selectTool(tool: Tool) {
+      selected = tool;
+    },
+    setStrokeColor(color: string) {
+      strokeColor = color;
+    },
+    setFillColor(color: string) {
+      fillColor = color;
+    },
+    setStrokeWidth(width: number) {
+      strokeWidth = width;
+    },
+  };
+
+  setContext(TOOL_KEY, context);
+  return context;
+}
+
+export function getToolContext(): ToolContext {
+  const context = getContext<ToolContext>(TOOL_KEY);
+  if (!context) {
+    throw new Error("ToolContext not found. Wrap component in ToolProvider.");
+  }
+  return context;
+}
+```
+
+**3. Toolbar Component** - `src/lib/components/Toolbar.svelte`
+
+```svelte
+<script lang="ts">
+	import { getThemeContext } from '$lib/contexts/theme.svelte';
+	import { getToolContext } from '$lib/contexts/tools.svelte';
+
+	const theme = getThemeContext();
+	const tools = getToolContext();
+
+	const toolButtons = [
+		{ id: 'select', icon: '👆', label: 'Select' },
+		{ id: 'rectangle', icon: '⬜', label: 'Rectangle' },
+		{ id: 'circle', icon: '⭕', label: 'Circle' },
+		{ id: 'line', icon: '📏', label: 'Line' }
+	] as const;
+</script>
+
+<div
+	class="flex gap-2 p-4 rounded-lg border"
+	style:background={theme.colors.surface}
+	style:border-color={theme.colors.border}
+>
+	{#each toolButtons as tool}
+		<button
+			class="w-12 h-12 rounded-lg border-2 text-xl transition-all hover:scale-105"
+			class:ring-2={tools.selected === tool.id}
+			class:ring-blue-400={tools.selected === tool.id}
+			style:background={tools.selected === tool.id ? theme.colors.primary : theme.colors.background}
+			style:border-color={theme.colors.border}
+			onclick={() => tools.selectTool(tool.id)}
+			title={tool.label}
+		>
+			{tool.icon}
+		</button>
+	{/each}
+
+	<div class="w-px bg-gray-600 mx-2"></div>
+
+	<div class="flex items-center gap-2">
+		<label class="text-sm" style:color={theme.colors.text}>Fill:</label>
+		<input
+			type="color"
+			value={tools.fillColor}
+			onchange={(e) => tools.setFillColor(e.currentTarget.value)}
+			class="w-8 h-8 rounded cursor-pointer"
+		/>
+	</div>
+
+	<div class="flex items-center gap-2">
+		<label class="text-sm" style:color={theme.colors.text}>Stroke:</label>
+		<input
+			type="color"
+			value={tools.strokeColor}
+			onchange={(e) => tools.setStrokeColor(e.currentTarget.value)}
+			class="w-8 h-8 rounded cursor-pointer"
+		/>
+	</div>
+
+	<div class="ml-auto">
+		<button
+			class="px-4 py-2 rounded-lg border transition-all hover:opacity-80"
+			style:background={theme.colors.surface}
+			style:border-color={theme.colors.border}
+			style:color={theme.colors.text}
+			onclick={theme.toggle}
+		>
+			{theme.current === 'dark' ? '☀️ Light' : '🌙 Dark'}
+		</button>
+	</div>
+</div>
+```
+
+**4. Canvas Shape Component** - `src/lib/components/CanvasShape.svelte`
+
+```svelte
+<script lang="ts">
+	import { onMount } from 'svelte';
+	import Konva from 'konva';
+	import { getLayerContext } from '$lib/contexts/konva.svelte';
+
+	interface Props {
+		id: string;
+		type: 'rectangle' | 'circle' | 'line';
+		x: number;
+		y: number;
+		width?: number;
+		height?: number;
+		radius?: number;
+		fill: string;
+		stroke: string;
+		strokeWidth: number;
+		draggable?: boolean;
+		selected?: boolean;
+		onselect?: () => void;
+		ondragend?: (x: number, y: number) => void;
+	}
+
+	let {
+		id,
+		type,
+		x = $bindable(),
+		y = $bindable(),
+		width = 100,
+		height = 80,
+		radius = 50,
+		fill,
+		stroke,
+		strokeWidth,
+		draggable = true,
+		selected = false,
+		onselect,
+		ondragend
+	}: Props = $props();
+
+	const layer = getLayerContext();
+	let shape: Konva.Shape;
+
+	onMount(() => {
+		if (type === 'rectangle') {
+			shape = new Konva.Rect({ x, y, width, height, fill, stroke, strokeWidth, draggable });
+		} else if (type === 'circle') {
+			shape = new Konva.Circle({ x, y, radius, fill, stroke, strokeWidth, draggable });
+		} else {
+			shape = new Konva.Line({
+				points: [x, y, x + width, y + height],
+				stroke,
+				strokeWidth,
+				draggable
+			});
+		}
+
+		shape.on('click', () => onselect?.());
+		shape.on('dragend', () => {
+			x = shape.x();
+			y = shape.y();
+			ondragend?.(x, y);
+		});
+
+		layer.add(shape);
+		layer.draw();
+
+		return () => shape.destroy();
+	});
+
+	$effect(() => {
+		if (!shape) return;
+		shape.setAttrs({ x, y, fill, stroke, strokeWidth });
+		if (selected) {
+			shape.stroke('#ff6b6b');
+			shape.strokeWidth(3);
+		}
+		layer.draw();
+	});
+</script>
+```
+
+**5. Properties Panel** - `src/lib/components/PropertiesPanel.svelte`
+
+```svelte
+<script lang="ts">
+	import { getThemeContext } from '$lib/contexts/theme.svelte';
+
+	interface Props {
+		selectedShape: {
+			id: string;
+			x: number;
+			y: number;
+			width: number;
+			height: number;
+			fill: string;
+		} | null;
+		onupdate?: (updates: Partial<{ x: number; y: number; width: number; height: number; fill: string }>) => void;
+	}
+
+	let { selectedShape, onupdate }: Props = $props();
+	const theme = getThemeContext();
+</script>
+
+<div
+	class="w-64 p-4 rounded-lg border"
+	style:background={theme.colors.surface}
+	style:border-color={theme.colors.border}
+>
+	<h3 class="text-lg font-bold mb-4" style:color={theme.colors.text}>Properties</h3>
+
+	{#if selectedShape}
+		<div class="space-y-3">
+			<div>
+				<label class="text-sm block mb-1" style:color={theme.colors.text}>Position X</label>
+				<input
+					type="number"
+					value={selectedShape.x}
+					onchange={(e) => onupdate?.({ x: +e.currentTarget.value })}
+					class="w-full px-3 py-2 rounded border bg-gray-800 text-white"
+				/>
+			</div>
+			<div>
+				<label class="text-sm block mb-1" style:color={theme.colors.text}>Position Y</label>
+				<input
+					type="number"
+					value={selectedShape.y}
+					onchange={(e) => onupdate?.({ y: +e.currentTarget.value })}
+					class="w-full px-3 py-2 rounded border bg-gray-800 text-white"
+				/>
+			</div>
+			<div>
+				<label class="text-sm block mb-1" style:color={theme.colors.text}>Width</label>
+				<input
+					type="number"
+					value={selectedShape.width}
+					onchange={(e) => onupdate?.({ width: +e.currentTarget.value })}
+					class="w-full px-3 py-2 rounded border bg-gray-800 text-white"
+				/>
+			</div>
+			<div>
+				<label class="text-sm block mb-1" style:color={theme.colors.text}>Height</label>
+				<input
+					type="number"
+					value={selectedShape.height}
+					onchange={(e) => onupdate?.({ height: +e.currentTarget.value })}
+					class="w-full px-3 py-2 rounded border bg-gray-800 text-white"
+				/>
+			</div>
+			<div>
+				<label class="text-sm block mb-1" style:color={theme.colors.text}>Fill Color</label>
+				<input
+					type="color"
+					value={selectedShape.fill}
+					onchange={(e) => onupdate?.({ fill: e.currentTarget.value })}
+					class="w-full h-10 rounded cursor-pointer"
+				/>
+			</div>
+		</div>
+	{:else}
+		<p class="text-gray-500 text-sm">Select a shape to edit its properties</p>
+	{/if}
+</div>
+```
+
+**6. Main Whiteboard Page** - `src/routes/whiteboard/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import { createThemeContext } from '$lib/contexts/theme.svelte';
+	import { createToolContext } from '$lib/contexts/tools.svelte';
+	import Toolbar from '$lib/components/Toolbar.svelte';
+	import PropertiesPanel from '$lib/components/PropertiesPanel.svelte';
+	import { Stage, Layer } from '$lib/components/konva';
+	import CanvasShape from '$lib/components/CanvasShape.svelte';
+
+	// Initialize contexts at the top level
+	const theme = createThemeContext();
+	const tools = createToolContext();
+
+	// Shape state
+	let shapes = $state([
+		{ id: '1', type: 'rectangle' as const, x: 100, y: 100, width: 120, height: 80, fill: '#4a9eff' },
+		{ id: '2', type: 'circle' as const, x: 300, y: 200, width: 100, height: 100, fill: '#4ade80' },
+		{ id: '3', type: 'rectangle' as const, x: 450, y: 150, width: 150, height: 100, fill: '#f472b6' }
+	]);
+
+	let selectedId = $state<string | null>(null);
+	let nextId = $state(4);
+
+	const selectedShape = $derived(shapes.find((s) => s.id === selectedId) ?? null);
+
+	function handleCanvasClick(e: MouseEvent) {
+		if (tools.selected === 'select') {
+			selectedId = null;
+			return;
+		}
+
+		const rect = (e.target as HTMLElement).getBoundingClientRect();
+		const x = e.clientX - rect.left;
+		const y = e.clientY - rect.top;
+
+		shapes.push({
+			id: String(nextId++),
+			type: tools.selected === 'circle' ? 'circle' : 'rectangle',
+			x,
+			y,
+			width: 100,
+			height: 80,
+			fill: tools.fillColor
+		});
+	}
+
+	function updateShape(updates: Partial<typeof shapes[0]>) {
+		if (!selectedId) return;
+		const index = shapes.findIndex((s) => s.id === selectedId);
+		if (index !== -1) {
+			shapes[index] = { ...shapes[index], ...updates };
+		}
+	}
+
+	function deleteSelected() {
+		if (!selectedId) return;
+		shapes = shapes.filter((s) => s.id !== selectedId);
+		selectedId = null;
+	}
+</script>
+
+<svelte:window
+	onkeydown={(e) => {
+		if (e.key === 'Delete' || e.key === 'Backspace') deleteSelected();
+	}}
+/>
+
+<div class="min-h-screen p-6" style:background={theme.colors.background}>
+	<div class="max-w-7xl mx-auto">
+		<h1 class="text-3xl font-bold mb-6" style:color={theme.colors.text}>
+			🎨 Collaborative Whiteboard
+		</h1>
+
+		<Toolbar />
+
+		<div class="flex gap-6 mt-6">
+			<div
+				class="flex-1 rounded-xl border overflow-hidden"
+				style:border-color={theme.colors.border}
+			>
+				<!-- svelte-ignore a11y_click_events_have_key_events a11y_no_static_element_interactions -->
+				<div onclick={handleCanvasClick}>
+					<Stage width={900} height={600}>
+						<Layer>
+							{#each shapes as shape (shape.id)}
+								<CanvasShape
+									{...shape}
+									stroke={tools.strokeColor}
+									strokeWidth={tools.strokeWidth}
+									selected={shape.id === selectedId}
+									onselect={() => (selectedId = shape.id)}
+									ondragend={(x, y) => updateShape({ x, y })}
+								/>
+							{/each}
+						</Layer>
+					</Stage>
+				</div>
+			</div>
+
+			<PropertiesPanel {selectedShape} onupdate={updateShape} />
+		</div>
+
+		<div class="mt-4 text-sm" style:color={theme.colors.text}>
+			<p>
+				<strong>Tips:</strong> Click canvas to add shapes • Drag to move • Select + Delete key to remove
+			</p>
+			<p class="mt-1 text-gray-500">
+				Shapes: {shapes.length} | Selected: {selectedId ?? 'None'}
+			</p>
+		</div>
+	</div>
+</div>
+```
+
+### 🎯 Project Checklist
+
+- [ ] Theme context provides reactive colors to all nested components
+- [ ] Tool context shares selected tool and colors across toolbar and canvas
+- [ ] Konva shapes update via `$effect()` when props change
+- [ ] Two-way binding works between property panel and shapes
+- [ ] Shapes are draggable with position syncing back to state
+- [ ] Delete key removes selected shape
+- [ ] Theme toggle affects entire application
+
+### 💡 Extension Ideas
+
+1. **Add undo/redo** using a history stack in context
+2. **Export to PNG** using Konva's `toDataURL()`
+3. **Add text tool** with editable text shapes
+4. **Implement layers** with z-index ordering
+5. **Add collaborative sync** with WebSockets
 
 ---
 

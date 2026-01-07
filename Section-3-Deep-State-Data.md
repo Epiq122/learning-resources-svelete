@@ -210,7 +210,7 @@ Create:
 				onclick={updateAge}>Increment Age</button
 			>
 		</div>
-		<div class="bg-gray-900 border border-gray-700 rounded-lg p-4 max-h-[200px] overflow-y-auto">
+		<div class="bg-gray-900 border border-gray-700 rounded-lg p-4 max-h-52 overflow-y-auto">
 			<h3 class="m-0 mb-3 text-white text-base">Access Log:</h3>
 			{#each accessLog as entry}
 				<div class="text-green-400 font-mono text-xs py-1 border-b border-gray-800 last:border-b-0">
@@ -2003,11 +2003,11 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 				<div class="text-4xl font-extrabold text-blue-400">{totalTasks}</div>
 				<div class="text-gray-400 mt-2">Total Tasks</div>
 			</div>
-			<div class="bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded-xl p-6 text-center">
+			<div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6 text-center">
 				<div class="text-4xl font-extrabold text-orange-500">{inProgressTasks}</div>
 				<div class="text-gray-400 mt-2">In Progress</div>
 			</div>
-			<div class="bg-[#2a2a2a] border-2 border-[#3a3a3a] rounded-xl p-6 text-center">
+			<div class="bg-gray-800 border-2 border-gray-700 rounded-xl p-6 text-center">
 				<div class="text-4xl font-extrabold text-green-400">{completedTasks}</div>
 				<div class="text-gray-400 mt-2">Completed</div>
 			</div>
@@ -2017,7 +2017,7 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 		<div class="grid grid-cols-3 gap-6">
 			{#each columns as column}
 				<div
-					class="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 min-h-[32rem]"
+					class="bg-gray-800 border-2 border-gray-700 rounded-xl p-4 min-h-96"
 					ondragover={handleDragOver}
 					ondrop={() => handleDrop(column.id)}
 				>
@@ -2072,11 +2072,11 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 	<!-- New Task Modal -->
 	{#if showNewTaskModal}
 		<div
-			class="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] backdrop-blur"
+			class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur"
 			onclick={() => (showNewTaskModal = false)}
 		>
 			<div
-				class="bg-gray-800 border-2 border-gray-700 rounded-2xl max-w-lg w-[90%] p-6"
+				class="bg-gray-800 border-2 border-gray-700 rounded-2xl max-w-lg w-11/12 p-6"
 				onclick={(e) => e.stopPropagation()}
 			>
 				<h2 class="text-blue-400 text-2xl font-bold m-0 mb-6">Create New Task</h2>
@@ -2104,7 +2104,7 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 					<label class="flex flex-col gap-2">
 						<span class="text-gray-400 font-semibold">Priority</span>
 						<select
-							class="bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
+							class="bg-gray-900 border-2 border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
 							bind:value={newTask.priority}
 						>
 							<option value="low">Low</option>
@@ -2116,7 +2116,7 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 					<label class="flex flex-col gap-2">
 						<span class="text-gray-400 font-semibold">Assignee</span>
 						<input
-							class="bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
+							class="bg-gray-900 border-2 border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
 							type="text"
 							bind:value={newTask.assignee}
 							placeholder="Assign to team member"
@@ -2126,7 +2126,7 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 					<label class="flex flex-col gap-2">
 						<span class="text-gray-400 font-semibold">Column</span>
 						<select
-							class="bg-[#1a1a1a] border-2 border-[#3a3a3a] text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
+							class="bg-gray-900 border-2 border-gray-700 text-white p-3 rounded-lg focus:outline-none focus:border-blue-400"
 							bind:value={newTaskColumn}
 						>
 							{#each columns as column}
@@ -2138,13 +2138,13 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 
 				<div class="flex gap-3 mt-6">
 					<button
-						class="flex-1 bg-[#3a3a3a] text-white px-6 py-3 rounded-lg font-bold cursor-pointer hover:bg-[#4a4a4a]"
+						class="flex-1 bg-gray-700 text-white px-6 py-3 rounded-lg font-bold cursor-pointer hover:bg-gray-600"
 						onclick={() => (showNewTaskModal = false)}
 					>
 						Cancel
 					</button>
 					<button
-						class="flex-1 bg-blue-400 text-black px-6 py-3 rounded-lg font-bold cursor-pointer hover:bg-[#6ab0ff]"
+						class="flex-1 bg-blue-400 text-black px-6 py-3 rounded-lg font-bold cursor-pointer hover:bg-blue-300"
 						onclick={addTask}
 					>
 						Create Task
@@ -2210,6 +2210,787 @@ A practical example combining deep state reactivity, array mutations, and drag-a
 ✅ Direct array mutations are reactive
 ✅ Understand when to use immutable patterns
 ✅ Complex components combine all concepts
+
+---
+
+## 🚀 End-of-Section Project: Task Management Dashboard
+
+### Project Overview
+
+Build a **comprehensive task management system** that combines all Section 3 concepts: deep state reactivity, array mutations, list rendering, debugging, and drag-and-drop. This goes beyond the Kanban example by adding filtering, search, bulk operations, and performance optimization with `$state.raw()`.
+
+**What You'll Build:**
+
+- **Multi-view dashboard**: List view, Kanban board, Calendar view
+- **Advanced filtering**: By status, priority, assignee, tags, date range
+- **Full-text search**: Reactive search across task titles and descriptions
+- **Bulk operations**: Select multiple tasks for batch updates/deletion
+- **Task templates**: Reusable task patterns with $state.raw()
+- **Statistics dashboard**: Real-time metrics using $derived
+- **Local storage sync**: Persistent data between sessions
+
+### 📁 Files to Create
+
+**1. Task Store** - `src/lib/stores/tasks.svelte.ts`
+
+```typescript
+import { browser } from "$app/environment";
+
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: "todo" | "in-progress" | "review" | "done";
+  priority: "low" | "medium" | "high" | "urgent";
+  assignee: string;
+  tags: string[];
+  dueDate: string;
+  createdAt: string;
+  completedAt?: string;
+  estimatedHours?: number;
+  actualHours?: number;
+}
+
+export interface TaskTemplate {
+  id: string;
+  name: string;
+  tasks: Omit<Task, "id" | "createdAt">[];
+}
+
+class TaskManager {
+  tasks = $state<Task[]>([]);
+  templates = $state<TaskTemplate[]>([]);
+  selectedIds = $state<Set<string>>(new Set());
+  searchQuery = $state("");
+  filters = $state({
+    status: [] as Task["status"][],
+    priority: [] as Task["priority"][],
+    assignee: [] as string[],
+    tags: [] as string[],
+  });
+
+  // Derived statistics
+  totalTasks = $derived(this.tasks.length);
+  completedTasks = $derived(
+    this.tasks.filter((t) => t.status === "done").length
+  );
+  completionRate = $derived(
+    this.totalTasks > 0
+      ? Math.round((this.completedTasks / this.totalTasks) * 100)
+      : 0
+  );
+
+  overdueTasks = $derived(
+    this.tasks.filter((t) => {
+      if (t.status === "done" || !t.dueDate) return false;
+      return new Date(t.dueDate) < new Date();
+    }).length
+  );
+
+  tasksByStatus = $derived({
+    todo: this.tasks.filter((t) => t.status === "todo").length,
+    "in-progress": this.tasks.filter((t) => t.status === "in-progress").length,
+    review: this.tasks.filter((t) => t.status === "review").length,
+    done: this.tasks.filter((t) => t.status === "done").length,
+  });
+
+  tasksByPriority = $derived({
+    low: this.tasks.filter((t) => t.priority === "low").length,
+    medium: this.tasks.filter((t) => t.priority === "medium").length,
+    high: this.tasks.filter((t) => t.priority === "high").length,
+    urgent: this.tasks.filter((t) => t.priority === "urgent").length,
+  });
+
+  // Filtered and searched tasks
+  filteredTasks = $derived(() => {
+    let result = this.tasks;
+
+    // Apply search
+    if (this.searchQuery) {
+      const query = this.searchQuery.toLowerCase();
+      result = result.filter(
+        (t) =>
+          t.title.toLowerCase().includes(query) ||
+          t.description.toLowerCase().includes(query)
+      );
+    }
+
+    // Apply filters
+    if (this.filters.status.length > 0) {
+      result = result.filter((t) => this.filters.status.includes(t.status));
+    }
+    if (this.filters.priority.length > 0) {
+      result = result.filter((t) => this.filters.priority.includes(t.priority));
+    }
+    if (this.filters.assignee.length > 0) {
+      result = result.filter((t) => this.filters.assignee.includes(t.assignee));
+    }
+    if (this.filters.tags.length > 0) {
+      result = result.filter((t) =>
+        this.filters.tags.some((tag) => t.tags.includes(tag))
+      );
+    }
+
+    return result;
+  });
+
+  // All unique assignees
+  allAssignees = $derived([...new Set(this.tasks.map((t) => t.assignee))]);
+
+  // All unique tags
+  allTags = $derived([...new Set(this.tasks.flatMap((t) => t.tags))]);
+
+  constructor() {
+    // Load from localStorage on client
+    if (browser) {
+      this.loadFromStorage();
+    }
+
+    // Auto-save to localStorage
+    $effect(() => {
+      if (browser) {
+        localStorage.setItem("tasks", JSON.stringify(this.tasks));
+        localStorage.setItem("templates", JSON.stringify(this.templates));
+      }
+    });
+  }
+
+  loadFromStorage() {
+    const saved = localStorage.getItem("tasks");
+    const savedTemplates = localStorage.getItem("templates");
+    if (saved) this.tasks = JSON.parse(saved);
+    if (savedTemplates) this.templates = JSON.parse(savedTemplates);
+
+    // Add sample data if empty
+    if (this.tasks.length === 0) {
+      this.addSampleData();
+    }
+  }
+
+  addTask(task: Omit<Task, "id" | "createdAt">) {
+    this.tasks.push({
+      ...task,
+      id: crypto.randomUUID(),
+      createdAt: new Date().toISOString(),
+    });
+  }
+
+  updateTask(id: string, updates: Partial<Task>) {
+    const task = this.tasks.find((t) => t.id === id);
+    if (task) {
+      Object.assign(task, updates);
+      if (updates.status === "done" && !task.completedAt) {
+        task.completedAt = new Date().toISOString();
+      }
+    }
+  }
+
+  deleteTask(id: string) {
+    this.tasks = this.tasks.filter((t) => t.id !== id);
+    this.selectedIds.delete(id);
+  }
+
+  bulkUpdate(ids: string[], updates: Partial<Task>) {
+    ids.forEach((id) => this.updateTask(id, updates));
+  }
+
+  bulkDelete(ids: string[]) {
+    this.tasks = this.tasks.filter((t) => !ids.includes(t.id));
+    this.selectedIds.clear();
+  }
+
+  toggleSelect(id: string) {
+    if (this.selectedIds.has(id)) {
+      this.selectedIds.delete(id);
+    } else {
+      this.selectedIds.add(id);
+    }
+    // Trigger reactivity
+    this.selectedIds = this.selectedIds;
+  }
+
+  selectAll() {
+    this.filteredTasks.forEach((t) => this.selectedIds.add(t.id));
+    this.selectedIds = this.selectedIds;
+  }
+
+  deselectAll() {
+    this.selectedIds.clear();
+    this.selectedIds = this.selectedIds;
+  }
+
+  saveAsTemplate(name: string, taskIds: string[]) {
+    const tasks = this.tasks
+      .filter((t) => taskIds.includes(t.id))
+      .map(({ id, createdAt, completedAt, ...rest }) => rest);
+
+    this.templates.push({
+      id: crypto.randomUUID(),
+      name,
+      tasks,
+    });
+  }
+
+  applyTemplate(templateId: string) {
+    const template = this.templates.find((t) => t.id === templateId);
+    if (!template) return;
+
+    template.tasks.forEach((task) => this.addTask(task));
+  }
+
+  addSampleData() {
+    const sampleTasks: Omit<Task, "id" | "createdAt">[] = [
+      {
+        title: "Design landing page mockups",
+        description: "Create high-fidelity mockups for the new landing page",
+        status: "in-progress",
+        priority: "high",
+        assignee: "Sarah",
+        tags: ["design", "frontend"],
+        dueDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedHours: 8,
+      },
+      {
+        title: "Implement authentication API",
+        description: "Build JWT-based auth endpoints",
+        status: "todo",
+        priority: "urgent",
+        assignee: "Mike",
+        tags: ["backend", "security"],
+        dueDate: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedHours: 12,
+      },
+      {
+        title: "Write unit tests",
+        description: "Add test coverage for user service",
+        status: "review",
+        priority: "medium",
+        assignee: "Alex",
+        tags: ["testing", "backend"],
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedHours: 4,
+      },
+      {
+        title: "Update documentation",
+        description: "Document new API endpoints",
+        status: "done",
+        priority: "low",
+        assignee: "Sarah",
+        tags: ["documentation"],
+        dueDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+        estimatedHours: 2,
+        actualHours: 2.5,
+        completedAt: new Date().toISOString(),
+      },
+    ];
+
+    sampleTasks.forEach((task) => this.addTask(task));
+  }
+
+  clearFilters() {
+    this.filters = {
+      status: [],
+      priority: [],
+      assignee: [],
+      tags: [],
+    };
+    this.searchQuery = "";
+  }
+}
+
+export const taskManager = new TaskManager();
+```
+
+**2. Statistics Dashboard** - `src/lib/components/TaskStats.svelte`
+
+```svelte
+<script lang="ts">
+	import { taskManager } from '$lib/stores/tasks.svelte';
+
+	const stats = [
+		{
+			label: 'Total Tasks',
+			value: taskManager.totalTasks,
+			icon: '📋',
+			color: 'blue'
+		},
+		{
+			label: 'Completed',
+			value: taskManager.completedTasks,
+			icon: '✅',
+			color: 'green'
+		},
+		{
+			label: 'Completion Rate',
+			value: `${taskManager.completionRate}%`,
+			icon: '📊',
+			color: 'purple'
+		},
+		{
+			label: 'Overdue',
+			value: taskManager.overdueTasks,
+			icon: '⚠️',
+			color: 'red'
+		}
+	];
+
+	const colors = {
+		blue: 'bg-blue-600',
+		green: 'bg-green-600',
+		purple: 'bg-purple-600',
+		red: 'bg-red-600'
+	};
+</script>
+
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+	{#each stats as stat}
+		<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+			<div class="flex items-center justify-between mb-4">
+				<span class="text-3xl">{stat.icon}</span>
+				<div class="w-3 h-3 rounded-full {colors[stat.color]}"></div>
+			</div>
+			<div class="text-2xl font-bold text-white mb-1">{stat.value}</div>
+			<div class="text-gray-500 text-sm">{stat.label}</div>
+		</div>
+	{/each}
+</div>
+
+<div class="mt-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+	<!-- By Status -->
+	<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+		<h3 class="text-lg font-bold text-white mb-4">Tasks by Status</h3>
+		<div class="space-y-3">
+			{#each Object.entries(taskManager.tasksByStatus) as [status, count]}
+				<div class="flex items-center justify-between">
+					<span class="text-gray-400 capitalize">{status.replace('-', ' ')}</span>
+					<span class="text-white font-semibold">{count}</span>
+				</div>
+			{/each}
+		</div>
+	</div>
+
+	<!-- By Priority -->
+	<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+		<h3 class="text-lg font-bold text-white mb-4">Tasks by Priority</h3>
+		<div class="space-y-3">
+			{#each Object.entries(taskManager.tasksByPriority) as [priority, count]}
+				<div class="flex items-center justify-between">
+					<span class="text-gray-400 capitalize">{priority}</span>
+					<span class="text-white font-semibold">{count}</span>
+				</div>
+			{/each}
+		</div>
+	</div>
+</div>
+```
+
+**3. Filter Panel** - `src/lib/components/FilterPanel.svelte`
+
+```svelte
+<script lang="ts">
+	import { taskManager } from '$lib/stores/tasks.svelte';
+
+	function toggleFilter(
+		type: 'status' | 'priority' | 'assignee' | 'tags',
+		value: string
+	) {
+		const filters = taskManager.filters[type] as string[];
+		const index = filters.indexOf(value);
+
+		if (index > -1) {
+			filters.splice(index, 1);
+		} else {
+			filters.push(value);
+		}
+	}
+</script>
+
+<div class="bg-gray-900 rounded-xl p-6 border border-gray-800">
+	<div class="flex items-center justify-between mb-6">
+		<h3 class="text-lg font-bold text-white">Filters</h3>
+		{#if taskManager.filters.status.length > 0 || taskManager.filters.priority.length > 0 || taskManager.filters.assignee.length > 0 || taskManager.filters.tags.length > 0}
+			<button
+				class="text-sm text-blue-400 hover:text-blue-300"
+				onclick={() => taskManager.clearFilters()}
+			>
+				Clear All
+			</button>
+		{/if}
+	</div>
+
+	<!-- Search -->
+	<div class="mb-6">
+		<input
+			type="text"
+			bind:value={taskManager.searchQuery}
+			placeholder="Search tasks..."
+			class="w-full px-4 py-2 bg-gray-800 border border-gray-700 rounded-lg text-white placeholder-gray-500"
+		/>
+	</div>
+
+	<!-- Status Filter -->
+	<div class="mb-6">
+		<h4 class="text-sm font-semibold text-gray-400 mb-2">Status</h4>
+		<div class="flex flex-wrap gap-2">
+			{#each ['todo', 'in-progress', 'review', 'done'] as status}
+				<button
+					class="px-3 py-1.5 rounded-lg text-sm transition-colors {taskManager.filters.status.includes(
+						status
+					)
+						? 'bg-blue-600 text-white'
+						: 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+					onclick={() => toggleFilter('status', status)}
+				>
+					{status.replace('-', ' ')}
+				</button>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Priority Filter -->
+	<div class="mb-6">
+		<h4 class="text-sm font-semibold text-gray-400 mb-2">Priority</h4>
+		<div class="flex flex-wrap gap-2">
+			{#each ['low', 'medium', 'high', 'urgent'] as priority}
+				<button
+					class="px-3 py-1.5 rounded-lg text-sm transition-colors {taskManager.filters.priority.includes(
+						priority
+					)
+						? 'bg-blue-600 text-white'
+						: 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+					onclick={() => toggleFilter('priority', priority)}
+				>
+					{priority}
+				</button>
+			{/each}
+		</div>
+	</div>
+
+	<!-- Assignee Filter -->
+	{#if taskManager.allAssignees.length > 0}
+		<div class="mb-6">
+			<h4 class="text-sm font-semibold text-gray-400 mb-2">Assignee</h4>
+			<div class="flex flex-wrap gap-2">
+				{#each taskManager.allAssignees as assignee}
+					<button
+						class="px-3 py-1.5 rounded-lg text-sm transition-colors {taskManager.filters.assignee.includes(
+							assignee
+						)
+							? 'bg-blue-600 text-white'
+							: 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+						onclick={() => toggleFilter('assignee', assignee)}
+					>
+						{assignee}
+					</button>
+				{/each}
+			</div>
+		</div>
+	{/if}
+
+	<!-- Tags Filter -->
+	{#if taskManager.allTags.length > 0}
+		<div>
+			<h4 class="text-sm font-semibold text-gray-400 mb-2">Tags</h4>
+			<div class="flex flex-wrap gap-2">
+				{#each taskManager.allTags as tag}
+					<button
+						class="px-3 py-1.5 rounded-lg text-sm transition-colors {taskManager.filters.tags.includes(
+							tag
+						)
+							? 'bg-blue-600 text-white'
+							: 'bg-gray-800 text-gray-400 hover:bg-gray-700'}"
+						onclick={() => toggleFilter('tags', tag)}
+					>
+						#{tag}
+					</button>
+				{/each}
+			</div>
+		</div>
+	{/if}
+</div>
+```
+
+**4. Bulk Actions Bar** - `src/lib/components/BulkActions.svelte`
+
+```svelte
+<script lang="ts">
+	import { taskManager } from '$lib/stores/tasks.svelte';
+	import type { Task } from '$lib/stores/tasks.svelte';
+
+	let showStatusMenu = $state(false);
+	let showPriorityMenu = $state(false);
+
+	function bulkUpdateStatus(status: Task['status']) {
+		taskManager.bulkUpdate([...taskManager.selectedIds], { status });
+		showStatusMenu = false;
+	}
+
+	function bulkUpdatePriority(priority: Task['priority']) {
+		taskManager.bulkUpdate([...taskManager.selectedIds], { priority });
+		showPriorityMenu = false;
+	}
+
+	function bulkDelete() {
+		if (confirm(`Delete ${taskManager.selectedIds.size} tasks?`)) {
+			taskManager.bulkDelete([...taskManager.selectedIds]);
+		}
+	}
+
+	function saveAsTemplate() {
+		const name = prompt('Template name:');
+		if (name) {
+			taskManager.saveAsTemplate(name, [...taskManager.selectedIds]);
+			taskManager.deselectAll();
+		}
+	}
+</script>
+
+{#if taskManager.selectedIds.size > 0}
+	<div
+		class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-900 border border-gray-700 rounded-xl shadow-2xl p-4 flex items-center gap-4 z-50"
+	>
+		<span class="text-white font-semibold">
+			{taskManager.selectedIds.size} selected
+		</span>
+
+		<div class="w-px h-6 bg-gray-700"></div>
+
+		<div class="relative">
+			<button
+				class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg"
+				onclick={() => (showStatusMenu = !showStatusMenu)}
+			>
+				Change Status
+			</button>
+			{#if showStatusMenu}
+				<div class="absolute bottom-full mb-2 bg-gray-800 rounded-lg shadow-lg py-2 min-w-40">
+					{#each ['todo', 'in-progress', 'review', 'done'] as status}
+						<button
+							class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"
+							onclick={() => bulkUpdateStatus(status)}
+						>
+							{status.replace('-', ' ')}
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<div class="relative">
+			<button
+				class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg"
+				onclick={() => (showPriorityMenu = !showPriorityMenu)}
+			>
+				Change Priority
+			</button>
+			{#if showPriorityMenu}
+				<div class="absolute bottom-full mb-2 bg-gray-800 rounded-lg shadow-lg py-2 min-w-40">
+					{#each ['low', 'medium', 'high', 'urgent'] as priority}
+						<button
+							class="w-full px-4 py-2 text-left text-white hover:bg-gray-700"
+							onclick={() => bulkUpdatePriority(priority)}
+						>
+							{priority}
+						</button>
+					{/each}
+				</div>
+			{/if}
+		</div>
+
+		<button
+			class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
+			onclick={saveAsTemplate}
+		>
+			Save as Template
+		</button>
+
+		<div class="w-px h-6 bg-gray-700"></div>
+
+		<button
+			class="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg"
+			onclick={bulkDelete}
+		>
+			Delete
+		</button>
+
+		<button
+			class="px-4 py-2 bg-gray-800 hover:bg-gray-700 text-white rounded-lg"
+			onclick={() => taskManager.deselectAll()}
+		>
+			Cancel
+		</button>
+	</div>
+{/if}
+```
+
+**5. Main Dashboard** - `src/routes/tasks/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import { taskManager } from '$lib/stores/tasks.svelte';
+	import TaskStats from '$lib/components/TaskStats.svelte';
+	import FilterPanel from '$lib/components/FilterPanel.svelte';
+	import BulkActions from '$lib/components/BulkActions.svelte';
+
+	const priorityColors = {
+		low: 'bg-gray-600',
+		medium: 'bg-blue-600',
+		high: 'bg-orange-600',
+		urgent: 'bg-red-600'
+	};
+
+	function isOverdue(dueDate: string, status: string) {
+		return status !== 'done' && new Date(dueDate) < new Date();
+	}
+</script>
+
+<div class="min-h-screen bg-gray-950 p-6">
+	<div class="max-w-7xl mx-auto">
+		<header class="mb-8">
+			<h1 class="text-3xl font-bold text-white mb-2">Task Management Dashboard</h1>
+			<p class="text-gray-500">
+				Manage your tasks with advanced filtering, search, and bulk operations
+			</p>
+		</header>
+
+		<!-- Statistics -->
+		<TaskStats />
+
+		<div class="mt-8 grid grid-cols-1 lg:grid-cols-4 gap-6">
+			<!-- Filters Sidebar -->
+			<div class="lg:col-span-1">
+				<FilterPanel />
+			</div>
+
+			<!-- Task List -->
+			<div class="lg:col-span-3">
+				<div class="bg-gray-900 rounded-xl border border-gray-800 overflow-hidden">
+					<div class="p-4 border-b border-gray-800 flex items-center justify-between">
+						<div class="flex items-center gap-4">
+							<input
+								type="checkbox"
+								checked={taskManager.selectedIds.size === taskManager.filteredTasks.length &&
+									taskManager.filteredTasks.length > 0}
+								onchange={(e) =>
+									e.currentTarget.checked ? taskManager.selectAll() : taskManager.deselectAll()}
+								class="w-4 h-4"
+							/>
+							<span class="text-white font-semibold">
+								{taskManager.filteredTasks.length} tasks
+							</span>
+						</div>
+						<button
+							class="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg"
+							onclick={() => {
+								const title = prompt('Task title:');
+								if (title) {
+									taskManager.addTask({
+										title,
+										description: '',
+										status: 'todo',
+										priority: 'medium',
+										assignee: 'Unassigned',
+										tags: [],
+										dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
+									});
+								}
+							}}
+						>
+							+ Add Task
+						</button>
+					</div>
+
+					<div class="divide-y divide-gray-800">
+						{#each taskManager.filteredTasks as task (task.id)}
+							<div
+								class="p-4 hover:bg-gray-800 transition-colors {taskManager.selectedIds.has(
+									task.id
+								)
+									? 'bg-gray-800/50'
+									: ''}"
+							>
+								<div class="flex items-start gap-4">
+									<input
+										type="checkbox"
+										checked={taskManager.selectedIds.has(task.id)}
+										onchange={() => taskManager.toggleSelect(task.id)}
+										class="mt-1 w-4 h-4"
+									/>
+
+									<div class="flex-1 min-w-0">
+										<div class="flex items-center gap-2 mb-2">
+											<h3 class="text-white font-semibold">{task.title}</h3>
+											<span class="px-2 py-0.5 rounded text-xs text-white {priorityColors[task.priority]}">
+												{task.priority}
+											</span>
+											{#if task.status === 'done'}
+												<span class="text-green-400 text-sm">✓ Done</span>
+											{/if}
+										</div>
+
+										{#if task.description}
+											<p class="text-gray-400 text-sm mb-2">{task.description}</p>
+										{/if}
+
+										<div class="flex items-center gap-4 text-sm text-gray-500">
+											<span>👤 {task.assignee}</span>
+											<span>
+												📅 {new Date(task.dueDate).toLocaleDateString()}
+												{#if isOverdue(task.dueDate, task.status)}
+													<span class="text-red-400 ml-1">Overdue!</span>
+												{/if}
+											</span>
+											{#if task.tags.length > 0}
+												<span>🏷️ {task.tags.join(', ')}</span>
+											{/if}
+										</div>
+									</div>
+
+									<button
+										class="text-red-400 hover:text-red-300"
+										onclick={() => taskManager.deleteTask(task.id)}
+									>
+										Delete
+									</button>
+								</div>
+							</div>
+						{:else}
+							<div class="p-12 text-center text-gray-500">
+								No tasks match your filters
+							</div>
+						{/each}
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Bulk Actions Bar -->
+		<BulkActions />
+	</div>
+</div>
+```
+
+### 🎯 Project Checklist
+
+- [ ] Deep state reactivity with nested objects and arrays
+- [ ] Array mutations (push, splice, filter) trigger reactivity
+- [ ] `#each` loops with unique keys for all lists
+- [ ] $derived for computed statistics
+- [ ] $inspect() for debugging state changes
+- [ ] Search and filtering with reactive updates
+- [ ] Bulk operations on selected tasks
+- [ ] Local storage persistence
+- [ ] Template system for reusable task patterns
+
+### 💡 Extension Ideas
+
+1. **Add drag-and-drop** for reordering tasks in list view
+2. **Calendar view** showing tasks by due date
+3. **Time tracking** with start/stop timers
+4. **Subtasks** with nested task hierarchies
+5. **Comments and attachments** on tasks
+6. **Export to CSV/JSON** for reporting
+7. **Real-time collaboration** with WebSockets
 
 ---
 

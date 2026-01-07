@@ -51,7 +51,14 @@ By the end of this section, you will:
   - [9. Dynamic Components with svelte:element](#9-dynamic-components-with-svelteelement)
     - [What is This?](#what-is-this-7)
     - [📁 Files to Create](#-files-to-create-8)
+  - [10. 🚀 End-of-Section Project: Component Library Dashboard](#10--end-of-section-project-component-library-dashboard)
+    - [Project Overview](#project-overview)
+    - [📁 Files to Create](#-files-to-create-9)
+    - [What This Project Demonstrates](#what-this-project-demonstrates)
   - [📝 Key Takeaways](#-key-takeaways)
+    - [💡 Best Practices for Component Architecture](#-best-practices-for-component-architecture)
+    - [⚠️ Common Mistakes](#️-common-mistakes)
+    - [⚡ Performance Tips](#-performance-tips)
   - [🚀 Next Steps](#-next-steps)
 
 ---
@@ -173,11 +180,11 @@ Create:
 
 {#if isOpen}
 	<div
-		class="fixed inset-0 bg-black/70 flex items-center justify-center z-[1000] backdrop-blur"
+		class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur"
 		onclick={onClose}
 	>
 		<div
-			class="bg-gray-800 border-2 border-gray-700 rounded-2xl max-w-[600px] w-[90%] max-h-[90vh] overflow-auto shadow-[0_20px_60px_rgba(0,0,0,0.5)]"
+			class="bg-gray-800 border-2 border-gray-700 rounded-2xl max-w-xl w-11/12 max-h-screen overflow-auto shadow-2xl"
 			onclick={(e) => e.stopPropagation()}
 		>
 			<div class="flex justify-between items-center p-6 border-b-2 border-gray-700">
@@ -575,16 +582,16 @@ Create:
 	<h1 class="text-center text-blue-400 m-0 mb-8 text-4xl">🔔 Notification System</h1>
 
 	<div class="flex gap-3 justify-center mb-10 flex-wrap">
-		<button onclick={() => addNotification('success')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-green-400 text-black hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]"> Add Success </button>
-		<button onclick={() => addNotification('error')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-red-400 text-white hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]"> Add Error </button>
-		<button onclick={() => addNotification('warning')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-orange-500 text-black hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]"> Add Warning </button>
-		<button onclick={() => addNotification('info')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-blue-400 text-black hover:-translate-y-0.5 hover:shadow-[0_4px_12px_rgba(0,0,0,0.3)]"> Add Info </button>
+		<button onclick={() => addNotification('success')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-green-400 text-black hover:-translate-y-0.5 hover:shadow-lg"> Add Success </button>
+		<button onclick={() => addNotification('error')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-red-400 text-white hover:-translate-y-0.5 hover:shadow-lg"> Add Error </button>
+		<button onclick={() => addNotification('warning')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-orange-500 text-black hover:-translate-y-0.5 hover:shadow-lg"> Add Warning </button>
+		<button onclick={() => addNotification('info')} class="px-6 py-3 border-none rounded-lg font-bold cursor-pointer transition-all duration-200 bg-blue-400 text-black hover:-translate-y-0.5 hover:shadow-lg"> Add Info </button>
 	</div>
 
 	<div class="max-w-2xl mx-auto flex flex-col gap-4">
 		{#each notifications as notification (notification.id)}
 			<div
-				class="border-2 rounded-xl p-5 flex items-start justify-between gap-4 relative animate-[slideIn_0.3s_ease-out]"
+				class="border-2 rounded-xl p-5 flex items-start justify-between gap-4 relative transition-all duration-300"
 				class:border-green-400={notification.type === 'success'}
 				class:bg-green-400/5={notification.type === 'success'}
 				class:border-red-400={notification.type === 'error'}
@@ -1612,6 +1619,416 @@ Create:
 - **Type safety**: Use union types for valid element names
 - **Flexibility**: Build components that adapt to different contexts
 - **Semantic HTML**: Choose appropriate elements dynamically
+
+---
+
+## 10. 🚀 End-of-Section Project: Component Library Dashboard
+
+### Project Overview
+
+Build a **reusable component library dashboard** that showcases all the concepts from this section. This real-world project combines snippets, props, events, dynamic styling, and programmatic component control.
+
+**What You'll Build:**
+
+- A **Card** component with snippet slots for header, body, and footer
+- A **Button** component with variants, sizes, and loading states
+- A **Input** component with validation and error display
+- A **Modal** component with programmatic open/close
+- A **Dashboard** that showcases all components together
+
+### 📁 Files to Create
+
+**1. Card Component** - `src/lib/components/Card.svelte`
+
+```svelte
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		variant?: 'default' | 'elevated' | 'outlined';
+		header?: Snippet;
+		children: Snippet;
+		footer?: Snippet;
+	}
+
+	let { variant = 'default', header, children, footer }: Props = $props();
+</script>
+
+<div
+	class="rounded-xl overflow-hidden transition-all duration-200"
+	class:bg-gray-800={variant === 'default'}
+	class:border-gray-700={variant === 'default'}
+	class:border-2={variant !== 'elevated'}
+	class:bg-gray-800={variant === 'elevated'}
+	class:shadow-xl={variant === 'elevated'}
+	class:hover:shadow-2xl={variant === 'elevated'}
+	class:hover:-translate-y-1={variant === 'elevated'}
+	class:bg-transparent={variant === 'outlined'}
+	class:border-gray-600={variant === 'outlined'}
+>
+	{#if header}
+		<div class="p-4 border-b border-gray-700 bg-gray-900/50">
+			{@render header()}
+		</div>
+	{/if}
+
+	<div class="p-6">
+		{@render children()}
+	</div>
+
+	{#if footer}
+		<div class="p-4 border-t border-gray-700 bg-gray-900/50">
+			{@render footer()}
+		</div>
+	{/if}
+</div>
+```
+
+**2. Button Component** - `src/lib/components/Button.svelte`
+
+```svelte
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+		size?: 'sm' | 'md' | 'lg';
+		loading?: boolean;
+		disabled?: boolean;
+		onclick?: () => void;
+		children: Snippet;
+	}
+
+	let {
+		variant = 'primary',
+		size = 'md',
+		loading = false,
+		disabled = false,
+		onclick,
+		children
+	}: Props = $props();
+
+	const isDisabled = $derived(disabled || loading);
+</script>
+
+<button
+	class="font-bold rounded-lg transition-all duration-200 flex items-center justify-center gap-2"
+	class:px-4={size === 'sm'}
+	class:py-2={size === 'sm'}
+	class:text-sm={size === 'sm'}
+	class:px-6={size === 'md'}
+	class:py-3={size === 'md'}
+	class:text-base={size === 'md'}
+	class:px-8={size === 'lg'}
+	class:py-4={size === 'lg'}
+	class:text-lg={size === 'lg'}
+	class:bg-blue-500={variant === 'primary'}
+	class:hover:bg-blue-400={variant === 'primary' && !isDisabled}
+	class:text-white={variant === 'primary'}
+	class:bg-gray-600={variant === 'secondary'}
+	class:hover:bg-gray-500={variant === 'secondary' && !isDisabled}
+	class:text-white={variant === 'secondary'}
+	class:bg-red-500={variant === 'danger'}
+	class:hover:bg-red-400={variant === 'danger' && !isDisabled}
+	class:text-white={variant === 'danger'}
+	class:bg-transparent={variant === 'ghost'}
+	class:hover:bg-gray-700={variant === 'ghost' && !isDisabled}
+	class:text-gray-300={variant === 'ghost'}
+	class:opacity-50={isDisabled}
+	class:cursor-not-allowed={isDisabled}
+	class:cursor-pointer={!isDisabled}
+	disabled={isDisabled}
+	{onclick}
+>
+	{#if loading}
+		<div class="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+	{/if}
+	{@render children()}
+</button>
+```
+
+**3. Input Component** - `src/lib/components/Input.svelte`
+
+```svelte
+<script lang="ts">
+	interface Props {
+		type?: 'text' | 'email' | 'password' | 'number';
+		label?: string;
+		placeholder?: string;
+		value?: string;
+		error?: string;
+		required?: boolean;
+		oninput?: (value: string) => void;
+		onvalidate?: (isValid: boolean) => void;
+	}
+
+	let {
+		type = 'text',
+		label,
+		placeholder = '',
+		value = $bindable(''),
+		error = '',
+		required = false,
+		oninput,
+		onvalidate
+	}: Props = $props();
+
+	function handleInput(e: Event) {
+		const target = e.target as HTMLInputElement;
+		value = target.value;
+		oninput?.(value);
+
+		// Basic validation
+		const isValid = !required || value.trim().length > 0;
+		onvalidate?.(isValid);
+	}
+</script>
+
+<div class="flex flex-col gap-2">
+	{#if label}
+		<label class="text-sm font-semibold text-gray-300">
+			{label}
+			{#if required}<span class="text-red-400">*</span>{/if}
+		</label>
+	{/if}
+
+	<input
+		{type}
+		{placeholder}
+		{value}
+		oninput={handleInput}
+		class="px-4 py-3 rounded-lg bg-gray-800 border-2 text-white transition-all duration-200 focus:outline-none"
+		class:border-gray-600={!error}
+		class:focus:border-blue-400={!error}
+		class:border-red-400={error}
+		class:focus:border-red-400={error}
+	/>
+
+	{#if error}
+		<span class="text-sm text-red-400">{error}</span>
+	{/if}
+</div>
+```
+
+**4. Modal Component** - `src/lib/components/Modal.svelte`
+
+```svelte
+<script lang="ts">
+	import type { Snippet } from 'svelte';
+
+	interface Props {
+		title: string;
+		isOpen?: boolean;
+		children: Snippet;
+		footer?: Snippet;
+	}
+
+	let { title, isOpen = $bindable(false), children, footer }: Props = $props();
+
+	export function open() {
+		isOpen = true;
+	}
+
+	export function close() {
+		isOpen = false;
+	}
+
+	export function toggle() {
+		isOpen = !isOpen;
+	}
+</script>
+
+{#if isOpen}
+	<div
+		class="fixed inset-0 bg-black/70 flex items-center justify-center z-50 backdrop-blur-sm"
+		onclick={close}
+	>
+		<div
+			class="bg-gray-800 border-2 border-gray-700 rounded-2xl max-w-lg w-11/12 shadow-2xl"
+			onclick={(e) => e.stopPropagation()}
+		>
+			<div class="flex justify-between items-center p-6 border-b border-gray-700">
+				<h2 class="text-xl font-bold text-white">{title}</h2>
+				<button
+					class="text-gray-400 hover:text-white text-2xl transition-colors"
+					onclick={close}
+				>
+					✕
+				</button>
+			</div>
+
+			<div class="p-6 text-gray-200">
+				{@render children()}
+			</div>
+
+			{#if footer}
+				<div class="p-6 border-t border-gray-700 flex gap-3 justify-end">
+					{@render footer()}
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
+```
+
+**5. Dashboard Page** - `src/routes/component-library/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import Card from '$lib/components/Card.svelte';
+	import Button from '$lib/components/Button.svelte';
+	import Input from '$lib/components/Input.svelte';
+	import Modal from '$lib/components/Modal.svelte';
+
+	// Form state
+	let name = $state('');
+	let email = $state('');
+	let formError = $state('');
+	let isSubmitting = $state(false);
+
+	// Modal reference
+	let confirmModal: Modal;
+
+	async function handleSubmit() {
+		if (!name || !email) {
+			formError = 'Please fill in all fields';
+			return;
+		}
+
+		isSubmitting = true;
+		// Simulate API call
+		await new Promise((r) => setTimeout(r, 1500));
+		isSubmitting = false;
+		confirmModal.open();
+	}
+
+	function resetForm() {
+		name = '';
+		email = '';
+		formError = '';
+		confirmModal.close();
+	}
+</script>
+
+<div class="bg-gray-900 min-h-screen p-8 text-gray-200">
+	<div class="max-w-6xl mx-auto">
+		<h1 class="text-4xl font-bold text-blue-400 mb-2">Component Library</h1>
+		<p class="text-gray-400 mb-10">A showcase of reusable Svelte components</p>
+
+		<div class="grid md:grid-cols-2 gap-8">
+			<!-- Buttons Section -->
+			<Card variant="elevated">
+				{#snippet header()}
+					<h2 class="text-lg font-bold text-white">Buttons</h2>
+				{/snippet}
+
+				<div class="flex flex-wrap gap-3">
+					<Button variant="primary">Primary</Button>
+					<Button variant="secondary">Secondary</Button>
+					<Button variant="danger">Danger</Button>
+					<Button variant="ghost">Ghost</Button>
+				</div>
+
+				<div class="flex flex-wrap gap-3 mt-4">
+					<Button size="sm">Small</Button>
+					<Button size="md">Medium</Button>
+					<Button size="lg">Large</Button>
+				</div>
+
+				<div class="mt-4">
+					<Button loading={true}>Loading...</Button>
+				</div>
+			</Card>
+
+			<!-- Form Section -->
+			<Card variant="elevated">
+				{#snippet header()}
+					<h2 class="text-lg font-bold text-white">Contact Form</h2>
+				{/snippet}
+
+				<div class="flex flex-col gap-4">
+					<Input
+						label="Name"
+						placeholder="Enter your name"
+						bind:value={name}
+						required
+					/>
+					<Input
+						type="email"
+						label="Email"
+						placeholder="you@example.com"
+						bind:value={email}
+						error={formError}
+						required
+					/>
+					<Button onclick={handleSubmit} loading={isSubmitting}>
+						Submit Form
+					</Button>
+				</div>
+			</Card>
+
+			<!-- Card Variants -->
+			<Card variant="outlined">
+				{#snippet header()}
+					<h2 class="text-lg font-bold text-white">Outlined Card</h2>
+				{/snippet}
+
+				<p class="text-gray-400">
+					This card uses the outlined variant with a transparent background.
+				</p>
+
+				{#snippet footer()}
+					<Button variant="ghost" size="sm">Learn More</Button>
+				{/snippet}
+			</Card>
+
+			<!-- Modal Trigger -->
+			<Card>
+				{#snippet header()}
+					<h2 class="text-lg font-bold text-white">Modal Demo</h2>
+				{/snippet}
+
+				<p class="text-gray-400 mb-4">
+					Click the button to open a modal with programmatic control.
+				</p>
+				<Button onclick={() => confirmModal.open()}>
+					Open Modal
+				</Button>
+			</Card>
+		</div>
+	</div>
+</div>
+
+<!-- Confirmation Modal -->
+<Modal bind:this={confirmModal} title="Success!">
+	<p>Your form has been submitted successfully.</p>
+	<p class="text-gray-400 mt-2">Name: {name}</p>
+	<p class="text-gray-400">Email: {email}</p>
+
+	{#snippet footer()}
+		<Button variant="secondary" onclick={() => confirmModal.close()}>
+			Close
+		</Button>
+		<Button onclick={resetForm}>
+			Submit Another
+		</Button>
+	{/snippet}
+</Modal>
+```
+
+### What This Project Demonstrates
+
+| Concept              | Implementation                      |
+| -------------------- | ----------------------------------- |
+| **Snippets**         | Card header, body, footer slots     |
+| **Snippet Props**    | Flexible component composition      |
+| **class: directive** | Dynamic styling based on variants   |
+| **Spread Props**     | Button and Input forward attributes |
+| **style: directive** | Dynamic inline styles               |
+| **Event Forwarding** | onclick, oninput handlers           |
+| **Custom Events**    | onvalidate callback                 |
+| **bind:this**        | Programmatic modal control          |
+| **$bindable**        | Two-way binding for form values     |
 
 ---
 

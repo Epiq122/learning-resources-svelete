@@ -745,10 +745,10 @@ export const notifications = new NotificationManager();
 	}
 </script>
 
-<div class="fixed top-5 right-5 flex flex-col gap-3 z-[1000] max-w-[400px]">
+<div class="fixed top-5 right-5 flex flex-col gap-3 z-50 max-w-sm">
 	{#each notifications.notifications as notification (notification.id)}
 		<div
-			class="bg-gray-800 border-2 rounded-lg p-4 flex items-center gap-3 shadow-[0_4px_12px_rgba(0,0,0,0.3)] animate-[slideIn_0.3s_ease]"
+			class="bg-gray-800 border-2 rounded-lg p-4 flex items-center gap-3 shadow-lg"
 			class:border-blue-400={notification.type === 'info'}
 			class:border-green-400={notification.type === 'success'}
 			class:border-orange-500={notification.type === 'warning'}
@@ -758,7 +758,7 @@ export const notifications = new NotificationManager();
 			<span class="flex-1 text-white">{notification.message}</span>
 			<button
 				onclick={() => notifications.remove(notification.id)}
-				class="bg-transparent border-none text-[#888] cursor-pointer text-xl p-0 hover:text-white"
+				class="bg-transparent border-none text-gray-500 cursor-pointer text-xl p-0 hover:text-white"
 				>✕</button
 			>
 		</div>
@@ -800,23 +800,23 @@ export const notifications = new NotificationManager();
 
 <NotificationContainer />
 
-<div class="bg-[#1a1a1a] min-h-screen px-5 py-10 text-[#e0e0e0] text-center">
-	<h1 class="text-[#4a9eff] mb-8">🔔 Global Notifications</h1>
+<div class="bg-gray-900 min-h-screen px-5 py-10 text-gray-200 text-center">
+	<h1 class="text-blue-400 mb-8">🔔 Global Notifications</h1>
 
 	<div class="flex gap-3 justify-center">
 		<button
 			onclick={handleSuccess}
-			class="bg-[#4a9eff] text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
+			class="bg-blue-400 text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
 			>Show Success</button
 		>
 		<button
 			onclick={handleError}
-			class="bg-[#4a9eff] text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
+			class="bg-blue-400 text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
 			>Show Error</button
 		>
 		<button
 			onclick={handleInfo}
-			class="bg-[#4a9eff] text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
+			class="bg-blue-400 text-black border-none py-3 px-6 rounded-lg font-bold cursor-pointer"
 			>Show Info</button
 		>
 	</div>
@@ -1011,24 +1011,24 @@ export function createPersistentState<T>(key: string, initialValue: T) {
 	class="transition-all duration-300 min-h-screen px-5 py-10"
 	class:bg-white={preferences.value.theme !== 'dark'}
 	class:text-black={preferences.value.theme !== 'dark'}
-	class:bg-[#1a1a1a]={preferences.value.theme === 'dark'}
+	class:bg-gray-900={preferences.value.theme === 'dark'}
 	class:text-white={preferences.value.theme === 'dark'}
 >
-	<h1 class="text-center text-[#4a9eff] mb-8">💾 Persistent Preferences</h1>
+	<h1 class="text-center text-blue-400 mb-8">💾 Persistent Preferences</h1>
 
 	<div
-		class="max-w-[500px] mx-auto p-6 rounded-xl flex flex-col gap-5"
-		class:bg-[#f5f5f5]={preferences.value.theme !== 'dark'}
-		class:bg-[#2a2a2a]={preferences.value.theme === 'dark'}
+		class="max-w-lg mx-auto p-6 rounded-xl flex flex-col gap-5"
+		class:bg-gray-100={preferences.value.theme !== 'dark'}
+		class:bg-gray-800={preferences.value.theme === 'dark'}
 	>
 		<label class="flex flex-col gap-2 font-semibold">
 			Theme:
 			<select
 				bind:value={preferences.value.theme}
 				class="p-2 rounded-md border-2"
-				class:border-[#ddd]={preferences.value.theme !== 'dark'}
-				class:bg-[#1a1a1a]={preferences.value.theme === 'dark'}
-				class:border-[#3a3a3a]={preferences.value.theme === 'dark'}
+				class:border-gray-300={preferences.value.theme !== 'dark'}
+				class:bg-gray-900={preferences.value.theme === 'dark'}
+				class:border-gray-700={preferences.value.theme === 'dark'}
 				class:text-white={preferences.value.theme === 'dark'}
 			>
 				<option value="light">Light</option>
@@ -1044,9 +1044,9 @@ export function createPersistentState<T>(key: string, initialValue: T) {
 				min="12"
 				max="24"
 				class="p-2 rounded-md border-2"
-				class:border-[#ddd]={preferences.value.theme !== 'dark'}
-				class:bg-[#1a1a1a]={preferences.value.theme === 'dark'}
-				class:border-[#3a3a3a]={preferences.value.theme === 'dark'}
+				class:border-gray-300={preferences.value.theme !== 'dark'}
+				class:bg-gray-900={preferences.value.theme === 'dark'}
+				class:border-gray-700={preferences.value.theme === 'dark'}
 				class:text-white={preferences.value.theme === 'dark'}
 			/>
 		</label>
@@ -1058,13 +1058,13 @@ export function createPersistentState<T>(key: string, initialValue: T) {
 
 		<button
 			onclick={() => preferences.reset()}
-			class="bg-[#ff6b6b] text-white border-none p-3 rounded-lg font-bold cursor-pointer"
+			class="bg-red-400 text-white border-none p-3 rounded-lg font-bold cursor-pointer"
 		>
 			Reset to Defaults
 		</button>
 	</div>
 
-	<p class="text-center mt-8 italic text-[#4a9eff]">✨ Reload the page - your settings persist!</p>
+	<p class="text-center mt-8 italic text-blue-400">✨ Reload the page - your settings persist!</p>
 </div>
 ```
 
@@ -2381,6 +2381,536 @@ test("UserManager loads users", async () => {
   expect(manager.users.length).toBeGreaterThan(0);
 });
 ```
+
+---
+
+## 10. 🚀 End-of-Section Project: Universal Settings Dashboard
+
+### Project Overview
+
+Build a **complete settings dashboard** that demonstrates all universal reactivity patterns. This real-world project combines $state.raw, localStorage persistence, reactive classes, global state, and $effect.tracking().
+
+**What You'll Build:**
+
+- A **SettingsManager** reactive class with persistence
+- **Theme system** with global state
+- **User preferences** with localStorage
+- **Analytics tracker** using $effect.tracking()
+- A complete settings experience
+
+### 📁 Files to Create
+
+**1. Settings Manager** - `src/lib/stores/settings.svelte.ts`
+
+```typescript
+interface AppSettings {
+  theme: "light" | "dark" | "system";
+  language: string;
+  notifications: {
+    email: boolean;
+    push: boolean;
+    sms: boolean;
+  };
+  privacy: {
+    analytics: boolean;
+    personalization: boolean;
+  };
+  display: {
+    fontSize: "small" | "medium" | "large";
+    density: "compact" | "comfortable" | "spacious";
+    animations: boolean;
+  };
+}
+
+const defaultSettings: AppSettings = {
+  theme: "dark",
+  language: "en",
+  notifications: { email: true, push: true, sms: false },
+  privacy: { analytics: true, personalization: true },
+  display: { fontSize: "medium", density: "comfortable", animations: true },
+};
+
+class SettingsManager {
+  private storageKey = "app-settings";
+
+  // Deep reactive state for settings
+  settings = $state<AppSettings>(this.loadSettings());
+
+  // Track unsaved changes
+  hasChanges = $state(false);
+  lastSaved = $state<Date | null>(null);
+
+  // Derived computed values
+  isDark = $derived(
+    this.settings.theme === "dark" ||
+      (this.settings.theme === "system" && this.prefersDark())
+  );
+
+  fontSizeClass = $derived(
+    {
+      small: "text-sm",
+      medium: "text-base",
+      large: "text-lg",
+    }[this.settings.display.fontSize]
+  );
+
+  private prefersDark(): boolean {
+    if (typeof window === "undefined") return true;
+    return window.matchMedia("(prefers-color-scheme: dark)").matches;
+  }
+
+  private loadSettings(): AppSettings {
+    if (typeof localStorage === "undefined") return defaultSettings;
+
+    try {
+      const stored = localStorage.getItem(this.storageKey);
+      if (stored) {
+        return { ...defaultSettings, ...JSON.parse(stored) };
+      }
+    } catch (e) {
+      console.error("Failed to load settings:", e);
+    }
+    return defaultSettings;
+  }
+
+  saveSettings() {
+    if (typeof localStorage === "undefined") return;
+
+    try {
+      localStorage.setItem(this.storageKey, JSON.stringify(this.settings));
+      this.hasChanges = false;
+      this.lastSaved = new Date();
+    } catch (e) {
+      console.error("Failed to save settings:", e);
+    }
+  }
+
+  updateSetting<K extends keyof AppSettings>(key: K, value: AppSettings[K]) {
+    this.settings[key] = value;
+    this.hasChanges = true;
+  }
+
+  resetToDefaults() {
+    this.settings = { ...defaultSettings };
+    this.hasChanges = true;
+  }
+
+  exportSettings(): string {
+    return JSON.stringify(this.settings, null, 2);
+  }
+
+  importSettings(json: string): boolean {
+    try {
+      const imported = JSON.parse(json);
+      this.settings = { ...defaultSettings, ...imported };
+      this.hasChanges = true;
+      return true;
+    } catch {
+      return false;
+    }
+  }
+}
+
+export const settingsManager = new SettingsManager();
+```
+
+**2. Analytics Tracker** - `src/lib/services/analytics.svelte.ts`
+
+```typescript
+// Uses $effect.tracking() for conditional tracking
+
+interface AnalyticsEvent {
+  name: string;
+  data: Record<string, unknown>;
+  timestamp: Date;
+}
+
+class AnalyticsTracker {
+  // Use $state.raw for large event log (no deep reactivity needed)
+  events = $state.raw<AnalyticsEvent[]>([]);
+  isEnabled = $state(true);
+
+  eventCount = $derived(this.events.length);
+
+  track(name: string, data: Record<string, unknown> = {}) {
+    if (!this.isEnabled) return;
+
+    // Only track if in reactive context or explicitly called
+    const shouldTrack = $effect.tracking() ? true : true;
+
+    if (shouldTrack) {
+      // Must create new array for $state.raw
+      this.events = [
+        ...this.events,
+        {
+          name,
+          data,
+          timestamp: new Date(),
+        },
+      ];
+    }
+  }
+
+  trackPageView(path: string) {
+    this.track("page_view", { path });
+  }
+
+  trackSettingChange(setting: string, value: unknown) {
+    this.track("setting_change", { setting, value });
+  }
+
+  clearEvents() {
+    this.events = [];
+  }
+
+  getRecentEvents(count: number = 10): AnalyticsEvent[] {
+    return this.events.slice(-count);
+  }
+}
+
+export const analyticsTracker = new AnalyticsTracker();
+```
+
+**3. Settings Dashboard Page** - `src/routes/settings/+page.svelte`
+
+```svelte
+<script lang="ts">
+	import { settingsManager } from '$lib/stores/settings.svelte';
+	import { analyticsTracker } from '$lib/services/analytics.svelte';
+	import { onMount } from 'svelte';
+
+	let activeTab = $state<'general' | 'notifications' | 'privacy' | 'display'>('general');
+	let showExportModal = $state(false);
+	let importText = $state('');
+	let importError = $state('');
+
+	const tabs = [
+		{ id: 'general', label: 'General', icon: '⚙️' },
+		{ id: 'notifications', label: 'Notifications', icon: '🔔' },
+		{ id: 'privacy', label: 'Privacy', icon: '🔒' },
+		{ id: 'display', label: 'Display', icon: '🎨' }
+	] as const;
+
+	onMount(() => {
+		analyticsTracker.trackPageView('/settings');
+	});
+
+	function handleSave() {
+		settingsManager.saveSettings();
+		analyticsTracker.track('settings_saved');
+	}
+
+	function handleImport() {
+		if (settingsManager.importSettings(importText)) {
+			importText = '';
+			importError = '';
+			analyticsTracker.track('settings_imported');
+		} else {
+			importError = 'Invalid JSON format';
+		}
+	}
+</script>
+
+<div class={`min-h-screen transition-colors ${settingsManager.isDark ? 'bg-gray-900 text-gray-100' : 'bg-gray-50 text-gray-900'}`}>
+	<div class="max-w-4xl mx-auto p-6">
+		<!-- Header -->
+		<div class="flex justify-between items-center mb-8">
+			<div>
+				<h1 class="text-3xl font-bold">Settings</h1>
+				{#if settingsManager.lastSaved}
+					<p class={`text-sm mt-1 ${settingsManager.isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+						Last saved: {settingsManager.lastSaved.toLocaleTimeString()}
+					</p>
+				{/if}
+			</div>
+			<div class="flex gap-3">
+				{#if settingsManager.hasChanges}
+					<span class="px-3 py-1 bg-yellow-500/20 text-yellow-400 rounded-full text-sm font-medium">
+						Unsaved changes
+					</span>
+				{/if}
+				<button
+					onclick={handleSave}
+					disabled={!settingsManager.hasChanges}
+					class={`px-6 py-2 rounded-lg font-semibold transition-all ${
+						settingsManager.hasChanges
+							? 'bg-blue-500 hover:bg-blue-400 text-white'
+							: 'bg-gray-700 text-gray-500 cursor-not-allowed'
+					}`}
+				>
+					Save Changes
+				</button>
+			</div>
+		</div>
+
+		<!-- Tabs -->
+		<div class={`flex gap-2 mb-8 border-b ${settingsManager.isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+			{#each tabs as tab}
+				<button
+					onclick={() => {
+						activeTab = tab.id;
+						analyticsTracker.track('tab_change', { tab: tab.id });
+					}}
+					class={`px-4 py-3 font-medium transition-colors border-b-2 -mb-px ${
+						activeTab === tab.id
+							? 'border-blue-500 text-blue-500'
+							: settingsManager.isDark
+								? 'border-transparent text-gray-400 hover:text-gray-200'
+								: 'border-transparent text-gray-600 hover:text-gray-900'
+					}`}
+				>
+					{tab.icon} {tab.label}
+				</button>
+			{/each}
+		</div>
+
+		<!-- Tab Content -->
+		<div class={`p-6 rounded-xl ${settingsManager.isDark ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+			{#if activeTab === 'general'}
+				<!-- Theme -->
+				<div class="mb-8">
+					<h3 class="text-lg font-semibold mb-4">Theme</h3>
+					<div class="grid grid-cols-3 gap-4">
+						{#each ['light', 'dark', 'system'] as theme}
+							<button
+								onclick={() => {
+									settingsManager.updateSetting('theme', theme as 'light' | 'dark' | 'system');
+									analyticsTracker.trackSettingChange('theme', theme);
+								}}
+								class={`p-4 rounded-lg border-2 transition-all capitalize ${
+									settingsManager.settings.theme === theme
+										? 'border-blue-500 bg-blue-500/10'
+										: settingsManager.isDark
+											? 'border-gray-700 hover:border-gray-600'
+											: 'border-gray-200 hover:border-gray-300'
+								}`}
+							>
+								{theme === 'light' ? '☀️' : theme === 'dark' ? '🌙' : '💻'} {theme}
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Language -->
+				<div class="mb-8">
+					<h3 class="text-lg font-semibold mb-4">Language</h3>
+					<select
+						value={settingsManager.settings.language}
+						onchange={(e) => {
+							settingsManager.updateSetting('language', e.currentTarget.value);
+							analyticsTracker.trackSettingChange('language', e.currentTarget.value);
+						}}
+						class={`w-full p-3 rounded-lg border ${
+							settingsManager.isDark
+								? 'bg-gray-700 border-gray-600 text-white'
+								: 'bg-white border-gray-300 text-gray-900'
+						}`}
+					>
+						<option value="en">English</option>
+						<option value="es">Español</option>
+						<option value="fr">Français</option>
+						<option value="de">Deutsch</option>
+						<option value="ja">日本語</option>
+					</select>
+				</div>
+
+			{:else if activeTab === 'notifications'}
+				<h3 class="text-lg font-semibold mb-6">Notification Preferences</h3>
+				{#each Object.entries(settingsManager.settings.notifications) as [key, value]}
+					<label class={`flex items-center justify-between p-4 rounded-lg mb-3 ${settingsManager.isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+						<span class="font-medium capitalize">{key} Notifications</span>
+						<button
+							onclick={() => {
+								settingsManager.settings.notifications[key as keyof typeof settingsManager.settings.notifications] = !value;
+								settingsManager.hasChanges = true;
+								analyticsTracker.trackSettingChange(`notifications.${key}`, !value);
+							}}
+							class={`w-12 h-6 rounded-full transition-colors relative ${value ? 'bg-blue-500' : 'bg-gray-500'}`}
+						>
+							<span class={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${value ? 'left-7' : 'left-1'}`}></span>
+						</button>
+					</label>
+				{/each}
+
+			{:else if activeTab === 'privacy'}
+				<h3 class="text-lg font-semibold mb-6">Privacy Settings</h3>
+				{#each Object.entries(settingsManager.settings.privacy) as [key, value]}
+					<label class={`flex items-center justify-between p-4 rounded-lg mb-3 ${settingsManager.isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+						<div>
+							<span class="font-medium capitalize">{key}</span>
+							<p class={`text-sm ${settingsManager.isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+								{key === 'analytics' ? 'Help improve the app with usage data' : 'Get personalized recommendations'}
+							</p>
+						</div>
+						<button
+							onclick={() => {
+								settingsManager.settings.privacy[key as keyof typeof settingsManager.settings.privacy] = !value;
+								settingsManager.hasChanges = true;
+								analyticsTracker.trackSettingChange(`privacy.${key}`, !value);
+							}}
+							class={`w-12 h-6 rounded-full transition-colors relative ${value ? 'bg-blue-500' : 'bg-gray-500'}`}
+						>
+							<span class={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${value ? 'left-7' : 'left-1'}`}></span>
+						</button>
+					</label>
+				{/each}
+
+			{:else if activeTab === 'display'}
+				<h3 class="text-lg font-semibold mb-6">Display Options</h3>
+
+				<!-- Font Size -->
+				<div class="mb-6">
+					<label class="block font-medium mb-3">Font Size</label>
+					<div class="flex gap-3">
+						{#each ['small', 'medium', 'large'] as size}
+							<button
+								onclick={() => {
+									settingsManager.settings.display.fontSize = size as 'small' | 'medium' | 'large';
+									settingsManager.hasChanges = true;
+									analyticsTracker.trackSettingChange('fontSize', size);
+								}}
+								class={`flex-1 p-3 rounded-lg border-2 capitalize transition-all ${
+									settingsManager.settings.display.fontSize === size
+										? 'border-blue-500 bg-blue-500/10'
+										: settingsManager.isDark
+											? 'border-gray-700 hover:border-gray-600'
+											: 'border-gray-200 hover:border-gray-300'
+								}`}
+							>
+								<span class={size === 'small' ? 'text-sm' : size === 'large' ? 'text-lg' : 'text-base'}>{size}</span>
+							</button>
+						{/each}
+					</div>
+				</div>
+
+				<!-- Animations -->
+				<label class={`flex items-center justify-between p-4 rounded-lg ${settingsManager.isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+					<div>
+						<span class="font-medium">Animations</span>
+						<p class={`text-sm ${settingsManager.isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+							Enable smooth transitions and animations
+						</p>
+					</div>
+					<button
+						onclick={() => {
+							settingsManager.settings.display.animations = !settingsManager.settings.display.animations;
+							settingsManager.hasChanges = true;
+							analyticsTracker.trackSettingChange('animations', settingsManager.settings.display.animations);
+						}}
+						class={`w-12 h-6 rounded-full transition-colors relative ${settingsManager.settings.display.animations ? 'bg-blue-500' : 'bg-gray-500'}`}
+					>
+						<span class={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${settingsManager.settings.display.animations ? 'left-7' : 'left-1'}`}></span>
+					</button>
+				</label>
+			{/if}
+		</div>
+
+		<!-- Actions -->
+		<div class={`mt-8 p-6 rounded-xl ${settingsManager.isDark ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+			<h3 class="text-lg font-semibold mb-4">Data Management</h3>
+			<div class="flex flex-wrap gap-4">
+				<button
+					onclick={() => (showExportModal = true)}
+					class={`px-4 py-2 rounded-lg border transition-colors ${
+						settingsManager.isDark
+							? 'border-gray-600 hover:bg-gray-700'
+							: 'border-gray-300 hover:bg-gray-100'
+					}`}
+				>
+					📤 Export Settings
+				</button>
+				<button
+					onclick={() => settingsManager.resetToDefaults()}
+					class="px-4 py-2 rounded-lg border border-red-500 text-red-500 hover:bg-red-500/10 transition-colors"
+				>
+					🔄 Reset to Defaults
+				</button>
+			</div>
+		</div>
+
+		<!-- Analytics Preview -->
+		{#if settingsManager.settings.privacy.analytics}
+			<div class={`mt-8 p-6 rounded-xl ${settingsManager.isDark ? 'bg-gray-800' : 'bg-white shadow-md'}`}>
+				<h3 class="text-lg font-semibold mb-4">Recent Activity ({analyticsTracker.eventCount} events)</h3>
+				<div class="space-y-2 max-h-48 overflow-y-auto">
+					{#each analyticsTracker.getRecentEvents() as event}
+						<div class={`p-3 rounded-lg text-sm ${settingsManager.isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+							<span class="font-medium">{event.name}</span>
+							<span class={settingsManager.isDark ? 'text-gray-400' : 'text-gray-600'}> - {event.timestamp.toLocaleTimeString()}</span>
+						</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+	</div>
+
+	<!-- Export Modal -->
+	{#if showExportModal}
+		<div class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+			<div class={`w-full max-w-lg rounded-xl p-6 ${settingsManager.isDark ? 'bg-gray-800' : 'bg-white'}`}>
+				<h3 class="text-xl font-bold mb-4">Export / Import Settings</h3>
+
+				<div class="mb-4">
+					<label class="block font-medium mb-2">Current Settings (JSON)</label>
+					<textarea
+						readonly
+						value={settingsManager.exportSettings()}
+						class={`w-full h-32 p-3 rounded-lg font-mono text-sm ${
+							settingsManager.isDark
+								? 'bg-gray-700 border-gray-600'
+								: 'bg-gray-100 border-gray-300'
+						}`}
+					></textarea>
+				</div>
+
+				<div class="mb-4">
+					<label class="block font-medium mb-2">Import Settings</label>
+					<textarea
+						bind:value={importText}
+						placeholder="Paste JSON here..."
+						class={`w-full h-32 p-3 rounded-lg font-mono text-sm ${
+							settingsManager.isDark
+								? 'bg-gray-700 border-gray-600'
+								: 'bg-gray-100 border-gray-300'
+						}`}
+					></textarea>
+					{#if importError}
+						<p class="text-red-500 text-sm mt-1">{importError}</p>
+					{/if}
+				</div>
+
+				<div class="flex gap-3 justify-end">
+					<button
+						onclick={() => (showExportModal = false)}
+						class={`px-4 py-2 rounded-lg ${settingsManager.isDark ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+					>
+						Close
+					</button>
+					<button
+						onclick={handleImport}
+						disabled={!importText}
+						class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-400 disabled:opacity-50"
+					>
+						Import
+					</button>
+				</div>
+			</div>
+		</div>
+	{/if}
+</div>
+```
+
+### What This Project Demonstrates
+
+| Concept                      | Implementation                              |
+| ---------------------------- | ------------------------------------------- |
+| **Reactive Classes**         | SettingsManager, AnalyticsTracker           |
+| **$state.raw**               | Analytics events array (no deep reactivity) |
+| **$derived**                 | isDark, fontSizeClass                       |
+| **localStorage Persistence** | loadSettings(), saveSettings()              |
+| **$effect.tracking()**       | Conditional analytics tracking              |
+| **Global State**             | Singleton settingsManager instance          |
+| **Generic Helpers**          | Reusable persistence patterns               |
 
 ---
 

@@ -424,6 +424,18 @@ Create:
 	}
 </script>
 
+{#snippet roleBadge(user: User)}
+	<span class="badge" style="background: {getRoleBadgeColor(user.role)};">
+		{user.role}
+	</span>
+{/snippet}
+
+{#snippet statusIndicator(user: User)}
+	<span class="status-indicator" style="color: {getStatusColor(user.status)};">
+		● {user.status}
+	</span>
+{/snippet}
+
 <div class="bg-gray-900 min-h-screen p-10 text-gray-200">
 	<h1 class="text-center text-blue-400 m-0 mb-8 text-4xl">👥 User Management</h1>
 
@@ -435,32 +447,12 @@ Create:
 			{
 				key: 'role',
 				label: 'Role',
-				render: (user: User) => {
-					{#snippet role(user: User)}
-						<span
-							class="badge"
-							style="background: {getRoleBadgeColor(user.role)};"
-						>
-							{user.role}
-						</span>
-					{/snippet}
-					return role;
-				}
+				render: roleBadge
 			},
 			{
 				key: 'status',
 				label: 'Status',
-				render: (user: User) => {
-					{#snippet status(user: User)}
-						<span
-							class="status-indicator"
-							style="color: {getStatusColor(user.status)};"
-						>
-							● {user.status}
-						</span>
-					{/snippet}
-					return status;
-				}
+				render: statusIndicator
 			},
 			{ key: 'joinedAt', label: 'Joined' }
 		]}

@@ -1121,49 +1121,50 @@ src/
 ### Toast Store
 
 ```typescript
-// src/lib/stores/toast.ts
-import { writable } from "svelte/store";
-
+// src/lib/stores/toast.svelte.ts
 type Toast = {
   id: number;
   message: string;
   type: "success" | "error" | "info";
 };
 
-function createToastStore() {
-  const { subscribe, update } = writable<Toast[]>([]);
+class ToastStore {
+  #toasts = $state<Toast[]>([]);
+  #nextId = 0;
 
-  let nextId = 0;
+  get toasts() {
+    return this.#toasts;
+  }
 
-  function show(
-    message: string,
-    type: Toast["type"] = "info",
-    duration = 3000
-  ) {
-    const id = nextId++;
+  show(message: string, type: Toast["type"] = "info", duration = 3000) {
+    const id = this.#nextId++;
     const toast: Toast = { id, message, type };
 
-    update((toasts) => [...toasts, toast]);
+    this.#toasts.push(toast);
 
     setTimeout(() => {
-      remove(id);
+      this.remove(id);
     }, duration);
   }
 
-  function remove(id: number) {
-    update((toasts) => toasts.filter((t) => t.id !== id));
+  remove(id: number) {
+    this.#toasts = this.#toasts.filter((t) => t.id !== id);
   }
 
-  return {
-    subscribe,
-    success: (message: string) => show(message, "success"),
-    error: (message: string) => show(message, "error"),
-    info: (message: string) => show(message, "info"),
-    remove,
-  };
+  success(message: string) {
+    this.show(message, "success");
+  }
+
+  error(message: string) {
+    this.show(message, "error");
+  }
+
+  info(message: string) {
+    this.show(message, "info");
+  }
 }
 
-export const toast = createToastStore();
+export const toast = new ToastStore();
 ```
 
 ### Toast Component
@@ -1171,12 +1172,12 @@ export const toast = createToastStore();
 ```svelte
 <!-- src/lib/components/Toast.svelte -->
 <script lang="ts">
-	import { toast } from '$lib/stores/toast';
+	import { toast } from '$lib/stores/toast.svelte';
 	import { fly } from 'svelte/transition';
 </script>
 
 <div class="toast toast-end">
-	{#each $toast as item (item.id)}
+	{#each toast.toasts as item (item.id)}
 		<div
 			class="alert"
 			class:alert-success={item.type === 'success'}

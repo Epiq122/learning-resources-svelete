@@ -629,15 +629,19 @@ import { getContext, setContext } from "svelte";
 import type Konva from "konva";
 
 // Stage context (the root Konva container)
+// Using Symbol ensures unique key that can't conflict
 const STAGE_KEY = Symbol("konva-stage");
 
+// Helper to provide stage to child components via context
 export function setStageContext(stage: Konva.Stage) {
   setContext(STAGE_KEY, stage);
 }
 
+// Helper to retrieve stage from context with error handling
 export function getStageContext(): Konva.Stage {
   const stage = getContext<Konva.Stage | undefined>(STAGE_KEY);
   if (!stage) {
+    // Throw helpful error if used outside <Stage> component
     throw new Error("Stage context not found. Use <Stage> component");
   }
   return stage;
@@ -714,17 +718,20 @@ export function getLayerContext(): Konva.Layer {
 
 	// Create the stage when component mounts
 	onMount(() => {
-		// Create Konva stage imperatively
+		// Create Konva stage imperatively (not reactive)
+		// Konva is an imperative library, so we create it with 'new'
 		stage = new Konva.Stage({
-			container: container, // DOM element to attach to
+			container: container, // DOM element to attach canvas to
 			width: width,
 			height: height
 		});
 
 		// Provide stage to child components via context
+		// This allows Layer, Rect, etc. to access the stage
 		setStageContext(stage);
 
 		// Cleanup: destroy stage when component unmounts
+		// CRITICAL - prevents memory leaks!
 		return () => {
 			stage.destroy();
 		};

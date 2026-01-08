@@ -111,15 +111,15 @@ src/routes/
 
 ```typescript
 // src/routes/blog/[slug]/+layout.server.ts
-import type { LayoutServerLoad } from './$types';
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ params }) => {
-	const [post, relatedPosts] = await Promise.all([
-		db.posts.findUnique({ where: { slug: params.slug } }),
-		db.posts.findRelated(params.slug, 3)
-	]);
+  const [post, relatedPosts] = await Promise.all([
+    db.posts.findUnique({ where: { slug: params.slug } }),
+    db.posts.findRelated(params.slug, 3),
+  ]);
 
-	return { post, relatedPosts };
+  return { post, relatedPosts };
 };
 ```
 
@@ -143,18 +143,20 @@ Load functions automatically re-run when their **dependencies** change.
 
 ```typescript
 // src/routes/search/+page.ts
-import type { PageLoad } from './$types';
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ url, fetch }) => {
-	const query = url.searchParams.get('q') || '';
-	const category = url.searchParams.get('category') || 'all';
+  // Extract params from URL - these create AUTOMATIC dependencies
+  const query = url.searchParams.get("q") || "";
+  const category = url.searchParams.get("category") || "all";
 
-	// This load function depends on 'q' and 'category' params
-	// It will re-run whenever they change!
-	const response = await fetch(`/api/search?q=${query}&category=${category}`);
-	const results = await response.json();
+  // This load function depends on 'q' and 'category' params
+  // When ?q=new or ?category=news changes, load automatically re-runs!
+  // You don't need to manually track these - SvelteKit does it
+  const response = await fetch(`/api/search?q=${query}&category=${category}`);
+  const results = await response.json();
 
-	return { results, query, category };
+  return { results, query, category };
 };
 ```
 
@@ -215,16 +217,18 @@ Use `invalidate()` to manually re-run load functions.
 
 ```typescript
 // src/routes/tasks/+page.ts
-import type { PageLoad } from './$types';
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch, depends }) => {
-	// Register custom dependency
-	depends('tasks:list');
+  // Register custom dependency with semantic name
+  // This allows calling invalidate('tasks:list') from anywhere
+  // to refresh just this data (not entire page)
+  depends("tasks:list");
 
-	const response = await fetch('/api/tasks');
-	const tasks = await response.json();
+  const response = await fetch("/api/tasks");
+  const tasks = await response.json();
 
-	return { tasks };
+  return { tasks };
 };
 ```
 
@@ -244,11 +248,15 @@ export const load: PageLoad = async ({ fetch, depends }) => {
 		});
 
 		// Manually invalidate to refresh tasks!
+		// This re-runs the load function that called depends('tasks:list')
+		// More efficient than full page reload - only refetches what changed
 		await invalidate('tasks:list');
 	}
 
 	async function refreshAll() {
-		// Invalidate all load functions on this page
+		// Invalidate ALL load functions on this page
+		// Predicate function: () => true means "match everything"
+		// Useful for "refresh" buttons or retry after errors
 		await invalidate(() => true);
 	}
 </script>
@@ -272,19 +280,19 @@ export const load: PageLoad = async ({ fetch, depends }) => {
 
 ```typescript
 // Invalidate specific dependency
-await invalidate('tasks:list');
+await invalidate("tasks:list");
 
 // Invalidate specific URL
-await invalidate('/api/tasks');
+await invalidate("/api/tasks");
 
 // Invalidate multiple
-await invalidate(['tasks:list', 'user:profile']);
+await invalidate(["tasks:list", "user:profile"]);
 
 // Invalidate all
 await invalidate(() => true);
 
 // Invalidate by pattern
-await invalidate((url) => url.pathname.startsWith('/api/'));
+await invalidate((url) => url.pathname.startsWith("/api/"));
 ```
 
 > 💡 **Best Practice**: Use custom dependencies with `depends()` for semantic invalidation.
@@ -301,22 +309,22 @@ When a load function throws an error, you can retry it.
 
 ```typescript
 // src/routes/posts/+page.ts
-import { error } from '@sveltejs/kit';
-import type { PageLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ fetch }) => {
-	try {
-		const response = await fetch('/api/posts');
+  try {
+    const response = await fetch("/api/posts");
 
-		if (!response.ok) {
-			throw error(response.status, 'Failed to load posts');
-		}
+    if (!response.ok) {
+      throw error(response.status, "Failed to load posts");
+    }
 
-		const posts = await response.json();
-		return { posts };
-	} catch (err) {
-		throw error(500, 'Network error - please try again');
-	}
+    const posts = await response.json();
+    return { posts };
+  } catch (err) {
+    throw error(500, "Network error - please try again");
+  }
 };
 ```
 
@@ -374,19 +382,23 @@ SvelteKit can preload routes before navigation for instant page loads.
 ### Preloading Strategies
 
 ```svelte
-<!-- 1. No preloading -->
+<!-- 1. No preloading - use for authenticated routes or heavy pages -->
 <a href="/large-page" data-sveltekit-preload-data="off"> Heavy Page </a>
 
-<!-- 2. Preload on hover (default) -->
+<!-- 2. Preload on hover (default) - starts loading when mouse hovers -->
+<!-- Best for desktop, gives ~100ms head start on data fetching -->
 <a href="/dashboard" data-sveltekit-preload-data="hover"> Dashboard </a>
 
-<!-- 3. Preload on tap (mobile-friendly) -->
+<!-- 3. Preload on tap (mobile-friendly) - starts loading on touchstart -->
+<!-- Better for mobile where hover doesn't exist -->
 <a href="/settings" data-sveltekit-preload-data="tap"> Settings </a>
 
-<!-- 4. Eager preload (as soon as link is visible) -->
+<!-- 4. Eager preload (as soon as link is visible in viewport) -->
+<!-- Use for critical next steps where instant navigation is important -->
 <a href="/next-step" data-sveltekit-preload-data="viewport"> Continue </a>
 
-<!-- 5. Preload code only (not data) -->
+<!-- 5. Preload code only (not data) - loads JS but not load functions -->
+<!-- Use when data is user-specific and shouldn't be prefetched -->
 <a href="/blog" data-sveltekit-preload-code="hover"> Blog </a>
 
 <!-- 6. Preload both code and data -->
@@ -478,95 +490,100 @@ src/
 ```typescript
 // src/lib/server/db.ts
 export interface Task {
-	id: string;
-	title: string;
-	description: string;
-	status: 'todo' | 'in-progress' | 'done';
-	priority: 'low' | 'medium' | 'high';
-	assignee: string;
-	createdAt: string;
-	updatedAt: string;
+  id: string;
+  title: string;
+  description: string;
+  status: "todo" | "in-progress" | "done";
+  priority: "low" | "medium" | "high";
+  assignee: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 let tasks: Task[] = [
-	{
-		id: '1',
-		title: 'Design landing page',
-		description: 'Create mockups for new landing page',
-		status: 'in-progress',
-		priority: 'high',
-		assignee: 'Alice',
-		createdAt: '2024-01-01T10:00:00Z',
-		updatedAt: '2024-01-01T10:00:00Z'
-	},
-	{
-		id: '2',
-		title: 'Write API docs',
-		description: 'Document all API endpoints',
-		status: 'todo',
-		priority: 'medium',
-		assignee: 'Bob',
-		createdAt: '2024-01-02T10:00:00Z',
-		updatedAt: '2024-01-02T10:00:00Z'
-	}
+  {
+    id: "1",
+    title: "Design landing page",
+    description: "Create mockups for new landing page",
+    status: "in-progress",
+    priority: "high",
+    assignee: "Alice",
+    createdAt: "2024-01-01T10:00:00Z",
+    updatedAt: "2024-01-01T10:00:00Z",
+  },
+  {
+    id: "2",
+    title: "Write API docs",
+    description: "Document all API endpoints",
+    status: "todo",
+    priority: "medium",
+    assignee: "Bob",
+    createdAt: "2024-01-02T10:00:00Z",
+    updatedAt: "2024-01-02T10:00:00Z",
+  },
 ];
 
 export const db = {
-	tasks: {
-		findAll: async (filters?: { status?: string; priority?: string; search?: string }) => {
-			let filtered = tasks;
+  tasks: {
+    findAll: async (filters?: {
+      status?: string;
+      priority?: string;
+      search?: string;
+    }) => {
+      let filtered = tasks;
 
-			if (filters?.status) {
-				filtered = filtered.filter((t) => t.status === filters.status);
-			}
-			if (filters?.priority) {
-				filtered = filtered.filter((t) => t.priority === filters.priority);
-			}
-			if (filters?.search) {
-				const search = filters.search.toLowerCase();
-				filtered = filtered.filter(
-					(t) =>
-						t.title.toLowerCase().includes(search) || t.description.toLowerCase().includes(search)
-				);
-			}
+      if (filters?.status) {
+        filtered = filtered.filter((t) => t.status === filters.status);
+      }
+      if (filters?.priority) {
+        filtered = filtered.filter((t) => t.priority === filters.priority);
+      }
+      if (filters?.search) {
+        const search = filters.search.toLowerCase();
+        filtered = filtered.filter(
+          (t) =>
+            t.title.toLowerCase().includes(search) ||
+            t.description.toLowerCase().includes(search)
+        );
+      }
 
-			return filtered;
-		},
+      return filtered;
+    },
 
-		findById: async (id: string) => {
-			return tasks.find((t) => t.id === id);
-		},
+    findById: async (id: string) => {
+      return tasks.find((t) => t.id === id);
+    },
 
-		create: async (data: Omit<Task, 'id' | 'createdAt' | 'updatedAt'>) => {
-			const task: Task = {
-				...data,
-				id: crypto.randomUUID(),
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString()
-			};
-			tasks.push(task);
-			return task;
-		},
+    create: async (data: Omit<Task, "id" | "createdAt" | "updatedAt">) => {
+      const task: Task = {
+        ...data,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+      tasks.push(task);
+      return task;
+    },
 
-		update: async (id: string, data: Partial<Task>) => {
-			const index = tasks.findIndex((t) => t.id === id);
-			if (index === -1) return null;
+    update: async (id: string, data: Partial<Task>) => {
+      const index = tasks.findIndex((t) => t.id === id);
+      if (index === -1) return null;
 
-			tasks[index] = {
-				...tasks[index],
-				...data,
-				updatedAt: new Date().toISOString()
-			};
-			return tasks[index];
-		},
+      tasks[index] = {
+        ...tasks[index],
+        ...data,
+        updatedAt: new Date().toISOString(),
+      };
+      return tasks[index];
+    },
 
-		delete: async (id: string) => {
-			const index = tasks.findIndex((t) => t.id === id);
-			if (index === -1) return false;
-			tasks.splice(index, 1);
-			return true;
-		}
-	}
+    delete: async (id: string) => {
+      const index = tasks.findIndex((t) => t.id === id);
+      if (index === -1) return false;
+      tasks.splice(index, 1);
+      return true;
+    },
+  },
 };
 ```
 
@@ -574,32 +591,32 @@ export const db = {
 
 ```typescript
 // src/routes/tasks/+page.ts
-import type { PageLoad } from './$types';
+import type { PageLoad } from "./$types";
 
 export const load: PageLoad = async ({ url, fetch, depends }) => {
-	// Register custom dependencies for granular invalidation
-	depends('tasks:list');
-	depends('tasks:filters');
+  // Register custom dependencies for granular invalidation
+  depends("tasks:list");
+  depends("tasks:filters");
 
-	// Extract filters from URL (automatic dependency!)
-	const status = url.searchParams.get('status') || undefined;
-	const priority = url.searchParams.get('priority') || undefined;
-	const search = url.searchParams.get('search') || undefined;
+  // Extract filters from URL (automatic dependency!)
+  const status = url.searchParams.get("status") || undefined;
+  const priority = url.searchParams.get("priority") || undefined;
+  const search = url.searchParams.get("search") || undefined;
 
-	// Build query string
-	const params = new URLSearchParams();
-	if (status) params.set('status', status);
-	if (priority) params.set('priority', priority);
-	if (search) params.set('search', search);
+  // Build query string
+  const params = new URLSearchParams();
+  if (status) params.set("status", status);
+  if (priority) params.set("priority", priority);
+  if (search) params.set("search", search);
 
-	// Fetch tasks (URL dependency!)
-	const response = await fetch(`/api/tasks?${params}`);
-	const tasks = await response.json();
+  // Fetch tasks (URL dependency!)
+  const response = await fetch(`/api/tasks?${params}`);
+  const tasks = await response.json();
 
-	return {
-		tasks,
-		filters: { status, priority, search }
-	};
+  return {
+    tasks,
+    filters: { status, priority, search },
+  };
 };
 ```
 
@@ -836,20 +853,20 @@ export const load: PageLoad = async ({ url, fetch, depends }) => {
 
 ```typescript
 // src/routes/tasks/[id]/+layout.ts
-import { error } from '@sveltejs/kit';
-import type { LayoutLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import type { LayoutLoad } from "./$types";
 
 export const load: LayoutLoad = async ({ params, fetch, depends }) => {
-	depends('task:detail');
+  depends("task:detail");
 
-	const response = await fetch(`/api/tasks/${params.id}`);
+  const response = await fetch(`/api/tasks/${params.id}`);
 
-	if (!response.ok) {
-		throw error(404, 'Task not found');
-	}
+  if (!response.ok) {
+    throw error(404, "Task not found");
+  }
 
-	const task = await response.json();
-	return { task };
+  const task = await response.json();
+  return { task };
 };
 ```
 
@@ -889,49 +906,49 @@ export const load: LayoutLoad = async ({ params, fetch, depends }) => {
 
 ```typescript
 // src/routes/api/tasks/+server.ts
-import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ url }) => {
-	const status = url.searchParams.get('status') || undefined;
-	const priority = url.searchParams.get('priority') || undefined;
-	const search = url.searchParams.get('search') || undefined;
+  const status = url.searchParams.get("status") || undefined;
+  const priority = url.searchParams.get("priority") || undefined;
+  const search = url.searchParams.get("search") || undefined;
 
-	const tasks = await db.tasks.findAll({ status, priority, search });
-	return json(tasks);
+  const tasks = await db.tasks.findAll({ status, priority, search });
+  return json(tasks);
 };
 
 export const POST: RequestHandler = async ({ request }) => {
-	const data = await request.json();
-	const task = await db.tasks.create(data);
-	return json(task, { status: 201 });
+  const data = await request.json();
+  const task = await db.tasks.create(data);
+  return json(task, { status: 201 });
 };
 ```
 
 ```typescript
 // src/routes/api/tasks/[id]/+server.ts
-import { json, error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json, error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ params }) => {
-	const task = await db.tasks.findById(params.id);
-	if (!task) throw error(404, 'Task not found');
-	return json(task);
+  const task = await db.tasks.findById(params.id);
+  if (!task) throw error(404, "Task not found");
+  return json(task);
 };
 
 export const PUT: RequestHandler = async ({ params, request }) => {
-	const data = await request.json();
-	const task = await db.tasks.update(params.id, data);
-	if (!task) throw error(404, 'Task not found');
-	return json(task);
+  const data = await request.json();
+  const task = await db.tasks.update(params.id, data);
+  if (!task) throw error(404, "Task not found");
+  return json(task);
 };
 
 export const DELETE: RequestHandler = async ({ params }) => {
-	const deleted = await db.tasks.delete(params.id);
-	if (!deleted) throw error(404, 'Task not found');
-	return json({ success: true });
+  const deleted = await db.tasks.delete(params.id);
+  if (!deleted) throw error(404, "Task not found");
+  return json({ success: true });
 };
 ```
 

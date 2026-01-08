@@ -68,29 +68,39 @@ npm install resend  # For email verification
 
 ```typescript
 // src/lib/server/auth.ts
-import { betterAuth } from 'better-auth';
-import { drizzleAdapter } from 'better-auth/adapters/drizzle';
-import { db } from './db';
-import { DATABASE_URL } from '$env/dynamic/private';
+import { betterAuth } from "better-auth";
+import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { db } from "./db";
+import { DATABASE_URL } from "$env/dynamic/private";
 
 export const auth = betterAuth({
-	database: drizzleAdapter(db, {
-		provider: 'pg'
-	}),
-	emailAndPassword: {
-		enabled: true,
-		requireEmailVerification: true
-	},
-	socialProviders: {
-		github: {
-			clientId: process.env.GITHUB_CLIENT_ID!,
-			clientSecret: process.env.GITHUB_CLIENT_SECRET!
-		}
-	},
-	session: {
-		expiresIn: 60 * 60 * 24 * 7, // 7 days
-		updateAge: 60 * 60 * 24 // 1 day
-	}
+  // Connect to database using Drizzle adapter
+  // Better Auth stores sessions, users, accounts in DB
+  database: drizzleAdapter(db, {
+    provider: "pg", // PostgreSQL
+  }),
+  // Enable email/password authentication
+  emailAndPassword: {
+    enabled: true,
+    // Require email verification before login
+    // Prevents spam accounts, validates real emails
+    requireEmailVerification: true,
+  },
+  // Social OAuth providers (GitHub, Google, etc.)
+  socialProviders: {
+    github: {
+      // Get these from GitHub OAuth App settings
+      clientId: process.env.GITHUB_CLIENT_ID!,
+      clientSecret: process.env.GITHUB_CLIENT_SECRET!,
+    },
+  },
+  // Session configuration
+  session: {
+    // Session expires after 7 days of inactivity
+    expiresIn: 60 * 60 * 24 * 7, // 7 days in seconds
+    // Extend session if used within last 24 hours
+    updateAge: 60 * 60 * 24, // 1 day in seconds
+  },
 });
 ```
 
@@ -98,47 +108,53 @@ export const auth = betterAuth({
 
 ```typescript
 // Add to src/lib/server/db/schema.ts
-import { pgTable, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  boolean,
+  integer,
+} from "drizzle-orm/pg-core";
 
-export const users = pgTable('users', {
-	id: text('id').primaryKey(),
-	email: text('email').notNull().unique(),
-	emailVerified: boolean('email_verified').default(false),
-	name: text('name'),
-	avatarUrl: text('avatar_url'),
-	createdAt: timestamp('created_at').defaultNow(),
-	updatedAt: timestamp('updated_at').defaultNow()
+export const users = pgTable("users", {
+  id: text("id").primaryKey(),
+  email: text("email").notNull().unique(),
+  emailVerified: boolean("email_verified").default(false),
+  name: text("name"),
+  avatarUrl: text("avatar_url"),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const sessions = pgTable('sessions', {
-	id: text('id').primaryKey(),
-	userId: text('user_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	expiresAt: timestamp('expires_at').notNull(),
-	token: text('token').notNull().unique(),
-	ipAddress: text('ip_address'),
-	userAgent: text('user_agent')
+export const sessions = pgTable("sessions", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  expiresAt: timestamp("expires_at").notNull(),
+  token: text("token").notNull().unique(),
+  ipAddress: text("ip_address"),
+  userAgent: text("user_agent"),
 });
 
-export const accounts = pgTable('accounts', {
-	id: text('id').primaryKey(),
-	userId: text('user_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	accountId: text('account_id').notNull(),
-	providerId: text('provider_id').notNull(),
-	accessToken: text('access_token'),
-	refreshToken: text('refresh_token'),
-	expiresAt: timestamp('expires_at'),
-	password: text('password') // Hashed password for email/password
+export const accounts = pgTable("accounts", {
+  id: text("id").primaryKey(),
+  userId: text("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  accountId: text("account_id").notNull(),
+  providerId: text("provider_id").notNull(),
+  accessToken: text("access_token"),
+  refreshToken: text("refresh_token"),
+  expiresAt: timestamp("expires_at"),
+  password: text("password"), // Hashed password for email/password
 });
 
-export const verificationTokens = pgTable('verification_tokens', {
-	id: text('id').primaryKey(),
-	identifier: text('identifier').notNull(),
-	token: text('token').notNull().unique(),
-	expires: timestamp('expires').notNull()
+export const verificationTokens = pgTable("verification_tokens", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull(),
+  token: text("token").notNull().unique(),
+  expires: timestamp("expires").notNull(),
 });
 ```
 
@@ -367,59 +383,63 @@ Handle user registration on the server.
 
 ```typescript
 // src/routes/(auth)/register/+page.server.ts
-import { fail } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
-import { sendVerificationEmail } from '$lib/server/email';
-import type { Actions } from './$types';
+import { fail } from "@sveltejs/kit";
+import { auth } from "$lib/server/auth";
+import { sendVerificationEmail } from "$lib/server/email";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request }) => {
-		const data = await request.formData();
-		const name = data.get('name')?.toString();
-		const email = data.get('email')?.toString();
-		const password = data.get('password')?.toString();
+  default: async ({ request }) => {
+    const data = await request.formData();
+    const name = data.get("name")?.toString();
+    const email = data.get("email")?.toString();
+    const password = data.get("password")?.toString();
 
-		// Validation
-		if (!name || name.length < 2) {
-			return fail(400, { error: 'Name must be at least 2 characters' });
-		}
+    // Validation
+    if (!name || name.length < 2) {
+      return fail(400, { error: "Name must be at least 2 characters" });
+    }
 
-		if (!email || !email.includes('@')) {
-			return fail(400, { error: 'Please enter a valid email' });
-		}
+    if (!email || !email.includes("@")) {
+      return fail(400, { error: "Please enter a valid email" });
+    }
 
-		if (!password || password.length < 8) {
-			return fail(400, { error: 'Password must be at least 8 characters' });
-		}
+    if (!password || password.length < 8) {
+      return fail(400, { error: "Password must be at least 8 characters" });
+    }
 
-		try {
-			// Create user with Better Auth
-			const result = await auth.api.signUp.email({
-				body: {
-					name,
-					email,
-					password
-				}
-			});
+    try {
+      // Create user with Better Auth
+      const result = await auth.api.signUp.email({
+        body: {
+          name,
+          email,
+          password,
+        },
+      });
 
-			if (!result.user) {
-				return fail(400, { error: 'Failed to create account' });
-			}
+      if (!result.user) {
+        return fail(400, { error: "Failed to create account" });
+      }
 
-			// Send verification email
-			await sendVerificationEmail(result.user.email, result.user.id);
+      // Send verification email
+      await sendVerificationEmail(result.user.email, result.user.id);
 
-			return {
-				success: true,
-				message: 'Account created! Please check your email to verify.'
-			};
-		} catch (error: any) {
-			if (error.message?.includes('duplicate')) {
-				return fail(400, { error: 'An account with this email already exists' });
-			}
-			return fail(500, { error: 'Failed to create account. Please try again.' });
-		}
-	}
+      return {
+        success: true,
+        message: "Account created! Please check your email to verify.",
+      };
+    } catch (error: any) {
+      if (error.message?.includes("duplicate")) {
+        return fail(400, {
+          error: "An account with this email already exists",
+        });
+      }
+      return fail(500, {
+        error: "Failed to create account. Please try again.",
+      });
+    }
+  },
 };
 ```
 
@@ -433,35 +453,35 @@ Use Resend to send beautiful verification emails.
 
 ```typescript
 // src/lib/server/email.ts
-import { Resend } from 'resend';
-import { RESEND_API_KEY, PUBLIC_APP_URL } from '$env/dynamic/private';
-import { db } from './db';
-import { verificationTokens } from './db/schema';
-import { randomBytes } from 'crypto';
+import { Resend } from "resend";
+import { RESEND_API_KEY, PUBLIC_APP_URL } from "$env/dynamic/private";
+import { db } from "./db";
+import { verificationTokens } from "./db/schema";
+import { randomBytes } from "crypto";
 
 const resend = new Resend(RESEND_API_KEY);
 
 export async function sendVerificationEmail(email: string, userId: string) {
-	// Generate verification token
-	const token = randomBytes(32).toString('hex');
-	const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+  // Generate verification token
+  const token = randomBytes(32).toString("hex");
+  const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-	// Store token in database
-	await db.insert(verificationTokens).values({
-		id: randomBytes(16).toString('hex'),
-		identifier: userId,
-		token,
-		expires
-	});
+  // Store token in database
+  await db.insert(verificationTokens).values({
+    id: randomBytes(16).toString("hex"),
+    identifier: userId,
+    token,
+    expires,
+  });
 
-	const verificationUrl = `${PUBLIC_APP_URL}/verify-email?token=${token}`;
+  const verificationUrl = `${PUBLIC_APP_URL}/verify-email?token=${token}`;
 
-	// Send email
-	await resend.emails.send({
-		from: 'noreply@yourdomain.com',
-		to: email,
-		subject: 'Verify your email address',
-		html: `
+  // Send email
+  await resend.emails.send({
+    from: "noreply@yourdomain.com",
+    to: email,
+    subject: "Verify your email address",
+    html: `
 			<div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
 				<h1>Verify Your Email</h1>
 				<p>Thanks for signing up! Please verify your email address by clicking the button below:</p>
@@ -475,8 +495,8 @@ export async function sendVerificationEmail(email: string, userId: string) {
 					This link will expire in 24 hours. If you didn't create an account, you can safely ignore this email.
 				</p>
 			</div>
-		`
-	});
+		`,
+  });
 }
 ```
 
@@ -484,40 +504,47 @@ export async function sendVerificationEmail(email: string, userId: string) {
 
 ```typescript
 // src/routes/verify-email/+page.server.ts
-import { redirect, error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { verificationTokens, users } from '$lib/server/db/schema';
-import { eq, and, gt } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { redirect, error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { verificationTokens, users } from "$lib/server/db/schema";
+import { eq, and, gt } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ url }) => {
-	const token = url.searchParams.get('token');
+  const token = url.searchParams.get("token");
 
-	if (!token) {
-		throw error(400, 'Missing verification token');
-	}
+  if (!token) {
+    throw error(400, "Missing verification token");
+  }
 
-	// Find token
-	const [verificationToken] = await db
-		.select()
-		.from(verificationTokens)
-		.where(and(eq(verificationTokens.token, token), gt(verificationTokens.expires, new Date())))
-		.limit(1);
+  // Find token
+  const [verificationToken] = await db
+    .select()
+    .from(verificationTokens)
+    .where(
+      and(
+        eq(verificationTokens.token, token),
+        gt(verificationTokens.expires, new Date())
+      )
+    )
+    .limit(1);
 
-	if (!verificationToken) {
-		throw error(400, 'Invalid or expired verification token');
-	}
+  if (!verificationToken) {
+    throw error(400, "Invalid or expired verification token");
+  }
 
-	// Update user email verified status
-	await db
-		.update(users)
-		.set({ emailVerified: true })
-		.where(eq(users.id, verificationToken.identifier));
+  // Update user email verified status
+  await db
+    .update(users)
+    .set({ emailVerified: true })
+    .where(eq(users.id, verificationToken.identifier));
 
-	// Delete used token
-	await db.delete(verificationTokens).where(eq(verificationTokens.id, verificationToken.id));
+  // Delete used token
+  await db
+    .delete(verificationTokens)
+    .where(eq(verificationTokens.id, verificationToken.id));
 
-	throw redirect(303, '/login?verified=true');
+  throw redirect(303, "/login?verified=true");
 };
 ```
 
@@ -533,25 +560,33 @@ Add session data to `locals` in hooks.
 
 ```typescript
 // src/hooks.server.ts
-import { auth } from '$lib/server/auth';
-import { sequence } from '@sveltejs/kit/hooks';
-import type { Handle } from '@sveltejs/kit';
+import { auth } from "$lib/server/auth";
+import { sequence } from "@sveltejs/kit/hooks";
+import type { Handle } from "@sveltejs/kit";
 
 const handleAuth: Handle = async ({ event, resolve }) => {
-	// Get session from Better Auth
-	const session = await auth.api.getSession({
-		headers: event.request.headers
-	});
+  // Get session from Better Auth by checking cookies/headers
+  // This runs on EVERY request before any route handler
+  const session = await auth.api.getSession({
+    headers: event.request.headers,
+  });
 
-	if (session) {
-		event.locals.user = session.user;
-		event.locals.session = session.session;
-	} else {
-		event.locals.user = null;
-		event.locals.session = null;
-	}
+  // If session exists, populate event.locals
+  // locals persists throughout request, available in:
+  // - Load functions
+  // - Form actions
+  // - API endpoints
+  if (session) {
+    event.locals.user = session.user;
+    event.locals.session = session.session;
+  } else {
+    // No session = user not logged in
+    event.locals.user = null;
+    event.locals.session = null;
+  }
 
-	return resolve(event);
+  // Continue to route handler with user data available
+  return resolve(event);
 };
 
 export const handle = sequence(handleAuth);
@@ -561,15 +596,15 @@ export const handle = sequence(handleAuth);
 
 ```typescript
 // src/app.d.ts
-import type { User, Session } from 'better-auth';
+import type { User, Session } from "better-auth";
 
 declare global {
-	namespace App {
-		interface Locals {
-			user: User | null;
-			session: Session | null;
-		}
-	}
+  namespace App {
+    interface Locals {
+      user: User | null;
+      session: Session | null;
+    }
+  }
 }
 
 export {};
@@ -587,74 +622,74 @@ Handle login and logout flows.
 
 ```typescript
 // src/routes/(auth)/login/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
-import type { Actions } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { auth } from "$lib/server/auth";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request, cookies }) => {
-		const data = await request.formData();
-		const email = data.get('email')?.toString();
-		const password = data.get('password')?.toString();
+  default: async ({ request, cookies }) => {
+    const data = await request.formData();
+    const email = data.get("email")?.toString();
+    const password = data.get("password")?.toString();
 
-		if (!email || !password) {
-			return fail(400, { error: 'Email and password are required' });
-		}
+    if (!email || !password) {
+      return fail(400, { error: "Email and password are required" });
+    }
 
-		try {
-			const result = await auth.api.signIn.email({
-				body: {
-					email,
-					password
-				}
-			});
+    try {
+      const result = await auth.api.signIn.email({
+        body: {
+          email,
+          password,
+        },
+      });
 
-			if (!result.user) {
-				return fail(400, { error: 'Invalid email or password' });
-			}
+      if (!result.user) {
+        return fail(400, { error: "Invalid email or password" });
+      }
 
-			// Check if email is verified
-			if (!result.user.emailVerified) {
-				return fail(400, {
-					error: 'Please verify your email before signing in'
-				});
-			}
+      // Check if email is verified
+      if (!result.user.emailVerified) {
+        return fail(400, {
+          error: "Please verify your email before signing in",
+        });
+      }
 
-			// Set session cookie
-			cookies.set('better-auth.session_token', result.token, {
-				path: '/',
-				httpOnly: true,
-				sameSite: 'lax',
-				secure: process.env.NODE_ENV === 'production',
-				maxAge: 60 * 60 * 24 * 7 // 7 days
-			});
+      // Set session cookie
+      cookies.set("better-auth.session_token", result.token, {
+        path: "/",
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production",
+        maxAge: 60 * 60 * 24 * 7, // 7 days
+      });
 
-			throw redirect(303, '/workspaces');
-		} catch (error: any) {
-			return fail(400, { error: 'Invalid email or password' });
-		}
-	}
+      throw redirect(303, "/workspaces");
+    } catch (error: any) {
+      return fail(400, { error: "Invalid email or password" });
+    }
+  },
 };
 ```
 
 ```typescript
 // src/routes/logout/+server.ts
-import { redirect } from '@sveltejs/kit';
-import { auth } from '$lib/server/auth';
-import type { RequestHandler } from './$types';
+import { redirect } from "@sveltejs/kit";
+import { auth } from "$lib/server/auth";
+import type { RequestHandler } from "./$types";
 
 export const POST: RequestHandler = async ({ cookies, locals }) => {
-	if (locals.session) {
-		await auth.api.signOut({
-			headers: {
-				authorization: `Bearer ${locals.session.token}`
-			}
-		});
-	}
+  if (locals.session) {
+    await auth.api.signOut({
+      headers: {
+        authorization: `Bearer ${locals.session.token}`,
+      },
+    });
+  }
 
-	cookies.delete('better-auth.session_token', { path: '/' });
+  cookies.delete("better-auth.session_token", { path: "/" });
 
-	throw redirect(303, '/login');
+  throw redirect(303, "/login");
 };
 ```
 
@@ -677,14 +712,14 @@ Enable GitHub OAuth for easy sign-in.
 
 ```typescript
 // src/routes/api/auth/github/+server.ts
-import { auth } from '$lib/server/auth';
-import type { RequestHandler } from './$types';
+import { auth } from "$lib/server/auth";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async (event) => {
-	return auth.api.signIn.social({
-		provider: 'github',
-		request: event.request
-	});
+  return auth.api.signIn.social({
+    provider: "github",
+    request: event.request,
+  });
 };
 ```
 
@@ -692,30 +727,30 @@ export const GET: RequestHandler = async (event) => {
 
 ```typescript
 // src/routes/api/auth/github/callback/+server.ts
-import { auth } from '$lib/server/auth';
-import { redirect } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { auth } from "$lib/server/auth";
+import { redirect } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async (event) => {
-	const result = await auth.api.callback.social({
-		provider: 'github',
-		request: event.request
-	});
+  const result = await auth.api.callback.social({
+    provider: "github",
+    request: event.request,
+  });
 
-	if (result.user) {
-		// Set session cookie
-		event.cookies.set('better-auth.session_token', result.token, {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'lax',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 7
-		});
+  if (result.user) {
+    // Set session cookie
+    event.cookies.set("better-auth.session_token", result.token, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
-		throw redirect(303, '/workspaces');
-	}
+    throw redirect(303, "/workspaces");
+  }
 
-	throw redirect(303, '/login?error=oauth_failed');
+  throw redirect(303, "/login?error=oauth_failed");
 };
 ```
 
@@ -731,24 +766,24 @@ Implement simple route protection.
 
 ```typescript
 // src/lib/server/guards.ts
-import { redirect, error } from '@sveltejs/kit';
-import type { RequestEvent } from '@sveltejs/kit';
+import { redirect, error } from "@sveltejs/kit";
+import type { RequestEvent } from "@sveltejs/kit";
 
 export function requireAuth(event: RequestEvent) {
-	if (!event.locals.user) {
-		throw redirect(303, `/login?redirect=${event.url.pathname}`);
-	}
-	return event.locals.user;
+  if (!event.locals.user) {
+    throw redirect(303, `/login?redirect=${event.url.pathname}`);
+  }
+  return event.locals.user;
 }
 
 export function requireEmailVerified(event: RequestEvent) {
-	const user = requireAuth(event);
+  const user = requireAuth(event);
 
-	if (!user.emailVerified) {
-		throw error(403, 'Please verify your email to access this page');
-	}
+  if (!user.emailVerified) {
+    throw error(403, "Please verify your email to access this page");
+  }
 
-	return user;
+  return user;
 }
 ```
 
@@ -756,14 +791,14 @@ export function requireEmailVerified(event: RequestEvent) {
 
 ```typescript
 // src/routes/(app)/workspaces/+layout.server.ts
-import { requireAuth } from '$lib/server/guards';
-import type { LayoutServerLoad } from './$types';
+import { requireAuth } from "$lib/server/guards";
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async (event) => {
-	const user = requireAuth(event);
+  const user = requireAuth(event);
 
-	// User is authenticated, continue loading
-	return { user };
+  // User is authenticated, continue loading
+  return { user };
 };
 ```
 
@@ -785,58 +820,72 @@ npm install @casl/ability
 
 ```typescript
 // src/lib/server/permissions.ts
-import { AbilityBuilder, createMongoAbility, type MongoAbility } from '@casl/ability';
-import type { User } from 'better-auth';
+import {
+  AbilityBuilder,
+  createMongoAbility,
+  type MongoAbility,
+} from "@casl/ability";
+import type { User } from "better-auth";
 
-type Actions = 'create' | 'read' | 'update' | 'delete' | 'manage';
-type Subjects = 'Workspace' | 'Page' | 'WorkspaceMember' | 'all';
+type Actions = "create" | "read" | "update" | "delete" | "manage";
+type Subjects = "Workspace" | "Page" | "WorkspaceMember" | "all";
 
 export type AppAbility = MongoAbility<[Actions, Subjects]>;
 
-export function defineAbilitiesFor(user: User, workspace?: any, membership?: any): AppAbility {
-	const { can, cannot, build } = new AbilityBuilder<AppAbility>(createMongoAbility);
+export function defineAbilitiesFor(
+  user: User,
+  workspace?: any,
+  membership?: any
+): AppAbility {
+  const { can, cannot, build } = new AbilityBuilder<AppAbility>(
+    createMongoAbility
+  );
 
-	if (!user) {
-		// Unauthenticated users can't do anything
-		return build();
-	}
+  if (!user) {
+    // Unauthenticated users can't do anything
+    return build();
+  }
 
-	// Everyone can read public workspaces
-	can('read', 'Workspace', { isPublic: true });
+  // Everyone can read public workspaces
+  can("read", "Workspace", { isPublic: true });
 
-	if (membership) {
-		// Workspace member permissions
-		const role = membership.role;
+  if (membership) {
+    // Workspace member permissions
+    // Role-based access control (RBAC)
+    const role = membership.role;
 
-		// All members can read workspace content
-		can('read', 'Workspace', { id: workspace.id });
-		can('read', 'Page', { workspaceId: workspace.id });
+    // All members can read workspace content
+    // can(action, subject, conditions)
+    can("read", "Workspace", { id: workspace.id });
+    can("read", "Page", { workspaceId: workspace.id });
 
-		if (role === 'owner') {
-			// Owners can do everything
-			can('manage', 'all', { workspaceId: workspace.id });
-			can('delete', 'Workspace', { id: workspace.id });
-		} else if (role === 'admin') {
-			// Admins can manage content but not delete workspace
-			can('create', 'Page', { workspaceId: workspace.id });
-			can('update', 'Page', { workspaceId: workspace.id });
-			can('delete', 'Page', { workspaceId: workspace.id });
-			can('update', 'Workspace', { id: workspace.id });
-			can('create', 'WorkspaceMember', { workspaceId: workspace.id });
-			can('update', 'WorkspaceMember', { workspaceId: workspace.id });
-		} else if (role === 'member') {
-			// Members can create and edit their own pages
-			can('create', 'Page', { workspaceId: workspace.id });
-			can('update', 'Page', { workspaceId: workspace.id, authorId: user.id });
-			can('delete', 'Page', { workspaceId: workspace.id, authorId: user.id });
-		} else if (role === 'viewer') {
-			// Viewers can only read
-			can('read', 'Workspace', { id: workspace.id });
-			can('read', 'Page', { workspaceId: workspace.id });
-		}
-	}
+    if (role === "owner") {
+      // Owners can do everything
+      // 'manage' + 'all' = super admin permission
+      can("manage", "all", { workspaceId: workspace.id });
+      // Including deleting the entire workspace
+      can("delete", "Workspace", { id: workspace.id });
+    } else if (role === "admin") {
+      // Admins can manage content but not delete workspace
+      can("create", "Page", { workspaceId: workspace.id });
+      can("update", "Page", { workspaceId: workspace.id });
+      can("delete", "Page", { workspaceId: workspace.id });
+      can("update", "Workspace", { id: workspace.id });
+      can("create", "WorkspaceMember", { workspaceId: workspace.id });
+      can("update", "WorkspaceMember", { workspaceId: workspace.id });
+    } else if (role === "member") {
+      // Members can create and edit their own pages
+      can("create", "Page", { workspaceId: workspace.id });
+      can("update", "Page", { workspaceId: workspace.id, authorId: user.id });
+      can("delete", "Page", { workspaceId: workspace.id, authorId: user.id });
+    } else if (role === "viewer") {
+      // Viewers can only read
+      can("read", "Workspace", { id: workspace.id });
+      can("read", "Page", { workspaceId: workspace.id });
+    }
+  }
 
-	return build();
+  return build();
 }
 ```
 
@@ -844,85 +893,85 @@ export function defineAbilitiesFor(user: User, workspace?: any, membership?: any
 
 ```typescript
 // src/lib/server/access.ts
-import { error } from '@sveltejs/kit';
-import { db } from './db';
-import { workspaces, workspaceMembers, pages } from './db/schema';
-import { eq, and } from 'drizzle-orm';
-import { defineAbilitiesFor } from './permissions';
-import type { RequestEvent } from '@sveltejs/kit';
+import { error } from "@sveltejs/kit";
+import { db } from "./db";
+import { workspaces, workspaceMembers, pages } from "./db/schema";
+import { eq, and } from "drizzle-orm";
+import { defineAbilitiesFor } from "./permissions";
+import type { RequestEvent } from "@sveltejs/kit";
 
 export async function checkWorkspaceAccess(
-	event: RequestEvent,
-	workspaceSlug: string,
-	action: string = 'read'
+  event: RequestEvent,
+  workspaceSlug: string,
+  action: string = "read"
 ) {
-	if (!event.locals.user) {
-		throw error(401, 'You must be logged in');
-	}
+  if (!event.locals.user) {
+    throw error(401, "You must be logged in");
+  }
 
-	// Get workspace
-	const [workspace] = await db
-		.select()
-		.from(workspaces)
-		.where(eq(workspaces.slug, workspaceSlug))
-		.limit(1);
+  // Get workspace
+  const [workspace] = await db
+    .select()
+    .from(workspaces)
+    .where(eq(workspaces.slug, workspaceSlug))
+    .limit(1);
 
-	if (!workspace) {
-		throw error(404, 'Workspace not found');
-	}
+  if (!workspace) {
+    throw error(404, "Workspace not found");
+  }
 
-	// Get membership
-	const [membership] = await db
-		.select()
-		.from(workspaceMembers)
-		.where(
-			and(
-				eq(workspaceMembers.workspaceId, workspace.id),
-				eq(workspaceMembers.userId, event.locals.user.id)
-			)
-		)
-		.limit(1);
+  // Get membership
+  const [membership] = await db
+    .select()
+    .from(workspaceMembers)
+    .where(
+      and(
+        eq(workspaceMembers.workspaceId, workspace.id),
+        eq(workspaceMembers.userId, event.locals.user.id)
+      )
+    )
+    .limit(1);
 
-	// Define abilities
-	const ability = defineAbilitiesFor(event.locals.user, workspace, membership);
+  // Define abilities
+  const ability = defineAbilitiesFor(event.locals.user, workspace, membership);
 
-	// Check permission
-	if (!ability.can(action as any, 'Workspace', workspace)) {
-		throw error(403, 'You do not have permission to perform this action');
-	}
+  // Check permission
+  if (!ability.can(action as any, "Workspace", workspace)) {
+    throw error(403, "You do not have permission to perform this action");
+  }
 
-	return { workspace, membership, ability };
+  return { workspace, membership, ability };
 }
 
 export async function checkPageAccess(
-	event: RequestEvent,
-	workspaceSlug: string,
-	pageId: number,
-	action: string = 'read'
+  event: RequestEvent,
+  workspaceSlug: string,
+  pageId: number,
+  action: string = "read"
 ) {
-	const { workspace, membership, ability } = await checkWorkspaceAccess(
-		event,
-		workspaceSlug,
-		'read'
-	);
+  const { workspace, membership, ability } = await checkWorkspaceAccess(
+    event,
+    workspaceSlug,
+    "read"
+  );
 
-	// Get page
-	const [page] = await db
-		.select()
-		.from(pages)
-		.where(and(eq(pages.id, pageId), eq(pages.workspaceId, workspace.id)))
-		.limit(1);
+  // Get page
+  const [page] = await db
+    .select()
+    .from(pages)
+    .where(and(eq(pages.id, pageId), eq(pages.workspaceId, workspace.id)))
+    .limit(1);
 
-	if (!page) {
-		throw error(404, 'Page not found');
-	}
+  if (!page) {
+    throw error(404, "Page not found");
+  }
 
-	// Check page permission
-	if (!ability.can(action as any, 'Page', page)) {
-		throw error(403, 'You do not have permission to perform this action');
-	}
+  // Check page permission
+  if (!ability.can(action as any, "Page", page)) {
+    throw error(403, "You do not have permission to perform this action");
+  }
 
-	return { workspace, membership, page, ability };
+  return { workspace, membership, page, ability };
 }
 ```
 
@@ -949,32 +998,37 @@ Let's build a complete authenticated multi-tenant workspace platform!
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/+layout.server.ts
-import { checkWorkspaceAccess } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { pages } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { LayoutServerLoad } from './$types';
+import { checkWorkspaceAccess } from "$lib/server/access";
+import { db } from "$lib/server/db";
+import { pages } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async (event) => {
-	const { workspace, membership, ability } = await checkWorkspaceAccess(event, event.params.slug);
+  const { workspace, membership, ability } = await checkWorkspaceAccess(
+    event,
+    event.params.slug
+  );
 
-	// Load workspace pages
-	const workspacePages = await db
-		.select()
-		.from(pages)
-		.where(eq(pages.workspaceId, workspace.id))
-		.orderBy(pages.updatedAt);
+  // Load workspace pages
+  const workspacePages = await db
+    .select()
+    .from(pages)
+    .where(eq(pages.workspaceId, workspace.id))
+    .orderBy(pages.updatedAt);
 
-	return {
-		workspace,
-		pages: workspacePages,
-		userRole: membership?.role || null,
-		permissions: {
-			canCreatePage: ability.can('create', 'Page', { workspaceId: workspace.id }),
-			canUpdateWorkspace: ability.can('update', 'Workspace', workspace),
-			canDeleteWorkspace: ability.can('delete', 'Workspace', workspace)
-		}
-	};
+  return {
+    workspace,
+    pages: workspacePages,
+    userRole: membership?.role || null,
+    permissions: {
+      canCreatePage: ability.can("create", "Page", {
+        workspaceId: workspace.id,
+      }),
+      canUpdateWorkspace: ability.can("update", "Workspace", workspace),
+      canDeleteWorkspace: ability.can("delete", "Workspace", workspace),
+    },
+  };
 };
 ```
 
@@ -982,54 +1036,66 @@ export const load: LayoutServerLoad = async (event) => {
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/settings/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { checkWorkspaceAccess } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { workspaces } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { checkWorkspaceAccess } from "$lib/server/access";
+import { db } from "$lib/server/db";
+import { workspaces } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-	// Require update permission
-	const { workspace, ability } = await checkWorkspaceAccess(event, event.params.slug, 'update');
+  // Require update permission
+  const { workspace, ability } = await checkWorkspaceAccess(
+    event,
+    event.params.slug,
+    "update"
+  );
 
-	return {
-		workspace,
-		canDelete: ability.can('delete', 'Workspace', workspace)
-	};
+  return {
+    workspace,
+    canDelete: ability.can("delete", "Workspace", workspace),
+  };
 };
 
 export const actions: Actions = {
-	update: async (event) => {
-		const { workspace } = await checkWorkspaceAccess(event, event.params.slug, 'update');
+  update: async (event) => {
+    const { workspace } = await checkWorkspaceAccess(
+      event,
+      event.params.slug,
+      "update"
+    );
 
-		const data = await event.request.formData();
-		const name = data.get('name')?.toString();
-		const description = data.get('description')?.toString();
+    const data = await event.request.formData();
+    const name = data.get("name")?.toString();
+    const description = data.get("description")?.toString();
 
-		if (!name) {
-			return fail(400, { error: 'Name is required' });
-		}
+    if (!name) {
+      return fail(400, { error: "Name is required" });
+    }
 
-		await db
-			.update(workspaces)
-			.set({
-				name,
-				description,
-				updatedAt: new Date()
-			})
-			.where(eq(workspaces.id, workspace.id));
+    await db
+      .update(workspaces)
+      .set({
+        name,
+        description,
+        updatedAt: new Date(),
+      })
+      .where(eq(workspaces.id, workspace.id));
 
-		return { success: true };
-	},
+    return { success: true };
+  },
 
-	delete: async (event) => {
-		const { workspace } = await checkWorkspaceAccess(event, event.params.slug, 'delete');
+  delete: async (event) => {
+    const { workspace } = await checkWorkspaceAccess(
+      event,
+      event.params.slug,
+      "delete"
+    );
 
-		await db.delete(workspaces).where(eq(workspaces.id, workspace.id));
+    await db.delete(workspaces).where(eq(workspaces.id, workspace.id));
 
-		throw redirect(303, '/workspaces');
-	}
+    throw redirect(303, "/workspaces");
+  },
 };
 ```
 
@@ -1037,52 +1103,52 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/(app)/workspaces/[slug]/pages/[pageId]/edit/+page.server.ts
-import { fail, redirect } from '@sveltejs/kit';
-import { checkPageAccess } from '$lib/server/access';
-import { db } from '$lib/server/db';
-import { pages } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad } from './$types';
+import { fail, redirect } from "@sveltejs/kit";
+import { checkPageAccess } from "$lib/server/access";
+import { db } from "$lib/server/db";
+import { pages } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { Actions, PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async (event) => {
-	const { page } = await checkPageAccess(
-		event,
-		event.params.slug,
-		parseInt(event.params.pageId),
-		'update'
-	);
+  const { page } = await checkPageAccess(
+    event,
+    event.params.slug,
+    parseInt(event.params.pageId),
+    "update"
+  );
 
-	return { page };
+  return { page };
 };
 
 export const actions: Actions = {
-	default: async (event) => {
-		const { page, workspace } = await checkPageAccess(
-			event,
-			event.params.slug,
-			parseInt(event.params.pageId),
-			'update'
-		);
+  default: async (event) => {
+    const { page, workspace } = await checkPageAccess(
+      event,
+      event.params.slug,
+      parseInt(event.params.pageId),
+      "update"
+    );
 
-		const data = await event.request.formData();
-		const title = data.get('title')?.toString();
-		const content = data.get('content')?.toString();
+    const data = await event.request.formData();
+    const title = data.get("title")?.toString();
+    const content = data.get("content")?.toString();
 
-		if (!title) {
-			return fail(400, { error: 'Title is required' });
-		}
+    if (!title) {
+      return fail(400, { error: "Title is required" });
+    }
 
-		await db
-			.update(pages)
-			.set({
-				title,
-				content,
-				updatedAt: new Date()
-			})
-			.where(eq(pages.id, page.id));
+    await db
+      .update(pages)
+      .set({
+        title,
+        content,
+        updatedAt: new Date(),
+      })
+      .where(eq(pages.id, page.id));
 
-		throw redirect(303, `/workspaces/${workspace.slug}/pages/${page.id}`);
-	}
+    throw redirect(303, `/workspaces/${workspace.slug}/pages/${page.id}`);
+  },
 };
 ```
 

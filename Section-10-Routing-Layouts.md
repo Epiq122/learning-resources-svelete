@@ -155,10 +155,14 @@ src/routes/
 
 	function handleSubmit() {
 		// Process form...
+		// Programmatic navigation to success page
+		// goto() performs client-side navigation (no full page reload)
 		goto('/success');
 	}
 
 	function goBack() {
+		// Navigate back one page in browser history
+		// Equivalent to browser back button
 		goto(-1); // Go back one page
 	}
 </script>
@@ -347,6 +351,8 @@ src/routes/
 		</div>
 
 		<!-- Page content -->
+		<!-- CRITICAL: {@render children()} is where child pages render -->
+		<!-- This is the Svelte 5 way (replaces <slot /> from Svelte 4) -->
 		<div class="p-4">
 			{@render children()}
 		</div>

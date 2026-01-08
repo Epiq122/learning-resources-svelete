@@ -85,15 +85,20 @@ Create:
 
 	const proxyTarget = { name: 'John', age: 30, city: 'NYC' };
 
+	// Proxy handler intercepts all property access and modifications
 	const proxyHandler = {
+		// get() runs whenever a property is read
 		get(target: any, prop: string) {
+			// Log the property access and return the value
 			accessLog = [...accessLog, `READ: ${prop} = ${target[prop]}`];
 			return target[prop];
 		},
+		// set() runs whenever a property is written to
 		set(target: any, prop: string, value: any) {
+			// Log the modification and update the target object
 			accessLog = [...accessLog, `WRITE: ${prop} = ${value}`];
 			target[prop] = value;
-			return true;
+			return true; // Must return true to indicate success
 		}
 	};
 
@@ -110,26 +115,32 @@ Create:
 
 	// Example 3: Validation with Setters
 	class ValidatedUser {
+		// Private fields store the actual values (underscore prefix convention)
 		private _email: string = '';
 		private _age: number = 0;
+		// Reactive state for validation errors
 		errors = $state<string[]>([]);
 
+		// Getter provides read access to email
 		get email() {
 			return this._email;
 		}
 
+		// Setter runs validation automatically whenever email is assigned
 		set email(value: string) {
 			this._email = value;
-			this.validateEmail();
+			this.validateEmail(); // Auto-validate on every change
 		}
 
+		// Getter provides read access to age
 		get age() {
 			return this._age;
 		}
 
+		// Setter runs validation automatically whenever age is assigned
 		set age(value: number) {
 			this._age = value;
-			this.validateAge();
+			this.validateAge(); // Auto-validate on every change
 		}
 
 		private validateEmail() {
@@ -345,21 +356,24 @@ Create:
 		updateLog = [...updateLog, `${new Date().toLocaleTimeString()}: ${message}`];
 	}
 
-	// Deep mutations
+	// Deep mutations - modify deeply nested properties directly
 	function updateNestedAddress() {
+		// Svelte 5 tracks deep changes - no need for spreading or reassignment!
 		user.address.city = 'Los Angeles';
 		user.address.zip = '90001';
 		logUpdate('Updated nested address');
 	}
 
 	function toggleNotification(type: 'email' | 'push' | 'sms') {
+		// Directly toggle a deeply nested boolean - UI updates automatically
 		user.settings.notifications[type] = !user.settings.notifications[type];
 		logUpdate(`Toggled ${type} notification`);
 	}
 
 	function addTag() {
+		// Array mutations like push() are automatically reactive in Svelte 5
 		const newTag = `tag-${user.tags.length + 1}`;
-		user.tags.push(newTag);
+		user.tags.push(newTag); // No reassignment needed!
 		logUpdate(`Added tag: ${newTag}`);
 	}
 
@@ -545,11 +559,13 @@ Create:
 	const discountAmount = $derived(subtotal * discount);
 	const total = $derived(subtotal - discountAmount);
 
-	// 🔍 DEBUG: Inspect state changes
+	// 🔍 DEBUG: $inspect() logs state changes to console automatically
+	// Logs whenever 'cart' changes, with the type of change and new value
 	$inspect(cart).with((type, value) => {
 		console.log(`Cart ${type}:`, value);
 	});
 
+	// Inspect multiple values at once - logs when ANY of them change
 	$inspect(subtotal, total).with(() => {
 		console.log(`Totals - Subtotal: $${subtotal}, Total: $${total}`);
 	});
@@ -1131,10 +1147,11 @@ In Svelte 5, direct array mutations (push, pop, splice, etc.) are automatically 
 		actionLog.push(`[${new Date().toLocaleTimeString()}] ${action}`);
 	}
 
-	// PUSH - Add to end
+	// PUSH - Add to end (automatically reactive in Svelte 5)
 	function addMessage() {
 		if (!newMessageText.trim()) return;
 
+		// Direct array.push() triggers reactivity - UI updates automatically!
 		messages.push({
 			id: Date.now(),
 			text: newMessageText,
@@ -1146,8 +1163,9 @@ In Svelte 5, direct array mutations (push, pop, splice, etc.) are automatically 
 		newMessageText = '';
 	}
 
-	// POP - Remove from end
+	// POP - Remove from end (automatically reactive)
 	function removeLastMessage() {
+		// pop() returns the removed item and triggers reactivity
 		const removed = messages.pop();
 		if (removed) {
 			logAction(`POP: Removed message from ${removed.author}`);

@@ -60,21 +60,25 @@ SvelteKit adapters configure your app for different deployment targets.
 // svelte.config.js
 
 // 1. Auto (recommended for most cases)
-import adapter from '@sveltejs/adapter-auto';
+// Automatically detects platform from environment variables
+import adapter from "@sveltejs/adapter-auto";
 
 // 2. Node (VPS, Docker, traditional hosting)
-import adapter from '@sveltejs/adapter-node';
+// Outputs a Node.js server that runs anywhere
+import adapter from "@sveltejs/adapter-node";
 
 // 3. Static (pre-rendered only, no SSR)
-import adapter from '@sveltejs/adapter-static';
+// Outputs plain HTML/CSS/JS files (no server needed)
+import adapter from "@sveltejs/adapter-static";
 
 // 4. Vercel (optimized for Vercel)
-import adapter from '@sveltejs/adapter-vercel';
+// Supports Vercel-specific features (Edge Functions, ISR)
+import adapter from "@sveltejs/adapter-vercel";
 
 const config = {
-	kit: {
-		adapter: adapter()
-	}
+  kit: {
+    adapter: adapter(), // Pass options to customize build output
+  },
 };
 
 export default config;
@@ -158,20 +162,20 @@ DATABASE_URL="your-neon-url" npm run db:migrate
 
 ```typescript
 // drizzle.config.ts
-import type { Config } from 'drizzle-kit';
-import { config } from 'dotenv';
+import type { Config } from "drizzle-kit";
+import { config } from "dotenv";
 
 config(); // Load .env
 
 export default {
-	schema: './src/lib/server/db/schema.ts',
-	out: './drizzle',
-	driver: 'pg',
-	dbCredentials: {
-		connectionString: process.env.DATABASE_URL!
-	},
-	verbose: true,
-	strict: true
+  schema: "./src/lib/server/db/schema.ts",
+  out: "./drizzle",
+  driver: "pg",
+  dbCredentials: {
+    connectionString: process.env.DATABASE_URL!,
+  },
+  verbose: true,
+  strict: true,
 } satisfies Config;
 ```
 
@@ -179,16 +183,16 @@ export default {
 
 ```typescript
 // src/lib/server/db/index.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { DATABASE_URL } from '$env/dynamic/private';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { DATABASE_URL } from "$env/dynamic/private";
+import * as schema from "./schema";
 
 // Neon connection with pooling
 const client = postgres(DATABASE_URL!, {
-	max: 10, // Max connections
-	idle_timeout: 20,
-	connect_timeout: 10
+  max: 10, // Max connections
+  idle_timeout: 20,
+  connect_timeout: 10,
 });
 
 export const db = drizzle(client, { schema });
@@ -197,11 +201,16 @@ export const db = drizzle(client, { schema });
 **Neon-specific optimizations:**
 
 ```typescript
-// Use connection pooler for serverless
-const pooledUrl = DATABASE_URL!.replace('.aws.neon.tech', '-pooler.aws.neon.tech');
+// Use connection pooler for serverless (Vercel, Netlify)
+// Pooler prevents "too many connections" errors on serverless
+const pooledUrl = DATABASE_URL!.replace(
+  ".aws.neon.tech",
+  "-pooler.aws.neon.tech"
+);
 
 const client = postgres(pooledUrl, {
-	prepare: false // Required for pooled connections
+  prepare: false, // Disable prepared statements for PgBouncer compatibility
+  // Poolers use transaction mode, not session mode
 });
 ```
 
@@ -225,24 +234,26 @@ npm install -D @sveltejs/adapter-node
 
 ```typescript
 // svelte.config.js
-import adapter from '@sveltejs/adapter-node';
+import adapter from "@sveltejs/adapter-node";
 
 const config = {
-	kit: {
-		adapter: adapter({
-			// Output directory
-			out: 'build',
+  kit: {
+    adapter: adapter({
+      // Where to output the built server (default: 'build')
+      out: "build",
 
-			// Precompress files
-			precompress: true,
+      // Pre-compress static assets as .gz and .br files
+      // Reduces bandwidth by 70-80% if your server supports it
+      precompress: true,
 
-			// Environment variable prefix
-			envPrefix: '',
+      // Prefix for environment variables (default: '')
+      // Set to 'CUSTOM_' to only load vars starting with CUSTOM_
+      envPrefix: "",
 
-			// Polyfill fetch for Node < 18
-			polyfill: false
-		})
-	}
+      // Polyfill fetch API for Node < 18 (not needed in 2026)
+      polyfill: false,
+    }),
+  },
 };
 
 export default config;
@@ -287,12 +298,12 @@ npm run preview
 ```json
 // package.json
 {
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "node build/index.js",
-		"start": "NODE_ENV=production node build/index.js"
-	}
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "node build/index.js",
+    "start": "NODE_ENV=production node build/index.js"
+  }
 }
 ```
 
@@ -300,23 +311,23 @@ npm run preview
 
 ```javascript
 // server.js (optional)
-import { handler } from './build/handler.js';
-import express from 'express';
+import { handler } from "./build/handler.js";
+import express from "express";
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 // Custom middleware
 app.use((req, res, next) => {
-	console.log(`${req.method} ${req.path}`);
-	next();
+  console.log(`${req.method} ${req.path}`);
+  next();
 });
 
 // SvelteKit handler
 app.use(handler);
 
 app.listen(port, () => {
-	console.log(`Server running on port ${port}`);
+  console.log(`Server running on port ${port}`);
 });
 ```
 
@@ -364,39 +375,40 @@ flyctl auth login
 
 ```dockerfile
 # Dockerfile
+# Stage 1: Build stage (contains dev dependencies)
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
+# Copy package files first (better Docker layer caching)
 COPY package*.json ./
 
-# Install dependencies
+# Install ALL dependencies (including devDependencies for build)
 RUN npm ci
 
-# Copy source
+# Copy source code
 COPY . .
 
-# Build app
+# Build the SvelteKit app (creates /build directory)
 RUN npm run build
 
-# Remove dev dependencies
+# Remove devDependencies to reduce final image size
 RUN npm prune --production
 
-# Production stage
+# Stage 2: Production stage (minimal, production-only)
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Copy built app and dependencies
+# Copy ONLY what's needed to run (not source code)
 COPY --from=builder /app/build ./build
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
-# Expose port
+# Expose port (must match your PORT env var)
 EXPOSE 3000
 
-# Start app
+# Start the Node.js server
 CMD ["node", "build/index.js"]
 ```
 
@@ -497,31 +509,31 @@ flyctl scale count 2
 
 ```typescript
 // src/routes/api/health/+server.ts
-import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
-	try {
-		// Check database connection
-		await db.execute('SELECT 1');
+  try {
+    // Check database connection
+    await db.execute("SELECT 1");
 
-		return json({
-			status: 'healthy',
-			timestamp: new Date().toISOString(),
-			database: 'connected'
-		});
-	} catch (error) {
-		return json(
-			{
-				status: 'unhealthy',
-				timestamp: new Date().toISOString(),
-				database: 'disconnected',
-				error: error.message
-			},
-			{ status: 503 }
-		);
-	}
+    return json({
+      status: "healthy",
+      timestamp: new Date().toISOString(),
+      database: "connected",
+    });
+  } catch (error) {
+    return json(
+      {
+        status: "unhealthy",
+        timestamp: new Date().toISOString(),
+        database: "disconnected",
+        error: error.message,
+      },
+      { status: 503 }
+    );
+  }
 };
 ```
 
@@ -558,26 +570,29 @@ npm install -g vercel
 
 ```typescript
 // svelte.config.js
-import adapter from '@sveltejs/adapter-vercel';
+import adapter from "@sveltejs/adapter-vercel";
 
 const config = {
-	kit: {
-		adapter: adapter({
-			// Runtime for serverless functions
-			runtime: 'nodejs20.x',
+  kit: {
+    adapter: adapter({
+      // Node.js version for serverless functions (default: 18.x)
+      runtime: "nodejs20.x",
 
-			// Edge functions for specific routes
-			edge: false,
+      // Use Edge Runtime globally (faster, but limited APIs)
+      // Set to false to use per-route (recommended)
+      edge: false,
 
-			// External packages (not bundled)
-			external: [],
+      // Exclude packages from bundle (e.g., native modules)
+      // external: ['sharp', 'prisma']
+      external: [],
 
-			// ISR (Incremental Static Regeneration)
-			isr: {
-				expiration: 60 // Revalidate after 60 seconds
-			}
-		})
-	}
+      // ISR: Cache pages and regenerate in background
+      // Great for content sites that update periodically
+      isr: {
+        expiration: 60, // Revalidate every 60 seconds
+      },
+    }),
+  },
 };
 
 export default config;
@@ -621,21 +636,21 @@ Project Settings → Environment Variables
 ```json
 // vercel.json (optional)
 {
-	"buildCommand": "npm run build",
-	"devCommand": "npm run dev",
-	"installCommand": "npm install",
-	"framework": "sveltekit",
-	"outputDirectory": ".vercel/output",
-	"regions": ["iad1"],
-	"env": {
-		"NODE_ENV": "production"
-	},
-	"functions": {
-		"api/**": {
-			"memory": 1024,
-			"maxDuration": 10
-		}
-	}
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "framework": "sveltekit",
+  "outputDirectory": ".vercel/output",
+  "regions": ["iad1"],
+  "env": {
+    "NODE_ENV": "production"
+  },
+  "functions": {
+    "api/**": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
 }
 ```
 
@@ -643,18 +658,18 @@ Project Settings → Environment Variables
 
 ```typescript
 // src/routes/api/fast/+server.ts
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const config = {
-	runtime: 'edge' // Run on Edge network
+  runtime: "edge", // Run on Edge network
 };
 
 export const GET: RequestHandler = async () => {
-	return json({
-		message: 'This runs on Vercel Edge Network',
-		timestamp: Date.now()
-	});
+  return json({
+    message: "This runs on Vercel Edge Network",
+    timestamp: Date.now(),
+  });
 };
 ```
 
@@ -662,18 +677,18 @@ export const GET: RequestHandler = async () => {
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 export const config = {
-	isr: {
-		expiration: 60 // Revalidate every 60 seconds
-	}
+  isr: {
+    expiration: 60, // Revalidate every 60 seconds
+  },
 };
 
 export const load: PageServerLoad = async ({ params }) => {
-	// This page is cached and regenerated every 60 seconds
-	const post = await fetchPost(params.slug);
-	return { post };
+  // This page is cached and regenerated every 60 seconds
+  const post = await fetchPost(params.slug);
+  return { post };
 };
 ```
 
@@ -682,31 +697,31 @@ export const load: PageServerLoad = async ({ params }) => {
 ```json
 // vercel.json
 {
-	"crons": [
-		{
-			"path": "/api/cron/cleanup",
-			"schedule": "0 0 * * *"
-		}
-	]
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 0 * * *"
+    }
+  ]
 }
 ```
 
 ```typescript
 // src/routes/api/cron/cleanup/+server.ts
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ request }) => {
-	// Verify cron secret
-	const authHeader = request.headers.get('authorization');
-	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-		return json({ error: 'Unauthorized' }, { status: 401 });
-	}
+  // Verify cron secret
+  const authHeader = request.headers.get("authorization");
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return json({ error: "Unauthorized" }, { status: 401 });
+  }
 
-	// Cleanup logic
-	await cleanupOldData();
+  // Cleanup logic
+  await cleanupOldData();
 
-	return json({ success: true });
+  return json({ success: true });
 };
 ```
 
@@ -776,34 +791,34 @@ SENTRY_DSN=your_sentry_dsn
 
 ```typescript
 // svelte.config.js
-import adapter from '@sveltejs/adapter-auto';
-import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import adapter from "@sveltejs/adapter-auto";
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
-const isVercel = process.env.VERCEL === '1';
+const isVercel = process.env.VERCEL === "1";
 const isFly = process.env.FLY_APP_NAME !== undefined;
 
 const config = {
-	preprocess: vitePreprocess(),
+  preprocess: vitePreprocess(),
 
-	kit: {
-		adapter: adapter(),
+  kit: {
+    adapter: adapter(),
 
-		env: {
-			publicPrefix: 'PUBLIC_'
-		},
+    env: {
+      publicPrefix: "PUBLIC_",
+    },
 
-		csrf: {
-			checkOrigin: true
-		},
+    csrf: {
+      checkOrigin: true,
+    },
 
-		// Rate limiting
-		inlineStyleThreshold: 1024,
+    // Rate limiting
+    inlineStyleThreshold: 1024,
 
-		alias: {
-			$lib: './src/lib',
-			$components: './src/lib/components'
-		}
-	}
+    alias: {
+      $lib: "./src/lib",
+      $components: "./src/lib/components",
+    },
+  },
 };
 
 export default config;
@@ -813,59 +828,69 @@ export default config;
 
 ```typescript
 // src/hooks.server.ts
-import { sequence } from '@sveltejs/kit/hooks';
-import { auth } from '$lib/server/auth';
-import { handleErrorWithSentry, sentryHandle } from '@sentry/sveltekit';
-import * as Sentry from '@sentry/sveltekit';
-import type { Handle, HandleServerError } from '@sveltejs/kit';
+import { sequence } from "@sveltejs/kit/hooks";
+import { auth } from "$lib/server/auth";
+import { handleErrorWithSentry, sentryHandle } from "@sentry/sveltekit";
+import * as Sentry from "@sentry/sveltekit";
+import type { Handle, HandleServerError } from "@sveltejs/kit";
 
 // Initialize Sentry in production
-if (process.env.NODE_ENV === 'production') {
-	Sentry.init({
-		dsn: process.env.SENTRY_DSN,
-		tracesSampleRate: 1.0,
-		environment: process.env.VERCEL ? 'vercel' : 'fly'
-	});
+if (process.env.NODE_ENV === "production") {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    tracesSampleRate: 1.0,
+    environment: process.env.VERCEL ? "vercel" : "fly",
+  });
 }
 
 // Auth handler
 const handleAuth: Handle = async ({ event, resolve }) => {
-	const session = await auth.api.getSession({
-		headers: event.request.headers
-	});
+  const session = await auth.api.getSession({
+    headers: event.request.headers,
+  });
 
-	event.locals.user = session?.user || null;
-	event.locals.session = session?.session || null;
+  event.locals.user = session?.user || null;
+  event.locals.session = session?.session || null;
 
-	return resolve(event);
+  return resolve(event);
 };
 
 // Logging handler
 const handleLogging: Handle = async ({ event, resolve }) => {
-	const start = Date.now();
+  const start = Date.now();
 
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	const duration = Date.now() - start;
+  const duration = Date.now() - start;
 
-	console.log(`${event.request.method} ${event.url.pathname} - ${response.status} (${duration}ms)`);
+  console.log(
+    `${event.request.method} ${event.url.pathname} - ${response.status} (${duration}ms)`
+  );
 
-	return response;
+  return response;
 };
 
 // Security headers
 const handleSecurity: Handle = async ({ event, resolve }) => {
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	response.headers.set('X-Frame-Options', 'SAMEORIGIN');
-	response.headers.set('X-Content-Type-Options', 'nosniff');
-	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-	response.headers.set('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  response.headers.set("X-Frame-Options", "SAMEORIGIN");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
 
-	return response;
+  return response;
 };
 
-export const handle = sequence(sentryHandle(), handleAuth, handleLogging, handleSecurity);
+export const handle = sequence(
+  sentryHandle(),
+  handleAuth,
+  handleLogging,
+  handleSecurity
+);
 
 export const handleError = handleErrorWithSentry();
 ```
@@ -928,31 +953,31 @@ jobs:
 
 ```typescript
 // src/routes/api/health/+server.ts
-import { json } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { version } from '$app/environment';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { version } from "$app/environment";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
-	const checks: Record<string, any> = {
-		status: 'healthy',
-		timestamp: new Date().toISOString(),
-		version,
-		uptime: process.uptime(),
-		memory: process.memoryUsage()
-	};
+  const checks: Record<string, any> = {
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    version,
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+  };
 
-	// Database check
-	try {
-		await db.execute('SELECT 1');
-		checks.database = 'connected';
-	} catch (error) {
-		checks.database = 'disconnected';
-		checks.status = 'unhealthy';
-		return json(checks, { status: 503 });
-	}
+  // Database check
+  try {
+    await db.execute("SELECT 1");
+    checks.database = "connected";
+  } catch (error) {
+    checks.database = "disconnected";
+    checks.status = "unhealthy";
+    return json(checks, { status: 503 });
+  }
 
-	return json(checks);
+  return json(checks);
 };
 ```
 
@@ -960,39 +985,39 @@ export const GET: RequestHandler = async () => {
 
 ```json
 {
-	"name": "my-sveltekit-app",
-	"version": "1.0.0",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"start": "node build/index.js",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "eslint .",
-		"format": "prettier --write .",
-		"db:generate": "drizzle-kit generate:pg",
-		"db:push": "drizzle-kit push:pg",
-		"db:migrate": "tsx src/lib/server/db/migrate.ts",
-		"db:seed": "tsx src/lib/server/db/seed.ts",
-		"deploy:fly": "flyctl deploy",
-		"deploy:vercel": "vercel --prod"
-	},
-	"dependencies": {
-		"@sveltejs/kit": "^2.0.0",
-		"svelte": "^5.0.0",
-		"drizzle-orm": "^0.30.0",
-		"postgres": "^3.4.0",
-		"better-auth": "^1.0.0"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.0.0",
-		"@sveltejs/adapter-node": "^5.0.0",
-		"@sveltejs/adapter-vercel": "^5.0.0",
-		"@sveltejs/vite-plugin-svelte": "^4.0.0",
-		"drizzle-kit": "^0.20.0",
-		"vite": "^5.0.0"
-	}
+  "name": "my-sveltekit-app",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "start": "node build/index.js",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg",
+    "db:migrate": "tsx src/lib/server/db/migrate.ts",
+    "db:seed": "tsx src/lib/server/db/seed.ts",
+    "deploy:fly": "flyctl deploy",
+    "deploy:vercel": "vercel --prod"
+  },
+  "dependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "svelte": "^5.0.0",
+    "drizzle-orm": "^0.30.0",
+    "postgres": "^3.4.0",
+    "better-auth": "^1.0.0"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "^3.0.0",
+    "@sveltejs/adapter-node": "^5.0.0",
+    "@sveltejs/adapter-vercel": "^5.0.0",
+    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "drizzle-kit": "^0.20.0",
+    "vite": "^5.0.0"
+  }
 }
 ```
 

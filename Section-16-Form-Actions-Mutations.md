@@ -179,7 +179,8 @@ export const actions: Actions = {
     const email = data.get("email")?.toString();
     const password = data.get("password")?.toString();
 
-    // Validation
+    // Validation - always validate on server!
+    // Client validation is for UX, server validation is for security
     const errors: Record<string, string> = {};
 
     if (!username || username.length < 3) {
@@ -194,10 +195,14 @@ export const actions: Actions = {
       errors.password = "Password must be at least 8 characters";
     }
 
+    // If any validation errors, return fail() with 400 status
     if (Object.keys(errors).length > 0) {
+      // fail() makes errors available as 'form' prop in component
       return fail(400, {
         errors,
-        values: { username, email }, // Return values to repopulate form
+        // IMPORTANT: Return user input to repopulate form
+        // Makes better UX - don't make user retype everything
+        values: { username, email }, // DON'T return password!
       });
     }
 
@@ -345,17 +350,24 @@ export const actions: Actions = {
     }
 
     // Insert into database
+    // .insert() returns array of inserted rows
+    // Destructure [workspace] to get first (and only) row
     const [workspace] = await db
       .insert(workspaces)
       .values({
         name,
         slug,
         description: description || null,
+        // Get user ID from locals (set by hooks)
         ownerId: locals.user.id,
       })
+      // .returning() gives back the inserted row with generated ID
+      // Without this, you'd only get count of inserted rows
       .returning();
 
-    // Redirect to new workspace
+    // Redirect to new workspace after successful creation
+    // throw redirect() is how SvelteKit handles redirects in actions
+    // 303 = "See Other" - tells browser to GET the new URL
     throw redirect(303, `/workspaces/${workspace.slug}`);
   },
 };
@@ -436,11 +448,20 @@ Forms work without JS, but `use:enhance` improves the experience.
 
 <form
 	method="POST"
+	<!-- use:enhance makes form submit without full page reload -->
+	<!-- Progressive enhancement: works WITHOUT JavaScript! -->
 	use:enhance={() => {
+		// Runs BEFORE form submission
 		loading = true;
 
+		// Return callback that runs AFTER server responds
 		return async ({ update }) => {
+			// update() applies SvelteKit's default behavior:
+			// - Updates $page.form with server response
+			// - Invalidates affected load functions
+			// - Updates page data
 			await update();
+			// Set loading back to false after everything updates
 			loading = false;
 		};
 	}}

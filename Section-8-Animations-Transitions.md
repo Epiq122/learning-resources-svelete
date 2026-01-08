@@ -171,7 +171,11 @@ Svelte provides 5 built-in transitions:
 			class:border-red-400={notification.type === 'error'}
 			class:border-orange-500={notification.type === 'warning'}
 			class:border-blue-400={notification.type === 'info'}
+			<!-- in: transition plays when element enters DOM -->
+			<!-- Slides in from right (x: 300px) over 300ms with smooth easing -->
 			in:fly={{ x: 300, duration: 300, easing: cubicOut }}
+			<!-- out: transition plays when element leaves DOM -->
+			<!-- Fades out over 200ms -->
 			out:fade={{ duration: 200 }}
 		>
 			<div class="flex items-center gap-2.5 mb-2">
@@ -446,10 +450,14 @@ Key blocks (`{#key}`) destroy and recreate elements when a value changes, allowi
 		</button>
 
 		<div class="flex-1 relative h-96 overflow-hidden rounded-2xl bg-gray-800">
+			<!-- {#key} destroys and recreates element when value changes -->
+			<!-- This allows transitions between different content -->
 			{#key currentIndex}
 				<div
 					class="absolute w-full h-full"
+					<!-- Slide in from direction based on next/prev -->
 					in:fly={{ x: direction * 100, duration: 400, easing: cubicOut }}
+					<!-- Slide out in opposite direction -->
 					out:fly={{ x: direction * -100, duration: 400, easing: cubicOut }}
 				>
 					<img
@@ -697,12 +705,15 @@ Crossfade creates paired transitions where an element appears to move from one p
 		tasks: Task[];
 	}
 
-	// Create paired transitions
+	// Create paired transitions for moving items between lists
+	// crossfade creates coordinated send/receive transitions
+	// Items appear to "fly" from one position to another
 	const [send, receive] = crossfade({
 		duration: 400,
 		easing: quintOut,
+		// Fallback for items that don't have a matching pair
+		// (e.g., newly created items that weren't moved)
 		fallback: (node) => {
-			// Fallback for items that don't have a pair
 			return {
 				duration: 300,
 				css: (t: number) => `opacity: ${t}`

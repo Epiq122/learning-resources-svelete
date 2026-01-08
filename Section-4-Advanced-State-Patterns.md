@@ -38,6 +38,11 @@ By the end of this section, you will:
   - [8. API Integration Patterns](#8-api-integration-patterns)
     - [How to Structure API Calls?](#how-to-structure-api-calls)
     - [📁 Files to Create](#-files-to-create-4)
+  - [10. 🚀 End-of-Section Project: E-Commerce Shopping Cart](#10--end-of-section-project-e-commerce-shopping-cart)
+    - [Project Overview](#project-overview)
+    - [📁 Files to Create](#-files-to-create-5)
+    - [What This Project Demonstrates](#what-this-project-demonstrates)
+  - [📝 Key Takeaways](#-key-takeaways)
   - [🚀 Next Steps](#-next-steps)
 
 ---
@@ -97,12 +102,15 @@ export const popularCurrencies: Currency[] = [
 ];
 
 class CurrencyService {
+  // Map stores cached data with the base currency as key
   private cache: Map<string, ExchangeRates> = new Map();
+  // Cache expires after 5 minutes to keep data fresh
   private cacheExpiry = 5 * 60 * 1000; // 5 minutes
 
   async fetchRates(base: string): Promise<ExchangeRates> {
-    // Check cache first
+    // Check cache first to avoid unnecessary API calls
     const cached = this.cache.get(base);
+    // If cached data exists and hasn't expired, return it
     if (cached && Date.now() - cached.timestamp < this.cacheExpiry) {
       console.log("📦 Using cached rates for", base);
       return cached;
@@ -126,7 +134,7 @@ class CurrencyService {
       timestamp: Date.now(),
     };
 
-    // Cache the result
+    // Cache the result for future requests
     this.cache.set(base, rates);
 
     return rates;
@@ -318,12 +326,16 @@ Create:
 	// Temperature converter with writable derived state
 	let celsius = $state(20);
 
-	// Writable derived: can get AND set
+	// Writable derived: can get AND set (bidirectional binding)
+	// When you READ fahrenheit.value, it computes from celsius
+	// When you WRITE to fahrenheit.value, it updates celsius
 	let fahrenheit = {
 		get value() {
+			// Convert celsius to fahrenheit when reading
 			return (celsius * 9) / 5 + 32;
 		},
 		set value(f: number) {
+			// Convert fahrenheit back to celsius when writing
 			celsius = ((f - 32) * 5) / 9;
 		}
 	};
@@ -699,9 +711,11 @@ Classes with reactive properties that trigger UI updates when methods are called
 	}
 
 	class TodoList {
+		// $state makes properties reactive - UI updates when they change
 		items = $state<TodoItem[]>([]);
 		filter = $state<'all' | 'active' | 'completed'>('all');
 
+		// Computed property: auto-recalculates when items or filter changes
 		get filtered() {
 			switch (this.filter) {
 				case 'active':
@@ -713,6 +727,7 @@ Classes with reactive properties that trigger UI updates when methods are called
 			}
 		}
 
+		// Another computed property for statistics
 		get stats() {
 			return {
 				total: this.items.length,
@@ -721,9 +736,11 @@ Classes with reactive properties that trigger UI updates when methods are called
 			};
 		}
 
+		// Method to add a new todo - UI updates automatically when items array changes
 		add(text: string) {
 			if (!text.trim()) return;
 
+			// Array.push() is reactive - triggers UI update
 			this.items.push({
 				id: Date.now(),
 				text: text.trim(),
@@ -889,11 +906,12 @@ A more advanced example showing a shopping cart with multiple methods, computed 
 	}
 
 	class ShoppingCart {
+		// Reactive state: cart items update UI automatically
 		items = $state<CartItem[]>([]);
 		discountCode = $state<string>('');
 		taxRate = $state<number>(0.08); // 8% tax
 
-		// Available products
+		// Available products (not reactive - static data)
 		products: Product[] = [
 			{
 				id: 1,
@@ -940,11 +958,13 @@ A more advanced example showing a shopping cart with multiple methods, computed 
 		];
 
 		// Computed: Subtotal before tax and discount
+		// Automatically recalculates when items array changes
 		get subtotal(): number {
 			return this.items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
 		}
 
-		// Computed: Discount amount
+		// Computed: Discount amount based on discount code
+		// Updates automatically when discountCode or subtotal changes
 		get discount(): number {
 			const validCodes: Record<string, number> = {
 				SAVE10: 0.1,
@@ -1290,27 +1310,34 @@ Svelte 5 makes JavaScript's built-in classes like Set, Map, and Date automatical
 
 	// Set operations
 	function addTag() {
+		// Check for duplicates (Set automatically handles this, but validate input)
 		if (!newTag.trim() || tags.has(newTag.trim())) return;
+		// Add the new tag to the Set
 		tags.add(newTag.trim().toLowerCase());
-		tags = tags; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity for built-in classes
+		tags = tags;
 		newTag = '';
 	}
 
 	function removeTag(tag: string) {
+		// Remove tag from Set
 		tags.delete(tag);
-		tags = tags; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity
+		tags = tags;
 	}
 
 	function clearTags() {
+		// Clear all tags from Set
 		tags.clear();
-		tags = tags; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity
+		tags = tags;
 	}
 
 	// Map operations
 	function addSetting() {
 		if (!newKey.trim()) return;
 
-		// Try to parse as number or boolean
+		// Try to parse as number or boolean for proper typing
 		let value: string | number | boolean = newValue;
 		if (!isNaN(Number(newValue))) {
 			value = Number(newValue);
@@ -1320,20 +1347,26 @@ Svelte 5 makes JavaScript's built-in classes like Set, Map, and Date automatical
 			value = false;
 		}
 
+		// Add key-value pair to Map
 		userSettings.set(newKey, value);
-		userSettings = userSettings; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity for built-in classes
+		userSettings = userSettings;
 		newKey = '';
 		newValue = '';
 	}
 
 	function removeSetting(key: string) {
+		// Remove key from Map
 		userSettings.delete(key);
-		userSettings = userSettings; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity
+		userSettings = userSettings;
 	}
 
 	function clearSettings() {
+		// Clear all entries from Map
 		userSettings.clear();
-		userSettings = userSettings; // Force reactivity
+		// IMPORTANT: Reassign to trigger reactivity
+		userSettings = userSettings;
 	}
 
 	// Date operations
@@ -1698,15 +1731,16 @@ export class ApiService {
   async fetch<T>(endpoint: string, useCache = true): Promise<T> {
     const cacheKey = this.getCacheKey(endpoint);
 
-    // Check cache
+    // Check cache first - avoid unnecessary network requests
     if (useCache) {
       const cached = this.cache.get(cacheKey);
+      // If cached data exists and hasn't expired, return it immediately
       if (cached && this.isCacheValid(cached.timestamp)) {
         return cached.data as T;
       }
     }
 
-    // Fetch from API
+    // Fetch from API if cache miss or expired
     const response = await fetch(`${this.baseUrl}${endpoint}`);
 
     if (!response.ok) {
@@ -1715,7 +1749,7 @@ export class ApiService {
 
     const data = await response.json();
 
-    // Update cache
+    // Update cache with fresh data and current timestamp
     if (useCache) {
       this.cache.set(cacheKey, {
         data,

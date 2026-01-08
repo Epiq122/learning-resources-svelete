@@ -244,14 +244,17 @@ export default defineConfig({
 
 ```typescript
 // ❌ Bad: Imports entire library (200kb)
+// Bundler includes ALL of lodash even if you use one function
 import _ from "lodash";
 const result = _.debounce(fn, 300);
 
 // ✅ Good: Import only debounce (5kb)
+// Use lodash-es (ESM) for tree-shaking, not lodash (CommonJS)
 import debounce from "lodash-es/debounce";
 const result = debounce(fn, 300);
 
 // ✅ Even better: Write your own (0.5kb)
+// No external dependency, fully type-safe, zero bundle cost
 function debounce<T extends (...args: any[]) => any>(
   fn: T,
   delay: number
@@ -346,7 +349,8 @@ npm run build
 	let loading = $state(true);
 
 	onMount(async () => {
-		// Only load chart library when component mounts
+		// Lazy load: Only download chart.js (150kb) when user sees this component
+		// Reduces initial bundle size and speeds up page load
 		const module = await import('./HeavyChart.svelte');
 		ChartComponent = module.default;
 		loading = false;
@@ -356,6 +360,7 @@ npm run build
 {#if loading}
 	<div class="skeleton">Loading chart...</div>
 {:else if ChartComponent}
+	<!-- Svelte 5: Use component reference directly as a tag -->
 	<ChartComponent {...props} />
 {/if}
 ```
@@ -633,17 +638,20 @@ generateResponsive();
 
 	let { items = [] }: { items: any[] } = $props();
 
-	let containerHeight = $state(600);
-	let scrollTop = $state(0);
-	let itemHeight = 50;
+	let containerHeight = $state(600); // Fixed container height
+	let scrollTop = $state(0); // Current scroll position
+	let itemHeight = 50; // Fixed height per item (required for virtual scrolling)
 
-	// Calculate visible range
+	// Calculate which items are visible in viewport
+	// Only render visible items + 1 buffer row (not all 10,000!)
 	let startIndex = $derived(Math.floor(scrollTop / itemHeight));
 	let endIndex = $derived(
 		Math.min(startIndex + Math.ceil(containerHeight / itemHeight) + 1, items.length)
 	);
 
+	// Only render ~12 items instead of 10,000
 	let visibleItems = $derived(items.slice(startIndex, endIndex));
+	// Offset to position visible items correctly
 	let offsetY = $derived(startIndex * itemHeight);
 
 	function handleScroll(e: Event) {
@@ -824,6 +832,9 @@ npm install svelte-virtual-list
 ```typescript
 // src/lib/utils/performance.ts
 
+// Debounce: Wait for user to STOP typing before calling function
+// Use case: Search input, form validation, autosave
+// Calls function ONCE after delay of inactivity
 export function debounce<T extends (...args: any[]) => any>(
   fn: T,
   delay: number
@@ -831,11 +842,14 @@ export function debounce<T extends (...args: any[]) => any>(
   let timeoutId: ReturnType<typeof setTimeout>;
 
   return (...args) => {
-    clearTimeout(timeoutId);
+    clearTimeout(timeoutId); // Reset timer on every call
     timeoutId = setTimeout(() => fn(...args), delay);
   };
 }
 
+// Throttle: Call function at most ONCE per time period
+// Use case: Scroll events, resize events, button clicks
+// Calls function immediately, then ignores calls for 'limit' ms
 export function throttle<T extends (...args: any[]) => any>(
   fn: T,
   limit: number
@@ -844,10 +858,11 @@ export function throttle<T extends (...args: any[]) => any>(
 
   return (...args) => {
     if (!inThrottle) {
-      fn(...args);
+      fn(...args); // Call immediately
       inThrottle = true;
-      setTimeout(() => (inThrottle = false), limit);
+      setTimeout(() => (inThrottle = false), limit); // Unlock after limit
     }
+    // Ignore all calls while inThrottle === true
   };
 }
 ```
@@ -877,19 +892,25 @@ export function throttle<T extends (...args: any[]) => any>(
 ```typescript
 // src/lib/utils/memoize.ts
 
+// Memoization: Cache expensive function results
+// Trade-off: Memory (cache) vs CPU (recalculation)
 export function memoize<T extends (...args: any[]) => any>(fn: T): T {
-  const cache = new Map();
+  const cache = new Map(); // Store results by arguments
 
   return ((...args: any[]) => {
+    // Create cache key from arguments (works for primitives and objects)
     const key = JSON.stringify(args);
 
+    // Return cached result if available (O(1) lookup)
     if (cache.has(key)) {
       return cache.get(key);
     }
 
+    // Calculate result for first time
     const result = fn(...args);
-    cache.set(key, result);
+    cache.set(key, result); // Store in cache
     return result;
+    // Warning: Cache grows indefinitely! Use LRU cache for production
   }) as T;
 }
 ```

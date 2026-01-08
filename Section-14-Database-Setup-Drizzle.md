@@ -67,22 +67,28 @@ PUBLIC_API_URL="https://api.example.com"
 
 ```typescript
 // src/lib/server/env.ts
-import { env } from '$env/dynamic/private';
-import { PUBLIC_API_URL } from '$env/static/public';
+import { env } from "$env/dynamic/private";
+import { PUBLIC_API_URL } from "$env/static/public";
 
 // Private env vars (server-only)
+// NEVER sent to browser, safe for secrets
+// Dynamic import allows runtime environment variable changes
 export const DATABASE_URL = env.DATABASE_URL;
 if (!DATABASE_URL) {
-	throw new Error('DATABASE_URL is not set');
+  // Fail fast at startup if critical config is missing
+  // Better than cryptic database connection errors later
+  throw new Error("DATABASE_URL is not set");
 }
 
 // Public env vars (available on client)
+// These are embedded in client bundle during build
+// NEVER put secrets in PUBLIC_* variables!
 export { PUBLIC_API_URL };
 ```
 
 ```typescript
 // src/lib/server/db.ts
-import { DATABASE_URL } from './env';
+import { DATABASE_URL } from "./env";
 
 export const db = createConnection(DATABASE_URL);
 ```
@@ -134,9 +140,9 @@ src/lib/
 
 ```typescript
 // src/lib/server/db.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { DATABASE_URL } from './env';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { DATABASE_URL } from "./env";
 
 // This code ONLY runs on server
 const client = postgres(DATABASE_URL);
@@ -145,17 +151,17 @@ export const db = drizzle(client);
 
 ```typescript
 // src/routes/posts/+page.server.ts
-import { db } from '$lib/server/db'; // ✅ Allowed in .server.ts
+import { db } from "$lib/server/db"; // ✅ Allowed in .server.ts
 
 export const load = async () => {
-	const posts = await db.select().from(postsTable);
-	return { posts };
+  const posts = await db.select().from(postsTable);
+  return { posts };
 };
 ```
 
 ```typescript
 // src/routes/posts/+page.ts
-import { db } from '$lib/server/db'; // ❌ ERROR! Cannot import server code in universal load
+import { db } from "$lib/server/db"; // ❌ ERROR! Cannot import server code in universal load
 ```
 
 > 💡 **Best Practice**: Keep ALL database code in `$lib/server/` to prevent accidental exposure.
@@ -280,7 +286,7 @@ Docker provides isolated, reproducible database environments.
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -292,7 +298,7 @@ services:
       POSTGRES_PASSWORD: myapp_password
       POSTGRES_DB: myapp_dev
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
@@ -306,7 +312,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: admin@example.com
       PGADMIN_DEFAULT_PASSWORD: admin
     ports:
-      - '5050:80'
+      - "5050:80"
     depends_on:
       - postgres
 
@@ -365,18 +371,18 @@ npm install -D drizzle-kit
 
 ```typescript
 // drizzle.config.ts
-import type { Config } from 'drizzle-kit';
-import { env } from '$env/dynamic/private';
+import type { Config } from "drizzle-kit";
+import { env } from "$env/dynamic/private";
 
 export default {
-	schema: './src/lib/server/db/schema.ts',
-	out: './drizzle',
-	driver: 'pg',
-	dbCredentials: {
-		connectionString: env.DATABASE_URL!
-	},
-	verbose: true,
-	strict: true
+  schema: "./src/lib/server/db/schema.ts",
+  out: "./drizzle",
+  driver: "pg",
+  dbCredentials: {
+    connectionString: env.DATABASE_URL!,
+  },
+  verbose: true,
+  strict: true,
 } satisfies Config;
 ```
 
@@ -384,15 +390,15 @@ export default {
 
 ```typescript
 // src/lib/server/db/index.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import { DATABASE_URL } from '../env';
-import * as schema from './schema';
+import { drizzle } from "drizzle-orm/postgres-js";
+import postgres from "postgres";
+import { DATABASE_URL } from "../env";
+import * as schema from "./schema";
 
 // Connection
 const client = postgres(DATABASE_URL, {
-	max: 10, // Connection pool size
-	idle_timeout: 20
+  max: 10, // Connection pool size
+  idle_timeout: 20,
 });
 
 // Drizzle instance with schema
@@ -414,98 +420,119 @@ Define your schema in TypeScript, generate SQL migrations.
 
 ```typescript
 // src/lib/server/db/schema.ts
-import { pgTable, serial, varchar, text, timestamp, integer, boolean } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import {
+  pgTable,
+  serial,
+  varchar,
+  text,
+  timestamp,
+  integer,
+  boolean,
+} from "drizzle-orm/pg-core";
+import { relations } from "drizzle-orm";
 
 // Users table
-export const users = pgTable('users', {
-	id: serial('id').primaryKey(),
-	email: varchar('email', { length: 255 }).notNull().unique(),
-	name: varchar('name', { length: 255 }).notNull(),
-	passwordHash: text('password_hash').notNull(),
-	avatarUrl: text('avatar_url'),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+// Drizzle schema maps to PostgreSQL table definition
+export const users = pgTable("users", {
+  // serial = auto-incrementing integer, perfect for IDs
+  id: serial("id").primaryKey(),
+  // varchar with length limit, unique constraint enforced at DB level
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  name: varchar("name", { length: 255 }).notNull(),
+  // text = unlimited length, use for long strings
+  // Store hashed password, NEVER plain text!
+  passwordHash: text("password_hash").notNull(),
+  avatarUrl: text("avatar_url"),
+  // defaultNow() = automatic timestamp on insert
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Workspaces table
-export const workspaces = pgTable('workspaces', {
-	id: serial('id').primaryKey(),
-	name: varchar('name', { length: 255 }).notNull(),
-	slug: varchar('slug', { length: 255 }).notNull().unique(),
-	description: text('description'),
-	ownerId: integer('owner_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+export const workspaces = pgTable("workspaces", {
+  id: serial("id").primaryKey(),
+  name: varchar("name", { length: 255 }).notNull(),
+  // slug for clean URLs: "my-workspace" instead of id
+  slug: varchar("slug", { length: 255 }).notNull().unique(),
+  description: text("description"),
+  // Foreign key to users table
+  // references() creates relationship, enables joins
+  // onDelete: 'cascade' = when user deleted, delete their workspaces
+  ownerId: integer("owner_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Workspace members (many-to-many)
-export const workspaceMembers = pgTable('workspace_members', {
-	id: serial('id').primaryKey(),
-	workspaceId: integer('workspace_id')
-		.notNull()
-		.references(() => workspaces.id, { onDelete: 'cascade' }),
-	userId: integer('user_id')
-		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' }),
-	role: varchar('role', { length: 50 }).notNull().default('member'), // owner, admin, member
-	joinedAt: timestamp('joined_at').defaultNow().notNull()
+export const workspaceMembers = pgTable("workspace_members", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  userId: integer("user_id")
+    .notNull()
+    .references(() => users.id, { onDelete: "cascade" }),
+  role: varchar("role", { length: 50 }).notNull().default("member"), // owner, admin, member
+  joinedAt: timestamp("joined_at").defaultNow().notNull(),
 });
 
 // Pages table
-export const pages = pgTable('pages', {
-	id: serial('id').primaryKey(),
-	workspaceId: integer('workspace_id')
-		.notNull()
-		.references(() => workspaces.id, { onDelete: 'cascade' }),
-	title: varchar('title', { length: 255 }).notNull(),
-	content: text('content'),
-	authorId: integer('author_id')
-		.notNull()
-		.references(() => users.id),
-	isPublished: boolean('is_published').default(false).notNull(),
-	createdAt: timestamp('created_at').defaultNow().notNull(),
-	updatedAt: timestamp('updated_at').defaultNow().notNull()
+export const pages = pgTable("pages", {
+  id: serial("id").primaryKey(),
+  workspaceId: integer("workspace_id")
+    .notNull()
+    .references(() => workspaces.id, { onDelete: "cascade" }),
+  title: varchar("title", { length: 255 }).notNull(),
+  content: text("content"),
+  authorId: integer("author_id")
+    .notNull()
+    .references(() => users.id),
+  isPublished: boolean("is_published").default(false).notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
 // Relations (for queries)
 export const usersRelations = relations(users, ({ many }) => ({
-	ownedWorkspaces: many(workspaces),
-	memberships: many(workspaceMembers),
-	pages: many(pages)
+  ownedWorkspaces: many(workspaces),
+  memberships: many(workspaceMembers),
+  pages: many(pages),
 }));
 
 export const workspacesRelations = relations(workspaces, ({ one, many }) => ({
-	owner: one(users, {
-		fields: [workspaces.ownerId],
-		references: [users.id]
-	}),
-	members: many(workspaceMembers),
-	pages: many(pages)
+  owner: one(users, {
+    fields: [workspaces.ownerId],
+    references: [users.id],
+  }),
+  members: many(workspaceMembers),
+  pages: many(pages),
 }));
 
-export const workspaceMembersRelations = relations(workspaceMembers, ({ one }) => ({
-	workspace: one(workspaces, {
-		fields: [workspaceMembers.workspaceId],
-		references: [workspaces.id]
-	}),
-	user: one(users, {
-		fields: [workspaceMembers.userId],
-		references: [users.id]
-	})
-}));
+export const workspaceMembersRelations = relations(
+  workspaceMembers,
+  ({ one }) => ({
+    workspace: one(workspaces, {
+      fields: [workspaceMembers.workspaceId],
+      references: [workspaces.id],
+    }),
+    user: one(users, {
+      fields: [workspaceMembers.userId],
+      references: [users.id],
+    }),
+  })
+);
 
 export const pagesRelations = relations(pages, ({ one }) => ({
-	workspace: one(workspaces, {
-		fields: [pages.workspaceId],
-		references: [workspaces.id]
-	}),
-	author: one(users, {
-		fields: [pages.authorId],
-		references: [users.id]
-	})
+  workspace: one(workspaces, {
+    fields: [pages.workspaceId],
+    references: [workspaces.id],
+  }),
+  author: one(users, {
+    fields: [pages.authorId],
+    references: [users.id],
+  }),
 }));
 
 // TypeScript types (inferred from schema)
@@ -531,20 +558,20 @@ npm run db:generate
 
 ```typescript
 // scripts/migrate.ts
-import { drizzle } from 'drizzle-orm/postgres-js';
-import { migrate } from 'drizzle-orm/postgres-js/migrator';
-import postgres from 'postgres';
-import { DATABASE_URL } from '../src/lib/server/env';
+import { drizzle } from "drizzle-orm/postgres-js";
+import { migrate } from "drizzle-orm/postgres-js/migrator";
+import postgres from "postgres";
+import { DATABASE_URL } from "../src/lib/server/env";
 
 const runMigrations = async () => {
-	const connection = postgres(DATABASE_URL, { max: 1 });
-	const db = drizzle(connection);
+  const connection = postgres(DATABASE_URL, { max: 1 });
+  const db = drizzle(connection);
 
-	console.log('Running migrations...');
-	await migrate(db, { migrationsFolder: './drizzle' });
-	console.log('Migrations complete!');
+  console.log("Running migrations...");
+  await migrate(db, { migrationsFolder: "./drizzle" });
+  console.log("Migrations complete!");
 
-	await connection.end();
+  await connection.end();
 };
 
 runMigrations().catch(console.error);
@@ -553,12 +580,12 @@ runMigrations().catch(console.error);
 ```json
 // package.json
 {
-	"scripts": {
-		"db:generate": "drizzle-kit generate:pg",
-		"db:migrate": "tsx scripts/migrate.ts",
-		"db:studio": "drizzle-kit studio",
-		"db:push": "drizzle-kit push:pg"
-	}
+  "scripts": {
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push:pg"
+  }
 }
 ```
 
@@ -578,139 +605,148 @@ Seed realistic test data for development.
 
 ```typescript
 // scripts/seed.ts
-import { db } from '../src/lib/server/db';
-import { users, workspaces, workspaceMembers, pages } from '../src/lib/server/db/schema';
-import { hash } from '@node-rs/argon2';
+import { db } from "../src/lib/server/db";
+import {
+  users,
+  workspaces,
+  workspaceMembers,
+  pages,
+} from "../src/lib/server/db/schema";
+import { hash } from "@node-rs/argon2";
 
 async function seed() {
-	console.log('🌱 Seeding database...');
+  console.log("🌱 Seeding database...");
 
-	// Clear existing data
-	await db.delete(pages);
-	await db.delete(workspaceMembers);
-	await db.delete(workspaces);
-	await db.delete(users);
+  // Clear existing data
+  await db.delete(pages);
+  await db.delete(workspaceMembers);
+  await db.delete(workspaces);
+  await db.delete(users);
 
-	// Create users
-	const [alice, bob, charlie] = await db
-		.insert(users)
-		.values([
-			{
-				email: 'alice@example.com',
-				name: 'Alice Johnson',
-				passwordHash: await hash('password123'),
-				avatarUrl: 'https://i.pravatar.cc/150?img=1'
-			},
-			{
-				email: 'bob@example.com',
-				name: 'Bob Smith',
-				passwordHash: await hash('password123'),
-				avatarUrl: 'https://i.pravatar.cc/150?img=2'
-			},
-			{
-				email: 'charlie@example.com',
-				name: 'Charlie Brown',
-				passwordHash: await hash('password123'),
-				avatarUrl: 'https://i.pravatar.cc/150?img=3'
-			}
-		])
-		.returning();
+  // Create users
+  const [alice, bob, charlie] = await db
+    .insert(users)
+    .values([
+      {
+        email: "alice@example.com",
+        name: "Alice Johnson",
+        passwordHash: await hash("password123"),
+        avatarUrl: "https://i.pravatar.cc/150?img=1",
+      },
+      {
+        email: "bob@example.com",
+        name: "Bob Smith",
+        passwordHash: await hash("password123"),
+        avatarUrl: "https://i.pravatar.cc/150?img=2",
+      },
+      {
+        email: "charlie@example.com",
+        name: "Charlie Brown",
+        passwordHash: await hash("password123"),
+        avatarUrl: "https://i.pravatar.cc/150?img=3",
+      },
+    ])
+    .returning();
 
-	console.log('✅ Created users:', alice.name, bob.name, charlie.name);
+  console.log("✅ Created users:", alice.name, bob.name, charlie.name);
 
-	// Create workspaces
-	const [techWorkspace, designWorkspace] = await db
-		.insert(workspaces)
-		.values([
-			{
-				name: 'Tech Team',
-				slug: 'tech-team',
-				description: 'Engineering and development workspace',
-				ownerId: alice.id
-			},
-			{
-				name: 'Design Studio',
-				slug: 'design-studio',
-				description: 'Creative design projects',
-				ownerId: bob.id
-			}
-		])
-		.returning();
+  // Create workspaces
+  const [techWorkspace, designWorkspace] = await db
+    .insert(workspaces)
+    .values([
+      {
+        name: "Tech Team",
+        slug: "tech-team",
+        description: "Engineering and development workspace",
+        ownerId: alice.id,
+      },
+      {
+        name: "Design Studio",
+        slug: "design-studio",
+        description: "Creative design projects",
+        ownerId: bob.id,
+      },
+    ])
+    .returning();
 
-	console.log('✅ Created workspaces:', techWorkspace.name, designWorkspace.name);
+  console.log(
+    "✅ Created workspaces:",
+    techWorkspace.name,
+    designWorkspace.name
+  );
 
-	// Add workspace members
-	await db.insert(workspaceMembers).values([
-		{ workspaceId: techWorkspace.id, userId: alice.id, role: 'owner' },
-		{ workspaceId: techWorkspace.id, userId: bob.id, role: 'admin' },
-		{ workspaceId: techWorkspace.id, userId: charlie.id, role: 'member' },
-		{ workspaceId: designWorkspace.id, userId: bob.id, role: 'owner' },
-		{ workspaceId: designWorkspace.id, userId: alice.id, role: 'member' }
-	]);
+  // Add workspace members
+  await db.insert(workspaceMembers).values([
+    { workspaceId: techWorkspace.id, userId: alice.id, role: "owner" },
+    { workspaceId: techWorkspace.id, userId: bob.id, role: "admin" },
+    { workspaceId: techWorkspace.id, userId: charlie.id, role: "member" },
+    { workspaceId: designWorkspace.id, userId: bob.id, role: "owner" },
+    { workspaceId: designWorkspace.id, userId: alice.id, role: "member" },
+  ]);
 
-	console.log('✅ Added workspace members');
+  console.log("✅ Added workspace members");
 
-	// Create pages
-	await db.insert(pages).values([
-		{
-			workspaceId: techWorkspace.id,
-			title: 'API Documentation',
-			content: '# API Docs\n\nComplete API documentation for our services.',
-			authorId: alice.id,
-			isPublished: true
-		},
-		{
-			workspaceId: techWorkspace.id,
-			title: 'Database Schema',
-			content: '# Database Schema\n\nOverview of our database structure.',
-			authorId: bob.id,
-			isPublished: true
-		},
-		{
-			workspaceId: techWorkspace.id,
-			title: 'Sprint Planning',
-			content: '# Sprint 23\n\nGoals and tasks for this sprint.',
-			authorId: charlie.id,
-			isPublished: false
-		},
-		{
-			workspaceId: designWorkspace.id,
-			title: 'Brand Guidelines',
-			content: '# Brand Guidelines\n\nColors, fonts, and design principles.',
-			authorId: bob.id,
-			isPublished: true
-		},
-		{
-			workspaceId: designWorkspace.id,
-			title: 'UI Components',
-			content: '# Component Library\n\nReusable UI components.',
-			authorId: alice.id,
-			isPublished: true
-		}
-	]);
+  // Create pages
+  await db.insert(pages).values([
+    {
+      workspaceId: techWorkspace.id,
+      title: "API Documentation",
+      content: "# API Docs\n\nComplete API documentation for our services.",
+      authorId: alice.id,
+      isPublished: true,
+    },
+    {
+      workspaceId: techWorkspace.id,
+      title: "Database Schema",
+      content: "# Database Schema\n\nOverview of our database structure.",
+      authorId: bob.id,
+      isPublished: true,
+    },
+    {
+      workspaceId: techWorkspace.id,
+      title: "Sprint Planning",
+      content: "# Sprint 23\n\nGoals and tasks for this sprint.",
+      authorId: charlie.id,
+      isPublished: false,
+    },
+    {
+      workspaceId: designWorkspace.id,
+      title: "Brand Guidelines",
+      content: "# Brand Guidelines\n\nColors, fonts, and design principles.",
+      authorId: bob.id,
+      isPublished: true,
+    },
+    {
+      workspaceId: designWorkspace.id,
+      title: "UI Components",
+      content: "# Component Library\n\nReusable UI components.",
+      authorId: alice.id,
+      isPublished: true,
+    },
+  ]);
 
-	console.log('✅ Created pages');
-	console.log('\n🎉 Seeding complete!');
-	console.log('\nTest credentials:');
-	console.log('  alice@example.com / password123');
-	console.log('  bob@example.com / password123');
-	console.log('  charlie@example.com / password123');
+  console.log("✅ Created pages");
+  console.log("\n🎉 Seeding complete!");
+  console.log("\nTest credentials:");
+  console.log("  alice@example.com / password123");
+  console.log("  bob@example.com / password123");
+  console.log("  charlie@example.com / password123");
 }
 
 seed()
-	.catch((error) => {
-		console.error('❌ Seeding failed:', error);
-		process.exit(1);
-	})
-	.finally(() => process.exit(0));
+  .catch((error) => {
+    console.error("❌ Seeding failed:", error);
+    process.exit(1);
+  })
+  .finally(() => process.exit(0));
 ```
 
 ```json
 // package.json
 {
-	"scripts": {
-		"db:seed": "tsx scripts/seed.ts"
-	}
+  "scripts": {
+    "db:seed": "tsx scripts/seed.ts"
+  }
 }
 ```
 
@@ -783,7 +819,7 @@ PUBLIC_APP_NAME="Workspace Manager"
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   postgres:
@@ -795,11 +831,11 @@ services:
       POSTGRES_PASSWORD: myapp_password
       POSTGRES_DB: myapp_dev
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U myapp_user']
+      test: ["CMD-SHELL", "pg_isready -U myapp_user"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -812,130 +848,149 @@ volumes:
 
 ```typescript
 // src/lib/server/db/queries.ts
-import { db } from './index';
-import { users, workspaces, workspaceMembers, pages } from './schema';
-import { eq, and, desc } from 'drizzle-orm';
+import { db } from "./index";
+import { users, workspaces, workspaceMembers, pages } from "./schema";
+import { eq, and, desc } from "drizzle-orm";
 
 export const userQueries = {
-	findByEmail: async (email: string) => {
-		const [user] = await db.select().from(users).where(eq(users.email, email)).limit(1);
-		return user;
-	},
+  findByEmail: async (email: string) => {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+    return user;
+  },
 
-	findById: async (id: number) => {
-		const [user] = await db.select().from(users).where(eq(users.id, id)).limit(1);
-		return user;
-	},
+  findById: async (id: number) => {
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
+    return user;
+  },
 
-	create: async (data: { email: string; name: string; passwordHash: string }) => {
-		const [user] = await db.insert(users).values(data).returning();
-		return user;
-	}
+  create: async (data: {
+    email: string;
+    name: string;
+    passwordHash: string;
+  }) => {
+    const [user] = await db.insert(users).values(data).returning();
+    return user;
+  },
 };
 
 export const workspaceQueries = {
-	findBySlug: async (slug: string) => {
-		const [workspace] = await db
-			.select()
-			.from(workspaces)
-			.where(eq(workspaces.slug, slug))
-			.limit(1);
-		return workspace;
-	},
+  findBySlug: async (slug: string) => {
+    const [workspace] = await db
+      .select()
+      .from(workspaces)
+      .where(eq(workspaces.slug, slug))
+      .limit(1);
+    return workspace;
+  },
 
-	findUserWorkspaces: async (userId: number) => {
-		return db
-			.select({
-				workspace: workspaces,
-				role: workspaceMembers.role
-			})
-			.from(workspaceMembers)
-			.innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
-			.where(eq(workspaceMembers.userId, userId))
-			.orderBy(desc(workspaceMembers.joinedAt));
-	},
+  findUserWorkspaces: async (userId: number) => {
+    return db
+      .select({
+        workspace: workspaces,
+        role: workspaceMembers.role,
+      })
+      .from(workspaceMembers)
+      .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+      .where(eq(workspaceMembers.userId, userId))
+      .orderBy(desc(workspaceMembers.joinedAt));
+  },
 
-	create: async (data: { name: string; slug: string; ownerId: number; description?: string }) => {
-		const [workspace] = await db.insert(workspaces).values(data).returning();
+  create: async (data: {
+    name: string;
+    slug: string;
+    ownerId: number;
+    description?: string;
+  }) => {
+    const [workspace] = await db.insert(workspaces).values(data).returning();
 
-		// Add owner as member
-		await db.insert(workspaceMembers).values({
-			workspaceId: workspace.id,
-			userId: data.ownerId,
-			role: 'owner'
-		});
+    // Add owner as member
+    await db.insert(workspaceMembers).values({
+      workspaceId: workspace.id,
+      userId: data.ownerId,
+      role: "owner",
+    });
 
-		return workspace;
-	}
+    return workspace;
+  },
 };
 
 export const pageQueries = {
-	findByWorkspace: async (workspaceId: number, publishedOnly = false) => {
-		let query = db
-			.select({
-				page: pages,
-				author: {
-					id: users.id,
-					name: users.name,
-					avatarUrl: users.avatarUrl
-				}
-			})
-			.from(pages)
-			.innerJoin(users, eq(pages.authorId, users.id))
-			.where(eq(pages.workspaceId, workspaceId));
+  findByWorkspace: async (workspaceId: number, publishedOnly = false) => {
+    let query = db
+      .select({
+        page: pages,
+        author: {
+          id: users.id,
+          name: users.name,
+          avatarUrl: users.avatarUrl,
+        },
+      })
+      .from(pages)
+      .innerJoin(users, eq(pages.authorId, users.id))
+      .where(eq(pages.workspaceId, workspaceId));
 
-		if (publishedOnly) {
-			query = query.where(and(eq(pages.workspaceId, workspaceId), eq(pages.isPublished, true)));
-		}
+    if (publishedOnly) {
+      query = query.where(
+        and(eq(pages.workspaceId, workspaceId), eq(pages.isPublished, true))
+      );
+    }
 
-		return query.orderBy(desc(pages.updatedAt));
-	},
+    return query.orderBy(desc(pages.updatedAt));
+  },
 
-	findById: async (id: number) => {
-		const [page] = await db
-			.select({
-				page: pages,
-				author: {
-					id: users.id,
-					name: users.name,
-					avatarUrl: users.avatarUrl
-				},
-				workspace: {
-					id: workspaces.id,
-					name: workspaces.name,
-					slug: workspaces.slug
-				}
-			})
-			.from(pages)
-			.innerJoin(users, eq(pages.authorId, users.id))
-			.innerJoin(workspaces, eq(pages.workspaceId, workspaces.id))
-			.where(eq(pages.id, id))
-			.limit(1);
+  findById: async (id: number) => {
+    const [page] = await db
+      .select({
+        page: pages,
+        author: {
+          id: users.id,
+          name: users.name,
+          avatarUrl: users.avatarUrl,
+        },
+        workspace: {
+          id: workspaces.id,
+          name: workspaces.name,
+          slug: workspaces.slug,
+        },
+      })
+      .from(pages)
+      .innerJoin(users, eq(pages.authorId, users.id))
+      .innerJoin(workspaces, eq(pages.workspaceId, workspaces.id))
+      .where(eq(pages.id, id))
+      .limit(1);
 
-		return page;
-	},
+    return page;
+  },
 
-	create: async (data: {
-		workspaceId: number;
-		title: string;
-		content: string;
-		authorId: number;
-	}) => {
-		const [page] = await db.insert(pages).values(data).returning();
-		return page;
-	},
+  create: async (data: {
+    workspaceId: number;
+    title: string;
+    content: string;
+    authorId: number;
+  }) => {
+    const [page] = await db.insert(pages).values(data).returning();
+    return page;
+  },
 
-	update: async (
-		id: number,
-		data: Partial<{ title: string; content: string; isPublished: boolean }>
-	) => {
-		const [page] = await db
-			.update(pages)
-			.set({ ...data, updatedAt: new Date() })
-			.where(eq(pages.id, id))
-			.returning();
-		return page;
-	}
+  update: async (
+    id: number,
+    data: Partial<{ title: string; content: string; isPublished: boolean }>
+  ) => {
+    const [page] = await db
+      .update(pages)
+      .set({ ...data, updatedAt: new Date() })
+      .where(eq(pages.id, id))
+      .returning();
+    return page;
+  },
 };
 ```
 
@@ -943,23 +998,23 @@ export const pageQueries = {
 
 ```typescript
 // src/routes/api/health/+server.ts
-import { json, error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import type { RequestHandler } from './$types';
+import { json, error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async () => {
-	try {
-		// Test database connection
-		await db.execute('SELECT 1');
+  try {
+    // Test database connection
+    await db.execute("SELECT 1");
 
-		return json({
-			status: 'ok',
-			timestamp: new Date().toISOString(),
-			database: 'connected'
-		});
-	} catch (err) {
-		throw error(503, 'Database connection failed');
-	}
+    return json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      database: "connected",
+    });
+  } catch (err) {
+    throw error(503, "Database connection failed");
+  }
 };
 ```
 
@@ -968,32 +1023,32 @@ export const GET: RequestHandler = async () => {
 ```json
 // package.json
 {
-	"name": "workspace-manager",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview",
-		"db:generate": "drizzle-kit generate:pg",
-		"db:migrate": "tsx scripts/migrate.ts",
-		"db:seed": "tsx scripts/seed.ts",
-		"db:studio": "drizzle-kit studio",
-		"db:push": "drizzle-kit push:pg",
-		"db:setup": "npm run db:migrate && npm run db:seed",
-		"docker:up": "docker-compose up -d",
-		"docker:down": "docker-compose down",
-		"docker:reset": "docker-compose down -v && docker-compose up -d"
-	},
-	"dependencies": {
-		"@sveltejs/kit": "^2.0.0",
-		"drizzle-orm": "^0.29.0",
-		"postgres": "^3.4.0"
-	},
-	"devDependencies": {
-		"@node-rs/argon2": "^1.8.0",
-		"drizzle-kit": "^0.20.0",
-		"tsx": "^4.7.0",
-		"vite": "^5.0.0"
-	}
+  "name": "workspace-manager",
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "tsx scripts/migrate.ts",
+    "db:seed": "tsx scripts/seed.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:push": "drizzle-kit push:pg",
+    "db:setup": "npm run db:migrate && npm run db:seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down",
+    "docker:reset": "docker-compose down -v && docker-compose up -d"
+  },
+  "dependencies": {
+    "@sveltejs/kit": "^2.0.0",
+    "drizzle-orm": "^0.29.0",
+    "postgres": "^3.4.0"
+  },
+  "devDependencies": {
+    "@node-rs/argon2": "^1.8.0",
+    "drizzle-kit": "^0.20.0",
+    "tsx": "^4.7.0",
+    "vite": "^5.0.0"
+  }
 }
 ```
 

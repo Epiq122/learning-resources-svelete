@@ -75,9 +75,13 @@ Svelte 5's reactivity works ANYWHERE - not just in components! Create reactive s
 type Theme = "light" | "dark" | "auto";
 
 class ThemeManager {
+  // Reactive state - works OUTSIDE components!
+  // This state updates UI anywhere it's used in the component tree
   current = $state<Theme>("dark");
   systemPreference = $state<"light" | "dark">("dark");
 
+  // Computed property: auto-recalculates when dependencies change
+  // Returns the actual theme (handles 'auto' mode)
   get effective(): "light" | "dark" {
     if (this.current === "auto") {
       return this.systemPreference;
@@ -85,12 +89,13 @@ class ThemeManager {
     return this.current;
   }
 
+  // Another computed property for convenience
   get isDark() {
     return this.effective === "dark";
   }
 
   constructor() {
-    // Check system preference
+    // Check system preference using media query
     if (typeof window !== "undefined") {
       const media = window.matchMedia("(prefers-color-scheme: dark)");
       this.systemPreference = media.matches ? "dark" : "light";
@@ -206,11 +211,15 @@ export function createValidator<T>(
   initialValue: T,
   rules: ValidationRule<T>[]
 ) {
+  // Reactive state for the field value
   let value = $state(initialValue);
+  // Track if user has interacted with field (for showing errors)
   let touched = $state(false);
 
+  // Computed errors: only shows errors after field is touched
+  // Runs all validation rules and collects error messages
   const errors = $derived.by(() => {
-    if (!touched) return [];
+    if (!touched) return []; // Don't show errors until user touches field
     return rules
       .filter((rule) => !rule.validate(value))
       .map((rule) => rule.message);
@@ -435,13 +444,14 @@ export class DataTable<T extends Record<string, any>> {
     this.columns = columns;
   }
 
-  // Computed filtered data
+  // Computed filtered data - recalculates automatically when data or filters change
   get filtered(): T[] {
     let result = [...this.data];
 
-    // Apply filters
+    // Apply all active filters to the data
     for (const [key, value] of Object.entries(this.filters)) {
       if (value) {
+        // Case-insensitive search for each filter
         result = result.filter((row) =>
           String(row[key]).toLowerCase().includes(value.toLowerCase())
         );
@@ -451,7 +461,7 @@ export class DataTable<T extends Record<string, any>> {
     return result;
   }
 
-  // Computed sorted data
+  // Computed sorted data - applies sorting to filtered data
   get sorted(): T[] {
     if (!this.sortColumn) return this.filtered;
 
@@ -679,9 +689,11 @@ export interface Notification {
 }
 
 class NotificationManager {
+  // Reactive array - UI updates when notifications are added/removed
   notifications = $state<Notification[]>([]);
   nextId = 1;
 
+  // Add a new notification with auto-dismiss
   add(message: string, type: Notification["type"] = "info", duration = 5000) {
     const notification: Notification = {
       id: this.nextId++,
@@ -690,8 +702,10 @@ class NotificationManager {
       duration,
     };
 
+    // Array mutation triggers reactivity in Svelte 5
     this.notifications.push(notification);
 
+    // Auto-remove after duration (if duration > 0)
     if (duration > 0) {
       setTimeout(() => this.remove(notification.id), duration);
     }
@@ -953,9 +967,10 @@ Sync reactive state with localStorage automatically.
 ```typescript
 // lib/storage.svelte.ts
 export function createPersistentState<T>(key: string, initialValue: T) {
-  // Load from localStorage on initialization
+  // Load from localStorage on initialization (hydration)
   let storedValue: T = initialValue;
 
+  // Check if we're in browser (not SSR)
   if (typeof localStorage !== "undefined") {
     const stored = localStorage.getItem(key);
     if (stored) {
@@ -967,9 +982,11 @@ export function createPersistentState<T>(key: string, initialValue: T) {
     }
   }
 
+  // Create reactive state with stored or initial value
   let value = $state<T>(storedValue);
 
-  // Sync to localStorage whenever value changes
+  // Effect: Automatically sync to localStorage when value changes
+  // This runs every time 'value' is updated
   $effect(() => {
     if (typeof localStorage !== "undefined") {
       localStorage.setItem(key, JSON.stringify(value));

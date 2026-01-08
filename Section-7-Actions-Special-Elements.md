@@ -72,16 +72,20 @@ Actions are functions that run when an element is **mounted** and **unmounted**.
 ```typescript
 function actionName(node: HTMLElement, parameters?: any) {
   // Setup code runs when element is added to DOM
+  // 'node' is the element the action is attached to
+  // 'parameters' are any values passed to the action
 
   return {
     // Optional: Update when parameters change
+    // Called whenever reactive parameters passed to action change
     update(newParameters: any) {
-      // Update logic
+      // Update logic - modify behavior based on new parameters
     },
 
-    // Optional: Cleanup when element is removed
+    // Optional: Cleanup when element is removed from DOM
+    // ALWAYS remove event listeners here to prevent memory leaks!
     destroy() {
-      // Cleanup logic (remove listeners, etc.)
+      // Cleanup logic (remove listeners, destroy third-party instances)
     },
   };
 }
@@ -128,13 +132,16 @@ Instead of showing a confirmation dialog, use longpress to delete items. Common 
 	function longpress(node: HTMLElement, duration: number = 500) {
 		let timer: number;
 
+		// Start timer when mouse/touch is pressed down
 		function handleMouseDown() {
+			// Set timeout to dispatch event after duration
 			timer = setTimeout(() => {
-				// Dispatch custom event after duration
+				// Dispatch custom 'longpress' event that component can listen to
 				node.dispatchEvent(new CustomEvent('longpress'));
 			}, duration);
 		}
 
+		// Cancel timer if user releases before duration completes
 		function handleMouseUp() {
 			clearTimeout(timer);
 		}
@@ -251,19 +258,22 @@ npm install tippy.js
 	import 'tippy.js/themes/light.css'; // Light theme
 
 	function tooltip(node: HTMLElement, options: Partial<Props>) {
-		// Create tippy instance
+		// Create tippy instance attached to this element
+		// Tippy.js handles all tooltip positioning and display
 		const instance: Instance = tippy(node, {
 			...options,
-			theme: 'custom' // Our custom theme
+			theme: 'custom' // Our custom theme defined in CSS
 		});
 
 		return {
+			// Update tooltip content/options when reactive parameters change
 			update(newOptions: Partial<Props>) {
-				// Update tooltip when options change
+				// setProps updates the tooltip without recreating it
 				instance.setProps(newOptions);
 			},
+			// Clean up when element is removed from DOM
 			destroy() {
-				// Cleanup
+				// CRITICAL: Destroy tippy instance to prevent memory leaks
 				instance.destroy();
 			}
 		};
@@ -420,13 +430,16 @@ Close dropdowns/modals when user clicks outside. Essential for good UX!
 <script lang="ts">
 	function clickOutside(node: HTMLElement) {
 		function handleClick(event: MouseEvent) {
-			// Check if click was outside the element
+			// Check if the clicked element is outside our element
+			// node.contains() returns false if click is outside
 			if (node && !node.contains(event.target as Node)) {
+				// Dispatch custom event that component can listen to
 				node.dispatchEvent(new CustomEvent('clickoutside'));
 			}
 		}
 
-		// Use capture phase to catch events before they bubble
+		// Use capture phase (true) to catch events before they bubble
+		// This ensures we catch clicks even on elements that stop propagation
 		document.addEventListener('click', handleClick, true);
 
 		return {
@@ -730,7 +743,9 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 	let error = $state<ErrorInfo | null>(null);
 
 	// Catch errors from child components
+	// This prevents the error from crashing the entire app
 	onError((err) => {
+		// Store error details to show in fallback UI
 		error = {
 			message: err.message || 'An unknown error occurred',
 			stack: err.stack,
@@ -738,7 +753,8 @@ Error boundaries catch JavaScript errors in child components and display a fallb
 		};
 		console.error('Error caught by boundary:', err);
 
-		// Return true to prevent error from bubbling up
+		// Return true to prevent error from bubbling to parent error boundaries
+		// This stops the error here and shows our fallback UI
 		return true;
 	});
 

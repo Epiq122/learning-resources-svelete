@@ -19,31 +19,31 @@ By the end of this section, you will:
 ## Table of Contents
 
 - [Section 18: Rendering Strategies \& Pre-rendering](#section-18-rendering-strategies--pre-rendering)
-	- [📚 Learning Objectives](#-learning-objectives)
-	- [Table of Contents](#table-of-contents)
-	- [1. SSR, CSR \& Trailing Slashes](#1-ssr-csr--trailing-slashes)
-		- [Understanding Rendering Modes](#understanding-rendering-modes)
-	- [2. Pre-rendering Routes \& Building the App](#2-pre-rendering-routes--building-the-app)
-		- [Static Site Generation](#static-site-generation)
-	- [3. Pre-rendering Endpoints](#3-pre-rendering-endpoints)
-		- [Static API Responses](#static-api-responses)
-	- [4. Pre-rendering with Dynamic Data](#4-pre-rendering-with-dynamic-data)
-		- [Database Data at Build Time](#database-data-at-build-time)
-	- [5. Pre-rendering Dynamic Parameters](#5-pre-rendering-dynamic-parameters)
-		- [Generating Multiple Static Pages](#generating-multiple-static-pages)
-	- [6. Adding Dynamic Content to Pre-rendered Pages](#6-adding-dynamic-content-to-pre-rendered-pages)
-		- [Hybrid Rendering Approach](#hybrid-rendering-approach)
-	- [7. Complete Example: Documentation Site with Blog](#7-complete-example-documentation-site-with-blog)
-		- [Full Pre-rendering Strategy](#full-pre-rendering-strategy)
-		- [📁 Project Structure](#-project-structure)
-		- [Configuration](#configuration)
-		- [Database Schema](#database-schema)
-		- [Documentation Pages](#documentation-pages)
-		- [Blog List](#blog-list)
-		- [Blog Post](#blog-post)
-		- [Robots.txt](#robotstxt)
-	- [📝 Key Takeaways](#-key-takeaways)
-	- [🚀 Next Steps](#-next-steps)
+  - [📚 Learning Objectives](#-learning-objectives)
+  - [Table of Contents](#table-of-contents)
+  - [1. SSR, CSR \& Trailing Slashes](#1-ssr-csr--trailing-slashes)
+    - [Understanding Rendering Modes](#understanding-rendering-modes)
+  - [2. Pre-rendering Routes \& Building the App](#2-pre-rendering-routes--building-the-app)
+    - [Static Site Generation](#static-site-generation)
+  - [3. Pre-rendering Endpoints](#3-pre-rendering-endpoints)
+    - [Static API Responses](#static-api-responses)
+  - [4. Pre-rendering with Dynamic Data](#4-pre-rendering-with-dynamic-data)
+    - [Database Data at Build Time](#database-data-at-build-time)
+  - [5. Pre-rendering Dynamic Parameters](#5-pre-rendering-dynamic-parameters)
+    - [Generating Multiple Static Pages](#generating-multiple-static-pages)
+  - [6. Adding Dynamic Content to Pre-rendered Pages](#6-adding-dynamic-content-to-pre-rendered-pages)
+    - [Hybrid Rendering Approach](#hybrid-rendering-approach)
+  - [7. Complete Example: Documentation Site with Blog](#7-complete-example-documentation-site-with-blog)
+    - [Full Pre-rendering Strategy](#full-pre-rendering-strategy)
+    - [📁 Project Structure](#-project-structure)
+    - [Configuration](#configuration)
+    - [Database Schema](#database-schema)
+    - [Documentation Pages](#documentation-pages)
+    - [Blog List](#blog-list)
+    - [Blog Post](#blog-post)
+    - [Robots.txt](#robotstxt)
+  - [📝 Key Takeaways](#-key-takeaways)
+  - [🚀 Next Steps](#-next-steps)
 
 ---
 
@@ -79,16 +79,25 @@ export const csr = true;
 
 ```typescript
 // Marketing pages - Pre-render for speed
+// Marketing pages - Pre-render for speed and SEO
 // src/routes/(marketing)/about/+page.ts
+// prerender = true: Page HTML generated at BUILD time, not request time
+// Perfect for static content that rarely changes
 export const prerender = true;
 
 // Dashboard - SSR for fresh data + CSR for interactivity
 // src/routes/(app)/dashboard/+page.ts
+// ssr = true: Server renders on each request (default)
+// csr = true: Hydrates on client for interactivity (default)
+// Best for dynamic, user-specific data
 export const ssr = true;
 export const csr = true;
 
-// Admin panel - CSR only (lots of client-side state)
+// Admin panel - CSR only (SPA mode)
 // src/routes/(admin)/+layout.ts
+// ssr = false: No server rendering, client-only
+// csr = true: Pure SPA behavior
+// Use when heavy client state or not concerned with SEO
 export const ssr = false;
 export const csr = true;
 
@@ -101,27 +110,27 @@ export const prerender = true;
 
 ```typescript
 // svelte.config.js
-import adapter from '@sveltejs/adapter-auto';
+import adapter from "@sveltejs/adapter-auto";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-	kit: {
-		adapter: adapter(),
+  kit: {
+    adapter: adapter(),
 
-		// Trailing slash options:
-		// 'never' - /about (default)
-		// 'always' - /about/
-		// 'ignore' - both work
-		trailingSlash: 'never',
+    // Trailing slash options:
+    // 'never' - /about (default)
+    // 'always' - /about/
+    // 'ignore' - both work
+    trailingSlash: "never",
 
-		// Pre-render configuration
-		prerender: {
-			entries: ['*'], // Crawl all pages
-			crawl: true, // Follow links to find pages
-			handleHttpError: 'warn', // How to handle errors
-			handleMissingId: 'warn'
-		}
-	}
+    // Pre-render configuration
+    prerender: {
+      entries: ["*"], // Crawl all pages
+      crawl: true, // Follow links to find pages
+      handleHttpError: "warn", // How to handle errors
+      handleMissingId: "warn",
+    },
+  },
 };
 
 export default config;
@@ -131,7 +140,7 @@ export default config;
 
 ```typescript
 // src/routes/blog/+page.ts
-export const trailingSlash = 'always'; // /blog/ only
+export const trailingSlash = "always"; // /blog/ only
 ```
 
 > 💡 **Best Practice**: Choose one trailing slash strategy and stick with it for SEO consistency.
@@ -166,11 +175,11 @@ export const prerender = true;
 ```json
 // package.json
 {
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build",
-		"preview": "vite preview"
-	}
+  "scripts": {
+    "dev": "vite dev",
+    "build": "vite build",
+    "preview": "vite preview"
+  }
 }
 ```
 
@@ -205,7 +214,7 @@ npm run preview
 
 ```typescript
 // src/routes/blog/+page.ts
-import { dev } from '$app/environment';
+import { dev } from "$app/environment";
 
 // Only pre-render in production
 export const prerender = !dev;
@@ -249,19 +258,19 @@ Pre-render API endpoints that return static data.
 
 ```typescript
 // src/routes/api/config/+server.ts
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const prerender = true;
 
 export const GET: RequestHandler = async () => {
-	// This response is generated at build time
-	return json({
-		apiVersion: '1.0.0',
-		features: ['auth', 'workspaces', 'pages'],
-		maxUploadSize: 5242880, // 5MB
-		supportEmail: 'support@example.com'
-	});
+  // This response is generated at build time
+  return json({
+    apiVersion: "1.0.0",
+    features: ["auth", "workspaces", "pages"],
+    maxUploadSize: 5242880, // 5MB
+    supportEmail: "support@example.com",
+  });
 };
 ```
 
@@ -269,20 +278,26 @@ export const GET: RequestHandler = async () => {
 
 ```typescript
 // src/routes/sitemap.xml/+server.ts
-import { db } from '$lib/server/db';
-import { workspaces, pages } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { RequestHandler } from './$types';
+import { db } from "$lib/server/db";
+import { workspaces, pages } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { RequestHandler } from "./$types";
 
 export const prerender = true;
 
 export const GET: RequestHandler = async () => {
-	// Fetch data at build time
-	const allWorkspaces = await db.select().from(workspaces).where(eq(workspaces.isPublic, true));
+  // Fetch data at build time
+  const allWorkspaces = await db
+    .select()
+    .from(workspaces)
+    .where(eq(workspaces.isPublic, true));
 
-	const allPages = await db.select().from(pages).where(eq(pages.isPublished, true));
+  const allPages = await db
+    .select()
+    .from(pages)
+    .where(eq(pages.isPublished, true));
 
-	const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 	<url>
 		<loc>https://example.com</loc>
@@ -290,19 +305,19 @@ export const GET: RequestHandler = async () => {
 		<priority>1.0</priority>
 	</url>
 	${allWorkspaces
-		.map(
-			(workspace) => `
+    .map(
+      (workspace) => `
 	<url>
 		<loc>https://example.com/workspaces/${workspace.slug}</loc>
 		<changefreq>weekly</changefreq>
 		<priority>0.8</priority>
 	</url>
 	`
-		)
-		.join('')}
+    )
+    .join("")}
 	${allPages
-		.map(
-			(page) => `
+    .map(
+      (page) => `
 	<url>
 		<loc>https://example.com/pages/${page.id}</loc>
 		<lastmod>${page.updatedAt.toISOString()}</lastmod>
@@ -310,16 +325,16 @@ export const GET: RequestHandler = async () => {
 		<priority>0.6</priority>
 	</url>
 	`
-		)
-		.join('')}
+    )
+    .join("")}
 </urlset>`;
 
-	return new Response(sitemap, {
-		headers: {
-			'Content-Type': 'application/xml',
-			'Cache-Control': 'max-age=0, s-maxage=3600'
-		}
-	});
+  return new Response(sitemap, {
+    headers: {
+      "Content-Type": "application/xml",
+      "Cache-Control": "max-age=0, s-maxage=3600",
+    },
+  });
 };
 ```
 
@@ -327,30 +342,30 @@ export const GET: RequestHandler = async () => {
 
 ```typescript
 // src/routes/blog/rss.xml/+server.ts
-import { db } from '$lib/server/db';
-import { posts } from '$lib/server/db/schema';
-import { desc } from 'drizzle-orm';
-import type { RequestHandler } from './$types';
+import { db } from "$lib/server/db";
+import { posts } from "$lib/server/db/schema";
+import { desc } from "drizzle-orm";
+import type { RequestHandler } from "./$types";
 
 export const prerender = true;
 
 export const GET: RequestHandler = async () => {
-	const blogPosts = await db
-		.select()
-		.from(posts)
-		.where(eq(posts.published, true))
-		.orderBy(desc(posts.publishedAt))
-		.limit(20);
+  const blogPosts = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.published, true))
+    .orderBy(desc(posts.publishedAt))
+    .limit(20);
 
-	const rss = `<?xml version="1.0" encoding="UTF-8"?>
+  const rss = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0">
 	<channel>
 		<title>My Blog</title>
 		<link>https://example.com/blog</link>
 		<description>Latest blog posts</description>
 		${blogPosts
-			.map(
-				(post) => `
+      .map(
+        (post) => `
 		<item>
 			<title>${escapeXml(post.title)}</title>
 			<link>https://example.com/blog/${post.slug}</link>
@@ -358,23 +373,23 @@ export const GET: RequestHandler = async () => {
 			<pubDate>${new Date(post.publishedAt).toUTCString()}</pubDate>
 		</item>
 		`
-			)
-			.join('')}
+      )
+      .join("")}
 	</channel>
 </rss>`;
 
-	return new Response(rss, {
-		headers: { 'Content-Type': 'application/xml' }
-	});
+  return new Response(rss, {
+    headers: { "Content-Type": "application/xml" },
+  });
 };
 
 function escapeXml(str: string): string {
-	return str
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&apos;');
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&apos;");
 }
 ```
 
@@ -388,31 +403,31 @@ Fetch database data during build to pre-render pages.
 
 ```typescript
 // src/routes/blog/+page.server.ts
-import { db } from '$lib/server/db';
-import { posts } from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import { posts } from "$lib/server/db/schema";
+import { desc, eq } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const prerender = true;
 
 export const load: PageServerLoad = async () => {
-	// This runs at BUILD TIME, not request time
-	const blogPosts = await db
-		.select({
-			id: posts.id,
-			title: posts.title,
-			slug: posts.slug,
-			excerpt: posts.excerpt,
-			publishedAt: posts.publishedAt,
-			author: posts.authorName
-		})
-		.from(posts)
-		.where(eq(posts.published, true))
-		.orderBy(desc(posts.publishedAt));
+  // This runs at BUILD TIME, not request time
+  const blogPosts = await db
+    .select({
+      id: posts.id,
+      title: posts.title,
+      slug: posts.slug,
+      excerpt: posts.excerpt,
+      publishedAt: posts.publishedAt,
+      author: posts.authorName,
+    })
+    .from(posts)
+    .where(eq(posts.published, true))
+    .orderBy(desc(posts.publishedAt));
 
-	return {
-		posts: blogPosts
-	};
+  return {
+    posts: blogPosts,
+  };
 };
 ```
 
@@ -458,32 +473,42 @@ Use `entries` to specify which dynamic routes to pre-render.
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { posts } from '$lib/server/db/schema';
-import { eq } from 'drizzle-orm';
-import type { PageServerLoad, EntryGenerator } from './$types';
+import { error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { posts } from "$lib/server/db/schema";
+import { eq } from "drizzle-orm";
+import type { PageServerLoad, EntryGenerator } from "./$types";
 
 export const prerender = true;
 
 // Tell SvelteKit which [slug] values to pre-render
+// WITHOUT this, SvelteKit doesn't know which dynamic routes to build
 export const entries: EntryGenerator = async () => {
-	const allPosts = await db
-		.select({ slug: posts.slug })
-		.from(posts)
-		.where(eq(posts.published, true));
+  // Query database at BUILD time to get all post slugs
+  // This runs during 'npm run build', not at request time
+  const allPosts = await db
+    .select({ slug: posts.slug })
+    .from(posts)
+    .where(eq(posts.published, true));
 
-	return allPosts.map((post) => ({ slug: post.slug }));
+  // Return array of parameter objects
+  // SvelteKit will pre-render /blog/post-1, /blog/post-2, etc.
+  // Each object must have keys matching route parameters
+  return allPosts.map((post) => ({ slug: post.slug }));
 };
 
 export const load: PageServerLoad = async ({ params }) => {
-	const [post] = await db.select().from(posts).where(eq(posts.slug, params.slug)).limit(1);
+  const [post] = await db
+    .select()
+    .from(posts)
+    .where(eq(posts.slug, params.slug))
+    .limit(1);
 
-	if (!post) {
-		throw error(404, 'Post not found');
-	}
+  if (!post) {
+    throw error(404, "Post not found");
+  }
 
-	return { post };
+  return { post };
 };
 ```
 
@@ -491,18 +516,18 @@ export const load: PageServerLoad = async ({ params }) => {
 
 ```typescript
 // src/routes/docs/[category]/[page]/+page.server.ts
-import type { EntryGenerator } from './$types';
+import type { EntryGenerator } from "./$types";
 
 export const prerender = true;
 
 export const entries: EntryGenerator = async () => {
-	return [
-		{ category: 'getting-started', page: 'installation' },
-		{ category: 'getting-started', page: 'configuration' },
-		{ category: 'api', page: 'authentication' },
-		{ category: 'api', page: 'workspaces' },
-		{ category: 'guides', page: 'deployment' }
-	];
+  return [
+    { category: "getting-started", page: "installation" },
+    { category: "getting-started", page: "configuration" },
+    { category: "api", page: "authentication" },
+    { category: "api", page: "workspaces" },
+    { category: "guides", page: "deployment" },
+  ];
 };
 ```
 
@@ -513,12 +538,12 @@ export const entries: EntryGenerator = async () => {
 export const prerender = true;
 
 export const entries: EntryGenerator = () => {
-	return [
-		{ catchall: 'about' },
-		{ catchall: 'contact' },
-		{ catchall: 'privacy' },
-		{ catchall: 'terms' }
-	];
+  return [
+    { catchall: "about" },
+    { catchall: "contact" },
+    { catchall: "privacy" },
+    { catchall: "terms" },
+  ];
 };
 ```
 
@@ -536,23 +561,23 @@ Combine pre-rendered content with client-side dynamic data.
 
 ```typescript
 // src/routes/products/+page.server.ts
-import { db } from '$lib/server/db';
-import { products } from '$lib/server/db/schema';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import { products } from "$lib/server/db/schema";
+import type { PageServerLoad } from "./$types";
 
 export const prerender = true;
 
 export const load: PageServerLoad = async () => {
-	// Pre-render initial product data
-	const featuredProducts = await db
-		.select()
-		.from(products)
-		.where(eq(products.featured, true))
-		.limit(6);
+  // Pre-render initial product data
+  const featuredProducts = await db
+    .select()
+    .from(products)
+    .where(eq(products.featured, true))
+    .limit(6);
 
-	return {
-		featuredProducts
-	};
+  return {
+    featuredProducts,
+  };
 };
 ```
 
@@ -749,27 +774,27 @@ src/
 
 ```typescript
 // svelte.config.js
-import adapter from '@sveltejs/adapter-static';
+import adapter from "@sveltejs/adapter-static";
 
 const config = {
-	kit: {
-		adapter: adapter({
-			pages: 'build',
-			assets: 'build',
-			fallback: null,
-			precompress: true,
-			strict: true
-		}),
-		prerender: {
-			entries: ['*'],
-			crawl: true,
-			handleHttpError: ({ path, referrer, message }) => {
-				if (path.startsWith('/api/')) return;
-				throw new Error(message);
-			}
-		},
-		trailingSlash: 'never'
-	}
+  kit: {
+    adapter: adapter({
+      pages: "build",
+      assets: "build",
+      fallback: null,
+      precompress: true,
+      strict: true,
+    }),
+    prerender: {
+      entries: ["*"],
+      crawl: true,
+      handleHttpError: ({ path, referrer, message }) => {
+        if (path.startsWith("/api/")) return;
+        throw new Error(message);
+      },
+    },
+    trailingSlash: "never",
+  },
 };
 
 export default config;
@@ -779,27 +804,27 @@ export default config;
 
 ```typescript
 // src/lib/server/db/schema.ts
-export const docPages = pgTable('doc_pages', {
-	id: serial('id').primaryKey(),
-	category: text('category').notNull(),
-	slug: text('slug').notNull(),
-	title: text('title').notNull(),
-	content: text('content').notNull(),
-	order: integer('order').default(0),
-	updatedAt: timestamp('updated_at').defaultNow()
+export const docPages = pgTable("doc_pages", {
+  id: serial("id").primaryKey(),
+  category: text("category").notNull(),
+  slug: text("slug").notNull(),
+  title: text("title").notNull(),
+  content: text("content").notNull(),
+  order: integer("order").default(0),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 
-export const blogPosts = pgTable('blog_posts', {
-	id: serial('id').primaryKey(),
-	slug: text('slug').notNull().unique(),
-	title: text('title').notNull(),
-	excerpt: text('excerpt').notNull(),
-	content: text('content').notNull(),
-	authorName: text('author_name').notNull(),
-	authorAvatar: text('author_avatar'),
-	published: boolean('published').default(false),
-	publishedAt: timestamp('published_at'),
-	updatedAt: timestamp('updated_at').defaultNow()
+export const blogPosts = pgTable("blog_posts", {
+  id: serial("id").primaryKey(),
+  slug: text("slug").notNull().unique(),
+  title: text("title").notNull(),
+  excerpt: text("excerpt").notNull(),
+  content: text("content").notNull(),
+  authorName: text("author_name").notNull(),
+  authorAvatar: text("author_avatar"),
+  published: boolean("published").default(false),
+  publishedAt: timestamp("published_at"),
+  updatedAt: timestamp("updated_at").defaultNow(),
 });
 ```
 
@@ -807,66 +832,71 @@ export const blogPosts = pgTable('blog_posts', {
 
 ```typescript
 // src/routes/docs/[category]/[slug]/+page.server.ts
-import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { docPages } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
-import type { PageServerLoad, EntryGenerator } from './$types';
+import { error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { docPages } from "$lib/server/db/schema";
+import { eq, and } from "drizzle-orm";
+import type { PageServerLoad, EntryGenerator } from "./$types";
 
 export const prerender = true;
 
 export const entries: EntryGenerator = async () => {
-	const allDocs = await db
-		.select({
-			category: docPages.category,
-			slug: docPages.slug
-		})
-		.from(docPages);
+  const allDocs = await db
+    .select({
+      category: docPages.category,
+      slug: docPages.slug,
+    })
+    .from(docPages);
 
-	return allDocs.map((doc) => ({
-		category: doc.category,
-		slug: doc.slug
-	}));
+  return allDocs.map((doc) => ({
+    category: doc.category,
+    slug: doc.slug,
+  }));
 };
 
 export const load: PageServerLoad = async ({ params }) => {
-	const [doc] = await db
-		.select()
-		.from(docPages)
-		.where(and(eq(docPages.category, params.category), eq(docPages.slug, params.slug)))
-		.limit(1);
+  const [doc] = await db
+    .select()
+    .from(docPages)
+    .where(
+      and(
+        eq(docPages.category, params.category),
+        eq(docPages.slug, params.slug)
+      )
+    )
+    .limit(1);
 
-	if (!doc) {
-		throw error(404, 'Documentation page not found');
-	}
+  if (!doc) {
+    throw error(404, "Documentation page not found");
+  }
 
-	// Get all docs for sidebar
-	const allDocs = await db
-		.select({
-			category: docPages.category,
-			slug: docPages.slug,
-			title: docPages.title,
-			order: docPages.order
-		})
-		.from(docPages)
-		.orderBy(docPages.category, docPages.order);
+  // Get all docs for sidebar
+  const allDocs = await db
+    .select({
+      category: docPages.category,
+      slug: docPages.slug,
+      title: docPages.title,
+      order: docPages.order,
+    })
+    .from(docPages)
+    .orderBy(docPages.category, docPages.order);
 
-	// Group by category
-	const docsByCategory = allDocs.reduce(
-		(acc, doc) => {
-			if (!acc[doc.category]) {
-				acc[doc.category] = [];
-			}
-			acc[doc.category].push(doc);
-			return acc;
-		},
-		{} as Record<string, typeof allDocs>
-	);
+  // Group by category
+  const docsByCategory = allDocs.reduce(
+    (acc, doc) => {
+      if (!acc[doc.category]) {
+        acc[doc.category] = [];
+      }
+      acc[doc.category].push(doc);
+      return acc;
+    },
+    {} as Record<string, typeof allDocs>
+  );
 
-	return {
-		doc,
-		docsByCategory
-	};
+  return {
+    doc,
+    docsByCategory,
+  };
 };
 ```
 
@@ -930,28 +960,28 @@ export const load: PageServerLoad = async ({ params }) => {
 
 ```typescript
 // src/routes/blog/+page.server.ts
-import { db } from '$lib/server/db';
-import { blogPosts } from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
-import type { PageServerLoad } from './$types';
+import { db } from "$lib/server/db";
+import { blogPosts } from "$lib/server/db/schema";
+import { desc, eq } from "drizzle-orm";
+import type { PageServerLoad } from "./$types";
 
 export const prerender = true;
 
 export const load: PageServerLoad = async () => {
-	const posts = await db
-		.select({
-			slug: blogPosts.slug,
-			title: blogPosts.title,
-			excerpt: blogPosts.excerpt,
-			authorName: blogPosts.authorName,
-			authorAvatar: blogPosts.authorAvatar,
-			publishedAt: blogPosts.publishedAt
-		})
-		.from(blogPosts)
-		.where(eq(blogPosts.published, true))
-		.orderBy(desc(blogPosts.publishedAt));
+  const posts = await db
+    .select({
+      slug: blogPosts.slug,
+      title: blogPosts.title,
+      excerpt: blogPosts.excerpt,
+      authorName: blogPosts.authorName,
+      authorAvatar: blogPosts.authorAvatar,
+      publishedAt: blogPosts.publishedAt,
+    })
+    .from(blogPosts)
+    .where(eq(blogPosts.published, true))
+    .orderBy(desc(blogPosts.publishedAt));
 
-	return { posts };
+  return { posts };
 };
 ```
 
@@ -1017,35 +1047,35 @@ export const load: PageServerLoad = async () => {
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import { error } from '@sveltejs/kit';
-import { db } from '$lib/server/db';
-import { blogPosts } from '$lib/server/db/schema';
-import { eq, and } from 'drizzle-orm';
-import type { PageServerLoad, EntryGenerator } from './$types';
+import { error } from "@sveltejs/kit";
+import { db } from "$lib/server/db";
+import { blogPosts } from "$lib/server/db/schema";
+import { eq, and } from "drizzle-orm";
+import type { PageServerLoad, EntryGenerator } from "./$types";
 
 export const prerender = true;
 
 export const entries: EntryGenerator = async () => {
-	const posts = await db
-		.select({ slug: blogPosts.slug })
-		.from(blogPosts)
-		.where(eq(blogPosts.published, true));
+  const posts = await db
+    .select({ slug: blogPosts.slug })
+    .from(blogPosts)
+    .where(eq(blogPosts.published, true));
 
-	return posts.map((post) => ({ slug: post.slug }));
+  return posts.map((post) => ({ slug: post.slug }));
 };
 
 export const load: PageServerLoad = async ({ params }) => {
-	const [post] = await db
-		.select()
-		.from(blogPosts)
-		.where(and(eq(blogPosts.slug, params.slug), eq(blogPosts.published, true)))
-		.limit(1);
+  const [post] = await db
+    .select()
+    .from(blogPosts)
+    .where(and(eq(blogPosts.slug, params.slug), eq(blogPosts.published, true)))
+    .limit(1);
 
-	if (!post) {
-		throw error(404, 'Post not found');
-	}
+  if (!post) {
+    throw error(404, "Post not found");
+  }
 
-	return { post };
+  return { post };
 };
 ```
 
@@ -1053,19 +1083,19 @@ export const load: PageServerLoad = async ({ params }) => {
 
 ```typescript
 // src/routes/robots.txt/+server.ts
-import type { RequestHandler } from './$types';
+import type { RequestHandler } from "./$types";
 
 export const prerender = true;
 
 export const GET: RequestHandler = () => {
-	return new Response(
-		`User-agent: *
+  return new Response(
+    `User-agent: *
 Allow: /
 Sitemap: https://example.com/sitemap.xml`,
-		{
-			headers: { 'Content-Type': 'text/plain' }
-		}
-	);
+    {
+      headers: { "Content-Type": "text/plain" },
+    }
+  );
 };
 ```
 

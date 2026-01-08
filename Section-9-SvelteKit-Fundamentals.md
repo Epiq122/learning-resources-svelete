@@ -143,9 +143,10 @@ npx tailwindcss init
 ```typescript
 import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
-import tailwindcss from "@tailwindcss/vite";
+import tailwindcss from "@tailwindcss/vite"; // Tailwind 4 uses Vite plugin, not PostCSS
 
 export default defineConfig({
+  // Order matters: sveltekit() must come first
   plugins: [sveltekit(), tailwindcss()],
 });
 ```
@@ -161,20 +162,21 @@ npm install -D daisyui@latest
 ```javascript
 /** @type {import('tailwindcss').Config} */
 export default {
+  // Scan all Svelte/TS files for Tailwind classes
   content: ["./src/**/*.{html,js,svelte,ts}"],
   theme: {
-    extend: {},
+    extend: {}, // Add custom colors, spacing, etc. here
   },
   plugins: [require("daisyui")],
   daisyui: {
-    themes: ["light", "dark", "cupcake", "cyberpunk"], // Add your favorite themes
-    darkTheme: "dark", // name of one of the included themes
-    base: true, // applies background color and foreground color
-    styled: true, // include daisyUI colors and design decisions
-    utils: true, // adds responsive and modifier utility classes
-    prefix: "", // prefix for daisyUI classnames (components, modifiers and responsive class names)
-    logs: true, // Shows info about daisyUI version and used config
-    themeRoot: ":root", // The element that receives theme color CSS variables
+    themes: ["light", "dark", "cupcake", "cyberpunk"], // Multiple themes available via data-theme attribute
+    darkTheme: "dark", // Default dark theme
+    base: true, // Apply base styles (recommended: true)
+    styled: true, // Apply component styles (recommended: true)
+    utils: true, // Include utility classes (recommended: true)
+    prefix: "", // Prefix all DaisyUI classes (e.g., "daisy-" → "daisy-btn")
+    logs: true, // Show DaisyUI info in console
+    themeRoot: ":root", // CSS variable scope (usually :root or [data-theme])
   },
 };
 ```
@@ -402,15 +404,16 @@ import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-  preprocess: vitePreprocess(),
+  preprocess: vitePreprocess(), // Process TypeScript, SCSS, etc.
   kit: {
-    adapter: adapter(),
+    adapter: adapter(), // Auto-detect deployment platform
     alias: {
-      $lib: "src/lib",
-      $components: "src/lib/components",
-      $utils: "src/lib/utils",
-      $types: "src/lib/types",
-      $stores: "src/lib/stores",
+      $lib: "src/lib", // Built-in: import from '$lib/...'
+      $components: "src/lib/components", // Custom: import from '$components/...'
+      $utils: "src/lib/utils", // Custom: import from '$utils/...'
+      $types: "src/lib/types", // Custom: import from '$types/...'
+      $stores: "src/lib/stores", // Custom: import from '$stores/...'
+      // Aliases prevent brittle relative imports like '../../../lib/utils'
     },
   },
 };

@@ -98,7 +98,11 @@ Load functions fetch data **before** a page renders. They run on the server duri
 
 ```typescript
 // src/routes/blog/+page.ts
+// Load function runs BEFORE page renders
+// On server during SSR, on client during navigation
 export const load = async () => {
+  // Return data as object - becomes available as 'data' prop in component
+  // This runs on both server and client (universal load)
   return {
     posts: [
       { id: 1, title: "First Post", slug: "first-post" },
@@ -199,12 +203,17 @@ Use `+page.server.ts` for database queries and secrets.
 // src/routes/dashboard/+page.server.ts
 import { db } from "$lib/server/database";
 
+// +page.server.ts = SERVER-ONLY load function
+// NEVER runs on client, safe for database queries and API keys
 export const load = async ({ locals }) => {
   // Only runs on server - safe for secrets!
+  // Can access database, environment variables, secrets
+  // locals.userId was set by hooks.server.ts
   const user = await db.users.findUnique({
     where: { id: locals.userId },
   });
 
+  // Data is automatically serialized and sent to client
   return { user };
 };
 ```
@@ -258,10 +267,13 @@ Access parent load data using `await parent()`.
 ```typescript
 // src/routes/dashboard/settings/+page.ts
 export const load = async ({ parent }) => {
+  // await parent() gets data from parent layout load functions
+  // Waits for parent load to complete, then returns its data
+  // Use this to access user, theme, or other shared data from layouts
   const { user } = await parent(); // Get layout data
 
   return {
-    user, // Pass it down
+    user, // Pass it down to page
     settings: { theme: "dark", notifications: true },
   };
 };
@@ -320,12 +332,16 @@ Create API endpoints with `+server.ts` files.
 // src/routes/api/posts/+server.ts
 import { json } from "@sveltejs/kit";
 
+// GET handler for /api/posts endpoint
+// Export named functions for each HTTP method: GET, POST, PUT, DELETE, PATCH
 export const GET = async () => {
+  // In real app: fetch from database
   const posts = [
     { id: 1, title: "First Post" },
     { id: 2, title: "Second Post" },
   ];
 
+  // json() helper sets proper headers and serializes data
   return json(posts);
 };
 ```
@@ -342,16 +358,20 @@ export const GET = async () => {
 // src/routes/api/posts/+server.ts
 import { json } from "@sveltejs/kit";
 
+// POST handler - processes form submissions and API requests
 export const POST = async ({ request }) => {
+  // Parse JSON body from request
+  // For FormData, use: await request.formData()
   const body = await request.json();
 
-  // Save to database
+  // Save to database (mock here)
   const newPost = {
     id: Date.now(),
     title: body.title,
     content: body.content,
   };
 
+  // Return JSON with 201 Created status
   return json(newPost, { status: 201 });
 };
 ```
@@ -531,17 +551,20 @@ export const load = async ({ url, fetch }) => {
 ```typescript
 // src/routes/dashboard/+page.server.ts
 export const load = async () => {
-  // ❌ Slow: Sequential
-  // const user = await fetchUser();
-  // const stats = await fetchStats();
-  // const notifications = await fetchNotifications();
+  // ❌ Slow: Sequential (waits for each to complete before starting next)
+  // const user = await fetchUser();        // Wait 100ms
+  // const stats = await fetchStats();      // Wait another 100ms
+  // const notifications = await fetchNotifications(); // Wait another 100ms
+  // Total: 300ms
 
-  // ✅ Fast: Parallel
+  // ✅ Fast: Parallel (all three start at once)
+  // Promise.all waits for ALL promises to resolve simultaneously
   const [user, stats, notifications] = await Promise.all([
-    fetchUser(),
-    fetchStats(),
-    fetchNotifications(),
+    fetchUser(), // Starts immediately
+    fetchStats(), // Starts immediately
+    fetchNotifications(), // Starts immediately
   ]);
+  // Total: 100ms (time of slowest request)
 
   return { user, stats, notifications };
 };
@@ -559,10 +582,13 @@ export const load = async () => {
 // src/routes/dashboard/+page.server.ts
 export const load = async () => {
   return {
-    // Fast data - loads immediately
+    // Fast data - awaited, loads immediately (100ms)
+    // Page starts rendering as soon as this resolves
     user: await fetchUser(),
 
-    // Slow data - streams in later
+    // Slow data - NOT awaited, streams in later (5000ms)
+    // Returns a Promise that resolves later
+    // Page doesn't wait for this to start rendering!
     analytics: fetchAnalytics(), // No await!
   };
 };

@@ -59,12 +59,18 @@ import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async () => {
   // Your first query!
+  // select() with no args = SELECT * (all columns)
+  // Type-safe: TypeScript knows exact shape of returned data
   const allWorkspaces = await db
     .select()
     .from(workspaces)
+    // orderBy + desc = newest first (ORDER BY created_at DESC)
     .orderBy(desc(workspaces.createdAt))
+    // limit(10) = only return 10 rows (LIMIT 10)
     .limit(10);
 
+  // Return data to page component
+  // SvelteKit automatically serializes for client
   return {
     workspaces: allWorkspaces,
   };
@@ -147,17 +153,25 @@ export const load: LayoutServerLoad = async ({ locals }) => {
     throw redirect(303, "/login");
   }
 
-  // Query user's workspaces
+  // Query user's workspaces with JOIN
+  // Select specific columns (not SELECT *)
   const userWorkspaces = await db
     .select({
+      // Pick columns from workspace table
       id: workspaces.id,
       name: workspaces.name,
       slug: workspaces.slug,
+      // Pick role from members table
       role: workspaceMembers.role,
     })
+    // Start from workspaceMembers (the join table)
     .from(workspaceMembers)
+    // INNER JOIN workspaces ON workspace_members.workspace_id = workspaces.id
+    // innerJoin only returns rows where match exists in BOTH tables
     .innerJoin(workspaces, eq(workspaceMembers.workspaceId, workspaces.id))
+    // Filter to current user's memberships only
     .where(eq(workspaceMembers.userId, locals.user.id))
+    // Sort alphabetically by workspace name
     .orderBy(workspaces.name);
 
   return {

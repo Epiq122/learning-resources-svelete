@@ -75,15 +75,15 @@ Hooks are functions that run on **every request** before your routes are loaded.
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	console.log('Request:', event.url.pathname);
+  console.log("Request:", event.url.pathname);
 
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	console.log('Response:', response.status);
-	return response;
+  console.log("Response:", response.status);
+  return response;
 };
 ```
 
@@ -101,19 +101,19 @@ The `handle` hook intercepts every server request.
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Before route handler
-	event.locals.requestTime = Date.now();
+  // Before route handler
+  event.locals.requestTime = Date.now();
 
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	// After route handler
-	const duration = Date.now() - event.locals.requestTime;
-	response.headers.set('X-Response-Time', `${duration}ms`);
+  // After route handler
+  const duration = Date.now() - event.locals.requestTime;
+  response.headers.set("X-Response-Time", `${duration}ms`);
 
-	return response;
+  return response;
 };
 ```
 
@@ -131,25 +131,28 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Log all requests
-	console.log(`${event.request.method} ${event.url.pathname}`);
+  // Log all requests
+  console.log(`${event.request.method} ${event.url.pathname}`);
 
-	// Add custom headers to request
-	event.request.headers.set('X-Custom-Header', 'value');
+  // Add custom headers to request
+  event.request.headers.set("X-Custom-Header", "value");
 
-	// Resolve the request
-	const response = await resolve(event);
+  // Resolve the request
+  const response = await resolve(event);
 
-	// Add CORS headers to response
-	if (event.url.pathname.startsWith('/api')) {
-		response.headers.set('Access-Control-Allow-Origin', '*');
-		response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-	}
+  // Add CORS headers to response
+  if (event.url.pathname.startsWith("/api")) {
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE"
+    );
+  }
 
-	return response;
+  return response;
 };
 ```
 
@@ -173,16 +176,16 @@ The `locals` object passes data from hooks to your load functions and endpoints.
 ```typescript
 // src/app.d.ts
 declare global {
-	namespace App {
-		interface Locals {
-			user: {
-				id: string;
-				email: string;
-				role: 'admin' | 'user';
-			} | null;
-			requestId: string;
-		}
-	}
+  namespace App {
+    interface Locals {
+      user: {
+        id: string;
+        email: string;
+        role: "admin" | "user";
+      } | null;
+      requestId: string;
+    }
+  }
 }
 
 export {};
@@ -190,33 +193,33 @@ export {};
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Set request ID for logging
-	event.locals.requestId = crypto.randomUUID();
+  // Set request ID for logging
+  event.locals.requestId = crypto.randomUUID();
 
-	// Check for session cookie
-	const sessionId = event.cookies.get('session');
-	if (sessionId) {
-		event.locals.user = await getUserFromSession(sessionId);
-	} else {
-		event.locals.user = null;
-	}
+  // Check for session cookie
+  const sessionId = event.cookies.get("session");
+  if (sessionId) {
+    event.locals.user = await getUserFromSession(sessionId);
+  } else {
+    event.locals.user = null;
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 ```
 
 ```typescript
 // src/routes/dashboard/+page.server.ts
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Access user from locals!
-	return {
-		user: locals.user
-	};
+  // Access user from locals!
+  return {
+    user: locals.user,
+  };
 };
 ```
 
@@ -230,33 +233,35 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 ```typescript
 // src/hooks.server.ts
-import { redirect } from '@sveltejs/kit';
-import type { Handle } from '@sveltejs/kit';
+import { redirect } from "@sveltejs/kit";
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Get session from cookie
-	const sessionId = event.cookies.get('session');
+  // Get session from cookie
+  const sessionId = event.cookies.get("session");
 
-	if (sessionId) {
-		event.locals.user = await db.getUserBySession(sessionId);
-	}
+  if (sessionId) {
+    event.locals.user = await db.getUserBySession(sessionId);
+  }
 
-	// Protected routes
-	const protectedRoutes = ['/dashboard', '/admin', '/settings'];
-	const isProtected = protectedRoutes.some((route) => event.url.pathname.startsWith(route));
+  // Protected routes
+  const protectedRoutes = ["/dashboard", "/admin", "/settings"];
+  const isProtected = protectedRoutes.some((route) =>
+    event.url.pathname.startsWith(route)
+  );
 
-	if (isProtected && !event.locals.user) {
-		throw redirect(303, `/login?redirect=${event.url.pathname}`);
-	}
+  if (isProtected && !event.locals.user) {
+    throw redirect(303, `/login?redirect=${event.url.pathname}`);
+  }
 
-	// Admin-only routes
-	if (event.url.pathname.startsWith('/admin')) {
-		if (event.locals.user?.role !== 'admin') {
-			throw redirect(303, '/dashboard');
-		}
-	}
+  // Admin-only routes
+  if (event.url.pathname.startsWith("/admin")) {
+    if (event.locals.user?.role !== "admin") {
+      throw redirect(303, "/dashboard");
+    }
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 ```
 
@@ -276,23 +281,23 @@ The `resolve` function accepts options to customize how SvelteKit handles the re
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	// Custom transformations
-	const response = await resolve(event, {
-		// Transform the HTML before sending
-		transformPageChunk: ({ html }) => {
-			return html.replace('%app.version%', '1.0.0');
-		},
+  // Custom transformations
+  const response = await resolve(event, {
+    // Transform the HTML before sending
+    transformPageChunk: ({ html }) => {
+      return html.replace("%app.version%", "1.0.0");
+    },
 
-		// Filter which headers are serialized for client
-		filterSerializedResponseHeaders: (name) => {
-			return name === 'x-custom-header';
-		}
-	});
+    // Filter which headers are serialized for client
+    filterSerializedResponseHeaders: (name) => {
+      return name === "x-custom-header";
+    },
+  });
 
-	return response;
+  return response;
 };
 ```
 
@@ -312,15 +317,15 @@ Control how `fetch` works in load functions.
 
 ```typescript
 // src/hooks.server.ts
-import type { Handle } from '@sveltejs/kit';
+import type { Handle } from "@sveltejs/kit";
 
 export const handle: Handle = async ({ event, resolve }) => {
-	return resolve(event, {
-		// Allow these headers to be read on client
-		filterSerializedResponseHeaders: (name) => {
-			return name === 'x-rate-limit' || name === 'x-api-version';
-		}
-	});
+  return resolve(event, {
+    // Allow these headers to be read on client
+    filterSerializedResponseHeaders: (name) => {
+      return name === "x-rate-limit" || name === "x-api-version";
+    },
+  });
 };
 ```
 
@@ -328,18 +333,18 @@ export const handle: Handle = async ({ event, resolve }) => {
 
 ```typescript
 // src/hooks.server.ts
-import type { HandleFetch } from '@sveltejs/kit';
+import type { HandleFetch } from "@sveltejs/kit";
 
 export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
-	// Add auth token to all API requests
-	if (request.url.startsWith(process.env.API_URL)) {
-		request.headers.set('Authorization', `Bearer ${event.locals.user?.token}`);
-	}
+  // Add auth token to all API requests
+  if (request.url.startsWith(process.env.API_URL)) {
+    request.headers.set("Authorization", `Bearer ${event.locals.user?.token}`);
+  }
 
-	// Add request ID for tracing
-	request.headers.set('X-Request-ID', event.locals.requestId);
+  // Add request ID for tracing
+  request.headers.set("X-Request-ID", event.locals.requestId);
 
-	return fetch(request);
+  return fetch(request);
 };
 ```
 
@@ -353,24 +358,24 @@ Use `error()` for expected errors like 404s.
 
 ```typescript
 // src/routes/blog/[slug]/+page.server.ts
-import { error } from '@sveltejs/kit';
-import type { PageServerLoad } from './$types';
+import { error } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ params }) => {
-	const post = await db.posts.findUnique({ where: { slug: params.slug } });
+  const post = await db.posts.findUnique({ where: { slug: params.slug } });
 
-	if (!post) {
-		throw error(404, {
-			message: 'Post not found',
-			hint: 'Check the URL or browse all posts'
-		});
-	}
+  if (!post) {
+    throw error(404, {
+      message: "Post not found",
+      hint: "Check the URL or browse all posts",
+    });
+  }
 
-	if (!post.published && !event.locals.user?.isAdmin) {
-		throw error(403, 'This post is not published yet');
-	}
+  if (!post.published && !event.locals.user?.isAdmin) {
+    throw error(403, "This post is not published yet");
+  }
 
-	return { post };
+  return { post };
 };
 ```
 
@@ -408,30 +413,35 @@ Use `handleError` hook for unexpected errors (500s).
 
 ```typescript
 // src/hooks.server.ts
-import type { HandleServerError } from '@sveltejs/kit';
+import type { HandleServerError } from "@sveltejs/kit";
 
+// handleError catches ALL unexpected errors (500s)
+// Use error() helper for expected errors (404, 403, etc.)
 export const handleError: HandleServerError = async ({ error, event }) => {
-	// Log to error tracking service (Sentry, etc.)
-	console.error('Unexpected error:', {
-		message: error.message,
-		stack: error.stack,
-		url: event.url.pathname,
-		user: event.locals.user?.id,
-		requestId: event.locals.requestId
-	});
+  // Log to console with full context for debugging
+  // In production, this goes to your logging service
+  console.error("Unexpected error:", {
+    message: error.message,
+    stack: error.stack,
+    url: event.url.pathname,
+    user: event.locals.user?.id,
+    requestId: event.locals.requestId,
+  });
 
-	// Send to monitoring service
-	await logToSentry({
-		error,
-		user: event.locals.user,
-		url: event.url.pathname
-	});
+  // Send to monitoring service (Sentry, Datadog, etc.)
+  // Helps track errors in production
+  await logToSentry({
+    error,
+    user: event.locals.user,
+    url: event.url.pathname,
+  });
 
-	// Return user-friendly message (don't leak internals!)
-	return {
-		message: 'An unexpected error occurred. Our team has been notified.',
-		code: event.locals.requestId // Give user a reference ID
-	};
+  // Return user-friendly message (don't leak internals!)
+  // NEVER return error.stack or sensitive details to client
+  return {
+    message: "An unexpected error occurred. Our team has been notified.",
+    code: event.locals.requestId, // Give user a reference ID for support
+  };
 };
 ```
 
@@ -466,24 +476,24 @@ The `reroute` hook rewrites URLs before routing.
 
 ```typescript
 // src/hooks.ts (universal!)
-import type { Reroute } from '@sveltejs/kit';
+import type { Reroute } from "@sveltejs/kit";
 
 export const reroute: Reroute = ({ url }) => {
-	// Redirect old blog URLs to new structure
-	if (url.pathname.startsWith('/old-blog/')) {
-		return url.pathname.replace('/old-blog/', '/blog/');
-	}
+  // Redirect old blog URLs to new structure
+  if (url.pathname.startsWith("/old-blog/")) {
+    return url.pathname.replace("/old-blog/", "/blog/");
+  }
 
-	// Language routing
-	const match = url.pathname.match(/^\/([a-z]{2})(\/.*)?$/);
-	if (match) {
-		const [, lang, path = '/'] = match;
-		url.searchParams.set('lang', lang);
-		return path;
-	}
+  // Language routing
+  const match = url.pathname.match(/^\/([a-z]{2})(\/.*)?$/);
+  if (match) {
+    const [, lang, path = "/"] = match;
+    url.searchParams.set("lang", lang);
+    return path;
+  }
 
-	// Default: no rerouting
-	return url.pathname;
+  // Default: no rerouting
+  return url.pathname;
 };
 ```
 
@@ -503,15 +513,15 @@ The `transport` hook customizes how data is sent from server to client.
 
 ```typescript
 // src/hooks.ts
-import type { Transport } from '@sveltejs/kit';
+import type { Transport } from "@sveltejs/kit";
 
 export const transport: Transport = ({ data }) => {
-	// Compress large data before sending to client
-	if (JSON.stringify(data).length > 10000) {
-		return compress(data);
-	}
+  // Compress large data before sending to client
+  if (JSON.stringify(data).length > 10000) {
+    return compress(data);
+  }
 
-	return data;
+  return data;
 };
 ```
 
@@ -579,33 +589,33 @@ src/
 ```typescript
 // src/app.d.ts
 interface Tenant {
-	id: string;
-	name: string;
-	subdomain: string;
+  id: string;
+  name: string;
+  subdomain: string;
 }
 
 interface User {
-	id: string;
-	email: string;
-	name: string;
-	role: 'admin' | 'member' | 'guest';
-	tenantId: string;
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "member" | "guest";
+  tenantId: string;
 }
 
 declare global {
-	namespace App {
-		interface Locals {
-			user: User | null;
-			tenant: Tenant | null;
-			requestId: string;
-			requestTime: number;
-		}
-		interface Error {
-			message: string;
-			code?: string;
-			hint?: string;
-		}
-	}
+  namespace App {
+    interface Locals {
+      user: User | null;
+      tenant: Tenant | null;
+      requestId: string;
+      requestTime: number;
+    }
+    interface Error {
+      message: string;
+      code?: string;
+      hint?: string;
+    }
+  }
 }
 
 export {};
@@ -616,78 +626,90 @@ export {};
 ```typescript
 // src/lib/server/db.ts
 export interface Tenant {
-	id: string;
-	name: string;
-	subdomain: string;
+  id: string;
+  name: string;
+  subdomain: string;
 }
 
 export interface User {
-	id: string;
-	email: string;
-	name: string;
-	role: 'admin' | 'member' | 'guest';
-	tenantId: string;
+  id: string;
+  email: string;
+  name: string;
+  role: "admin" | "member" | "guest";
+  tenantId: string;
 }
 
 // Mock data
 const tenants: Tenant[] = [
-	{ id: '1', name: 'Acme Corp', subdomain: 'acme' },
-	{ id: '2', name: 'Tech Startup', subdomain: 'techco' }
+  { id: "1", name: "Acme Corp", subdomain: "acme" },
+  { id: "2", name: "Tech Startup", subdomain: "techco" },
 ];
 
 const users: User[] = [
-	{ id: '1', email: 'admin@acme.com', name: 'Admin User', role: 'admin', tenantId: '1' },
-	{ id: '2', email: 'member@acme.com', name: 'Member User', role: 'member', tenantId: '1' }
+  {
+    id: "1",
+    email: "admin@acme.com",
+    name: "Admin User",
+    role: "admin",
+    tenantId: "1",
+  },
+  {
+    id: "2",
+    email: "member@acme.com",
+    name: "Member User",
+    role: "member",
+    tenantId: "1",
+  },
 ];
 
 const sessions = new Map<string, string>(); // sessionId -> userId
 
 export const db = {
-	tenants: {
-		findBySubdomain: async (subdomain: string) => {
-			return tenants.find((t) => t.subdomain === subdomain);
-		}
-	},
-	users: {
-		findById: async (id: string) => {
-			return users.find((u) => u.id === id);
-		},
-		findByEmail: async (email: string) => {
-			return users.find((u) => u.email === email);
-		}
-	},
-	sessions: {
-		get: (sessionId: string) => sessions.get(sessionId),
-		create: (userId: string) => {
-			const sessionId = crypto.randomUUID();
-			sessions.set(sessionId, userId);
-			return sessionId;
-		},
-		delete: (sessionId: string) => sessions.delete(sessionId)
-	}
+  tenants: {
+    findBySubdomain: async (subdomain: string) => {
+      return tenants.find((t) => t.subdomain === subdomain);
+    },
+  },
+  users: {
+    findById: async (id: string) => {
+      return users.find((u) => u.id === id);
+    },
+    findByEmail: async (email: string) => {
+      return users.find((u) => u.email === email);
+    },
+  },
+  sessions: {
+    get: (sessionId: string) => sessions.get(sessionId),
+    create: (userId: string) => {
+      const sessionId = crypto.randomUUID();
+      sessions.set(sessionId, userId);
+      return sessionId;
+    },
+    delete: (sessionId: string) => sessions.delete(sessionId),
+  },
 };
 ```
 
 ```typescript
 // src/lib/server/auth.ts
-import { db } from './db';
+import { db } from "./db";
 
 export async function validateSession(sessionId: string | undefined) {
-	if (!sessionId) return null;
+  if (!sessionId) return null;
 
-	const userId = db.sessions.get(sessionId);
-	if (!userId) return null;
+  const userId = db.sessions.get(sessionId);
+  if (!userId) return null;
 
-	return await db.users.findById(userId);
+  return await db.users.findById(userId);
 }
 
 export async function login(email: string, password: string) {
-	// In production: verify bcrypt hash
-	const user = await db.users.findByEmail(email);
-	if (!user || password !== 'password123') return null;
+  // In production: verify bcrypt hash
+  const user = await db.users.findByEmail(email);
+  if (!user || password !== "password123") return null;
 
-	const sessionId = db.sessions.create(user.id);
-	return { user, sessionId };
+  const sessionId = db.sessions.create(user.id);
+  return { user, sessionId };
 }
 ```
 
@@ -696,32 +718,36 @@ export async function login(email: string, password: string) {
 ```typescript
 // src/lib/server/rateLimit.ts
 interface RateLimitEntry {
-	count: number;
-	resetAt: number;
+  count: number;
+  resetAt: number;
 }
 
 const limits = new Map<string, RateLimitEntry>();
 
 export function checkRateLimit(
-	key: string,
-	maxRequests = 100,
-	windowMs = 60000
+  key: string,
+  maxRequests = 100,
+  windowMs = 60000
 ): { allowed: boolean; remaining: number; resetAt: number } {
-	const now = Date.now();
-	const entry = limits.get(key);
+  const now = Date.now();
+  const entry = limits.get(key);
 
-	if (!entry || now > entry.resetAt) {
-		const resetAt = now + windowMs;
-		limits.set(key, { count: 1, resetAt });
-		return { allowed: true, remaining: maxRequests - 1, resetAt };
-	}
+  if (!entry || now > entry.resetAt) {
+    const resetAt = now + windowMs;
+    limits.set(key, { count: 1, resetAt });
+    return { allowed: true, remaining: maxRequests - 1, resetAt };
+  }
 
-	if (entry.count >= maxRequests) {
-		return { allowed: false, remaining: 0, resetAt: entry.resetAt };
-	}
+  if (entry.count >= maxRequests) {
+    return { allowed: false, remaining: 0, resetAt: entry.resetAt };
+  }
 
-	entry.count++;
-	return { allowed: true, remaining: maxRequests - entry.count, resetAt: entry.resetAt };
+  entry.count++;
+  return {
+    allowed: true,
+    remaining: maxRequests - entry.count,
+    resetAt: entry.resetAt,
+  };
 }
 ```
 
@@ -730,42 +756,52 @@ export function checkRateLimit(
 ```typescript
 // src/lib/server/logger.ts
 interface LogEntry {
-	level: 'info' | 'warn' | 'error';
-	message: string;
-	timestamp: string;
-	requestId?: string;
-	userId?: string;
-	tenantId?: string;
-	error?: any;
+  level: "info" | "warn" | "error";
+  message: string;
+  timestamp: string;
+  requestId?: string;
+  userId?: string;
+  tenantId?: string;
+  error?: any;
 }
 
 export const logger = {
-	info: (message: string, meta?: any) => {
-		console.log(
-			JSON.stringify({ level: 'info', message, ...meta, timestamp: new Date().toISOString() })
-		);
-	},
+  info: (message: string, meta?: any) => {
+    console.log(
+      JSON.stringify({
+        level: "info",
+        message,
+        ...meta,
+        timestamp: new Date().toISOString(),
+      })
+    );
+  },
 
-	warn: (message: string, meta?: any) => {
-		console.warn(
-			JSON.stringify({ level: 'warn', message, ...meta, timestamp: new Date().toISOString() })
-		);
-	},
+  warn: (message: string, meta?: any) => {
+    console.warn(
+      JSON.stringify({
+        level: "warn",
+        message,
+        ...meta,
+        timestamp: new Date().toISOString(),
+      })
+    );
+  },
 
-	error: (message: string, error: any, meta?: any) => {
-		console.error(
-			JSON.stringify({
-				level: 'error',
-				message,
-				error: {
-					message: error.message,
-					stack: error.stack
-				},
-				...meta,
-				timestamp: new Date().toISOString()
-			})
-		);
-	}
+  error: (message: string, error: any, meta?: any) => {
+    console.error(
+      JSON.stringify({
+        level: "error",
+        message,
+        error: {
+          message: error.message,
+          stack: error.stack,
+        },
+        ...meta,
+        timestamp: new Date().toISOString(),
+      })
+    );
+  },
 };
 ```
 
@@ -773,170 +809,180 @@ export const logger = {
 
 ```typescript
 // src/hooks.server.ts
-import { redirect, error } from '@sveltejs/kit';
-import type { Handle, HandleFetch, HandleServerError } from '@sveltejs/kit';
-import { sequence } from '@sveltejs/kit/hooks';
-import { validateSession } from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import { checkRateLimit } from '$lib/server/rateLimit';
-import { logger } from '$lib/server/logger';
+import { redirect, error } from "@sveltejs/kit";
+import type { Handle, HandleFetch, HandleServerError } from "@sveltejs/kit";
+import { sequence } from "@sveltejs/kit/hooks";
+import { validateSession } from "$lib/server/auth";
+import { db } from "$lib/server/db";
+import { checkRateLimit } from "$lib/server/rateLimit";
+import { logger } from "$lib/server/logger";
 
 // Hook 1: Request tracking & logging
 const trackingHandle: Handle = async ({ event, resolve }) => {
-	event.locals.requestId = crypto.randomUUID();
-	event.locals.requestTime = Date.now();
+  event.locals.requestId = crypto.randomUUID();
+  event.locals.requestTime = Date.now();
 
-	logger.info('Request started', {
-		requestId: event.locals.requestId,
-		method: event.request.method,
-		path: event.url.pathname
-	});
+  logger.info("Request started", {
+    requestId: event.locals.requestId,
+    method: event.request.method,
+    path: event.url.pathname,
+  });
 
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	const duration = Date.now() - event.locals.requestTime;
-	logger.info('Request completed', {
-		requestId: event.locals.requestId,
-		status: response.status,
-		duration: `${duration}ms`
-	});
+  const duration = Date.now() - event.locals.requestTime;
+  logger.info("Request completed", {
+    requestId: event.locals.requestId,
+    status: response.status,
+    duration: `${duration}ms`,
+  });
 
-	response.headers.set('X-Request-ID', event.locals.requestId);
-	response.headers.set('X-Response-Time', `${duration}ms`);
+  response.headers.set("X-Request-ID", event.locals.requestId);
+  response.headers.set("X-Response-Time", `${duration}ms`);
 
-	return response;
+  return response;
 };
 
 // Hook 2: Multi-tenant resolution
 const tenantHandle: Handle = async ({ event, resolve }) => {
-	const host = event.request.headers.get('host') || '';
-	const subdomain = host.split('.')[0];
+  const host = event.request.headers.get("host") || "";
+  const subdomain = host.split(".")[0];
 
-	if (subdomain && subdomain !== 'localhost') {
-		event.locals.tenant = await db.tenants.findBySubdomain(subdomain);
+  if (subdomain && subdomain !== "localhost") {
+    event.locals.tenant = await db.tenants.findBySubdomain(subdomain);
 
-		if (!event.locals.tenant) {
-			throw error(404, 'Tenant not found');
-		}
-	}
+    if (!event.locals.tenant) {
+      throw error(404, "Tenant not found");
+    }
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 
 // Hook 3: Authentication
 const authHandle: Handle = async ({ event, resolve }) => {
-	const sessionId = event.cookies.get('session');
-	event.locals.user = await validateSession(sessionId);
+  const sessionId = event.cookies.get("session");
+  event.locals.user = await validateSession(sessionId);
 
-	// Verify user belongs to tenant
-	if (event.locals.user && event.locals.tenant) {
-		if (event.locals.user.tenantId !== event.locals.tenant.id) {
-			event.cookies.delete('session', { path: '/' });
-			event.locals.user = null;
-			throw redirect(303, '/login');
-		}
-	}
+  // Verify user belongs to tenant
+  if (event.locals.user && event.locals.tenant) {
+    if (event.locals.user.tenantId !== event.locals.tenant.id) {
+      event.cookies.delete("session", { path: "/" });
+      event.locals.user = null;
+      throw redirect(303, "/login");
+    }
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 
 // Hook 4: Authorization
 const authzHandle: Handle = async ({ event, resolve }) => {
-	const path = event.url.pathname;
+  const path = event.url.pathname;
 
-	// Protected routes require authentication
-	if (path.startsWith('/dashboard') || path.startsWith('/settings') || path.startsWith('/admin')) {
-		if (!event.locals.user) {
-			throw redirect(303, `/login?redirect=${path}`);
-		}
-	}
+  // Protected routes require authentication
+  if (
+    path.startsWith("/dashboard") ||
+    path.startsWith("/settings") ||
+    path.startsWith("/admin")
+  ) {
+    if (!event.locals.user) {
+      throw redirect(303, `/login?redirect=${path}`);
+    }
+  }
 
-	// Admin routes require admin role
-	if (path.startsWith('/admin')) {
-		if (event.locals.user?.role !== 'admin') {
-			throw error(403, 'Admin access required');
-		}
-	}
+  // Admin routes require admin role
+  if (path.startsWith("/admin")) {
+    if (event.locals.user?.role !== "admin") {
+      throw error(403, "Admin access required");
+    }
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 
 // Hook 5: Rate limiting
 const rateLimitHandle: Handle = async ({ event, resolve }) => {
-	// Rate limit API routes
-	if (event.url.pathname.startsWith('/api')) {
-		const key = event.locals.user?.id || event.getClientAddress();
-		const limit = checkRateLimit(key, 100, 60000);
+  // Rate limit API routes
+  if (event.url.pathname.startsWith("/api")) {
+    const key = event.locals.user?.id || event.getClientAddress();
+    const limit = checkRateLimit(key, 100, 60000);
 
-		if (!limit.allowed) {
-			throw error(429, 'Too many requests');
-		}
+    if (!limit.allowed) {
+      throw error(429, "Too many requests");
+    }
 
-		const response = await resolve(event);
-		response.headers.set('X-RateLimit-Remaining', limit.remaining.toString());
-		response.headers.set('X-RateLimit-Reset', new Date(limit.resetAt).toISOString());
-		return response;
-	}
+    const response = await resolve(event);
+    response.headers.set("X-RateLimit-Remaining", limit.remaining.toString());
+    response.headers.set(
+      "X-RateLimit-Reset",
+      new Date(limit.resetAt).toISOString()
+    );
+    return response;
+  }
 
-	return resolve(event);
+  return resolve(event);
 };
 
 // Hook 6: Security headers
 const securityHandle: Handle = async ({ event, resolve }) => {
-	const response = await resolve(event);
+  const response = await resolve(event);
 
-	response.headers.set('X-Frame-Options', 'DENY');
-	response.headers.set('X-Content-Type-Options', 'nosniff');
-	response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-	response.headers.set('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set(
+    "Permissions-Policy",
+    "geolocation=(), microphone=(), camera=()"
+  );
 
-	return response;
+  return response;
 };
 
 // Combine all hooks in sequence
 export const handle = sequence(
-	trackingHandle,
-	tenantHandle,
-	authHandle,
-	authzHandle,
-	rateLimitHandle,
-	securityHandle
+  trackingHandle,
+  tenantHandle,
+  authHandle,
+  authzHandle,
+  rateLimitHandle,
+  securityHandle
 );
 
 // Customize fetch in load functions
 export const handleFetch: HandleFetch = async ({ request, fetch, event }) => {
-	// Add auth token to internal API calls
-	if (request.url.startsWith(event.url.origin)) {
-		if (event.locals.user) {
-			request.headers.set('X-User-ID', event.locals.user.id);
-		}
-		if (event.locals.tenant) {
-			request.headers.set('X-Tenant-ID', event.locals.tenant.id);
-		}
-		request.headers.set('X-Request-ID', event.locals.requestId);
-	}
+  // Add auth token to internal API calls
+  if (request.url.startsWith(event.url.origin)) {
+    if (event.locals.user) {
+      request.headers.set("X-User-ID", event.locals.user.id);
+    }
+    if (event.locals.tenant) {
+      request.headers.set("X-Tenant-ID", event.locals.tenant.id);
+    }
+    request.headers.set("X-Request-ID", event.locals.requestId);
+  }
 
-	return fetch(request);
+  return fetch(request);
 };
 
 // Global error handler
 export const handleError: HandleServerError = async ({ error, event }) => {
-	const errorId = crypto.randomUUID();
+  const errorId = crypto.randomUUID();
 
-	logger.error('Unexpected error', error, {
-		errorId,
-		requestId: event.locals.requestId,
-		userId: event.locals.user?.id,
-		tenantId: event.locals.tenant?.id,
-		path: event.url.pathname
-	});
+  logger.error("Unexpected error", error, {
+    errorId,
+    requestId: event.locals.requestId,
+    userId: event.locals.user?.id,
+    tenantId: event.locals.tenant?.id,
+    path: event.url.pathname,
+  });
 
-	// In production: send to Sentry, Datadog, etc.
+  // In production: send to Sentry, Datadog, etc.
 
-	return {
-		message: 'An unexpected error occurred. Please try again.',
-		code: errorId
-	};
+  return {
+    message: "An unexpected error occurred. Please try again.",
+    code: errorId,
+  };
 };
 ```
 
@@ -944,15 +990,15 @@ export const handleError: HandleServerError = async ({ error, event }) => {
 
 ```typescript
 // src/hooks.ts
-import type { Reroute } from '@sveltejs/kit';
+import type { Reroute } from "@sveltejs/kit";
 
 export const reroute: Reroute = ({ url }) => {
-	// Handle legacy URLs
-	if (url.pathname.startsWith('/old-dashboard')) {
-		return url.pathname.replace('/old-dashboard', '/dashboard');
-	}
+  // Handle legacy URLs
+  if (url.pathname.startsWith("/old-dashboard")) {
+    return url.pathname.replace("/old-dashboard", "/dashboard");
+  }
 
-	return url.pathname;
+  return url.pathname;
 };
 ```
 
@@ -1032,37 +1078,37 @@ export const reroute: Reroute = ({ url }) => {
 
 ```typescript
 // src/routes/(auth)/login/+server.ts
-import { login } from '$lib/server/auth';
-import { fail, redirect } from '@sveltejs/kit';
-import type { Actions } from './$types';
+import { login } from "$lib/server/auth";
+import { fail, redirect } from "@sveltejs/kit";
+import type { Actions } from "./$types";
 
 export const actions: Actions = {
-	default: async ({ request, cookies, url }) => {
-		const data = await request.formData();
-		const email = data.get('email')?.toString();
-		const password = data.get('password')?.toString();
+  default: async ({ request, cookies, url }) => {
+    const data = await request.formData();
+    const email = data.get("email")?.toString();
+    const password = data.get("password")?.toString();
 
-		if (!email || !password) {
-			return fail(400, { error: 'Email and password required', email });
-		}
+    if (!email || !password) {
+      return fail(400, { error: "Email and password required", email });
+    }
 
-		const result = await login(email, password);
+    const result = await login(email, password);
 
-		if (!result) {
-			return fail(401, { error: 'Invalid credentials', email });
-		}
+    if (!result) {
+      return fail(401, { error: "Invalid credentials", email });
+    }
 
-		cookies.set('session', result.sessionId, {
-			path: '/',
-			httpOnly: true,
-			sameSite: 'strict',
-			secure: process.env.NODE_ENV === 'production',
-			maxAge: 60 * 60 * 24 * 7
-		});
+    cookies.set("session", result.sessionId, {
+      path: "/",
+      httpOnly: true,
+      sameSite: "strict",
+      secure: process.env.NODE_ENV === "production",
+      maxAge: 60 * 60 * 24 * 7,
+    });
 
-		const redirectTo = url.searchParams.get('redirect') || '/dashboard';
-		throw redirect(303, redirectTo);
-	}
+    const redirectTo = url.searchParams.get("redirect") || "/dashboard";
+    throw redirect(303, redirectTo);
+  },
 };
 ```
 
@@ -1070,13 +1116,13 @@ export const actions: Actions = {
 
 ```typescript
 // src/routes/(app)/+layout.server.ts
-import type { LayoutServerLoad } from './$types';
+import type { LayoutServerLoad } from "./$types";
 
 export const load: LayoutServerLoad = async ({ locals }) => {
-	return {
-		user: locals.user,
-		tenant: locals.tenant
-	};
+  return {
+    user: locals.user,
+    tenant: locals.tenant,
+  };
 };
 ```
 
@@ -1109,17 +1155,17 @@ export const load: LayoutServerLoad = async ({ locals }) => {
 
 ```typescript
 // src/routes/(app)/dashboard/+page.server.ts
-import type { PageServerLoad } from './$types';
+import type { PageServerLoad } from "./$types";
 
 export const load: PageServerLoad = async ({ locals }) => {
-	// Mock dashboard stats
-	return {
-		stats: {
-			users: 42,
-			revenue: 15000,
-			projects: 12
-		}
-	};
+  // Mock dashboard stats
+  return {
+    stats: {
+      users: 42,
+      revenue: 15000,
+      projects: 12,
+    },
+  };
 };
 ```
 
@@ -1204,16 +1250,16 @@ export const load: PageServerLoad = async ({ locals }) => {
 
 ```typescript
 // src/routes/api/health/+server.ts
-import { json } from '@sveltejs/kit';
-import type { RequestHandler } from './$types';
+import { json } from "@sveltejs/kit";
+import type { RequestHandler } from "./$types";
 
 export const GET: RequestHandler = async ({ locals }) => {
-	return json({
-		status: 'ok',
-		timestamp: new Date().toISOString(),
-		requestId: locals.requestId,
-		tenant: locals.tenant?.name
-	});
+  return json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    requestId: locals.requestId,
+    tenant: locals.tenant?.name,
+  });
 };
 ```
 
